@@ -1,5 +1,7 @@
 // Inspired by http://python-gitlab.readthedocs.io/en/stable/
 
+extern crate hyper;
+
 pub mod gitlab;
 pub mod projects;
 
