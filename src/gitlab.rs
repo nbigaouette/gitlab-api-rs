@@ -24,7 +24,7 @@ impl GitLab {
             port:   port,
             private_token: private_token.to_string(),
             client: hyper::Client::new()
-        };
+        }
     }
 
     pub fn new_http(domain: &str, private_token: &str) -> GitLab {
