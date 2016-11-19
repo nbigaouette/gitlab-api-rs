@@ -18,15 +18,13 @@ pub struct GitLab {
 impl GitLab {
 
     pub fn new(scheme: &str, domain: &str, port: u16, private_token: &str) -> GitLab {
-        let gl = GitLab {
+        GitLab {
             scheme: scheme.to_string(),
             domain: domain.to_string(),
             port:   port,
             private_token: private_token.to_string(),
             client: hyper::Client::new()
         };
-
-        gl
     }
 
     pub fn new_http(domain: &str, private_token: &str) -> GitLab {
