@@ -49,7 +49,8 @@ impl GitLab {
 
     pub fn get(&self, command: &str) -> Result<hyper::client::Response, hyper::Error> {
         let url = self.build_url(&command);
-        self.client.get(&url).send()
+        // Close connections after each GET.
+        self.client.get(&url).header(hyper::header::Connection::close()).send()
     }
 
     pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
