@@ -47,13 +47,13 @@ impl GitLab {
                                 self.private_token)
     }
 
+    pub fn get(&self, command: &str) -> Result<hyper::client::Response, hyper::Error> {
+        let url = self.build_url(&command);
+        self.client.get(&url).send()
+    }
+
     pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
-        let url = self.build_url("version");
-
-        let client = hyper::Client::new();
-
-        client.get(&url).send()
-
+        self.get("version")
     }
 
     // pub fn projects(&self) -> ProjectManager {
