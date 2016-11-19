@@ -11,6 +11,7 @@ pub struct GitLab {
     domain: String,
     port: u16,
     private_token: String,
+    client: hyper::Client,
 }
 
 
@@ -22,6 +23,7 @@ impl GitLab {
             domain: domain.to_string(),
             port:   port,
             private_token: private_token.to_string(),
+            client: hyper::Client::new()
         };
 
         gl
