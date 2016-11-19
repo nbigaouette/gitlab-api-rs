@@ -1,5 +1,4 @@
 
-use projects::ProjectManager;
 
 pub const API_VERSION: u16 = 3;
 

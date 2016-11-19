@@ -4,7 +4,7 @@ pub mod gitlab;
 pub mod projects;
 
 pub use gitlab::GitLab;
-pub use projects::ProjectManager;
+// pub use projects::ProjectManager;
 
 
 
