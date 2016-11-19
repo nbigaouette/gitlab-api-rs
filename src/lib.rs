@@ -29,13 +29,13 @@ mod tests {
         println!("gl: {:?}", gl);
         assert_eq!(gl.attempt_connection().unwrap().status, hyper::status::StatusCode::Unauthorized);
 
-        let gl = GitLab::new("http", "gitlab.com", 80, &token);
-        println!("gl: {:?}", gl);
-        assert_eq!(gl.attempt_connection().unwrap().status, hyper::Ok);
-
-        let gl = GitLab::new_http("gitlab.com", &token);
-        println!("gl: {:?}", gl);
-        assert_eq!(gl.attempt_connection().unwrap().status, hyper::Ok);
+        // let gl = GitLab::new("http", "gitlab.com", 80, &token);
+        // println!("gl: {:?}", gl);
+        // assert_eq!(gl.attempt_connection().unwrap().status, hyper::Ok);
+        //
+        // let gl = GitLab::new_http("gitlab.com", &token);
+        // println!("gl: {:?}", gl);
+        // assert_eq!(gl.attempt_connection().unwrap().status, hyper::Ok);
 
         let gl = GitLab::new_https("gitlab.com", &token);
         println!("gl: {:?}", gl);
