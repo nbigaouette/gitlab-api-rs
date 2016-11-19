@@ -2,6 +2,10 @@
 use std::io::Read;  // Trait providing read_to_string()
 
 use hyper;
+use rustc_serialize;
+
+
+use projects;
 
 
 pub const API_VERSION: u16 = 3;
@@ -67,12 +71,29 @@ impl GitLab {
         println!("Headers:\n{}", res.headers);
         println!("####################################################################");
 
-        println!("####################################################################");
+
+        // let fresh_request = Request::get(url);
+        // let streaming_request = fresh_request.start();
+        // let mut response = streaming_request.send();
+        // Ok(response.read_to_string())
+
+        // let mut body = Vec::new::<u8>();
+        // body.resize(, 0);
+        // let result = res.read_exact(&body);
+
+        // println!("####################################################################");
+        println!("----------------------------");
         let mut body = String::new();
-        println!("####################################################################");
-        let result = res.read_to_string(&mut body);
-        println!("####################################################################");
-        println!("body:\n{}", body);
+        println!("----------------------------");
+        res.read_to_string(&mut body).unwrap();
+        // println!("####################################################################");
+        // let result = res.read_to_string(&mut body);
+        // println!("####################################################################");
+        // println!("body:\n{}", body);
+
+        let projects: projects::Projects = rustc_serialize::json::decode(body.as_str()).unwrap();
+        println!("{}", projects.p[0].description);
+
     }
 
     // pub fn projects(&self) -> ProjectManager {
