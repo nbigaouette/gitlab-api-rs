@@ -24,6 +24,9 @@ impl GitLab {
 
         // FIXME: Connect to GitLab
 
+        let url = gl.build_url("version");
+        println!("url: {:?}", url);
+
         gl
     }
 
