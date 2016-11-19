@@ -1,6 +1,7 @@
 // Inspired by http://python-gitlab.readthedocs.io/en/stable/
 
 extern crate hyper;
+extern crate rustc_serialize;
 
 pub mod gitlab;
 pub mod projects;
