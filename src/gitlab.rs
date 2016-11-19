@@ -28,4 +28,14 @@ impl GitLab {
             private_token: private_token.to_string(),
         }
     }
+
+    pub fn build_url(&self, command: &str) -> String {
+        format!("{}://{}:{}/api/v{}/{}?private_token={}",
+                                self.scheme,
+                                self.domain,
+                                self.port,
+                                API_VERSION,
+                                command,
+                                self.private_token)
+    }
 }
