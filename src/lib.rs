@@ -11,22 +11,25 @@ pub use gitlab::GitLab;
 
 
 
-
 #[cfg(test)]
 mod tests {
     use gitlab::GitLab;
+    use hyper;
 
     #[test]
     fn it_works() {
 
         let gl = GitLab::new("http", "gitlab.com", 80, "XXXXXXXXXXXXX");
         println!("gl: {:?}", gl);
+        assert_eq!(gl.attempt_connection().unwrap().status, hyper::status::StatusCode::Unauthorized);
 
         let gl = GitLab::new_http("gitlab.com", "XXXXXXXXXXXXX");
         println!("gl: {:?}", gl);
+        assert_eq!(gl.attempt_connection().unwrap().status, hyper::status::StatusCode::Unauthorized);
 
         let gl = GitLab::new_https("gitlab.com", "XXXXXXXXXXXXX");
         println!("gl: {:?}", gl);
+        assert_eq!(gl.attempt_connection().unwrap().status, hyper::status::StatusCode::Unauthorized);
 
         println!("gl.build_url(): {:?}", gl.build_url("test"));
 

@@ -4,4 +4,4 @@ version = "0.1.0"
 authors = ["Nicolas Bigaouette <nbigaouette@gmail.com>"]
 
 [dependencies]
-hyper = "0.9"
+hyper = { version = "0.9", default-features = false, features = ["security-framework"] }

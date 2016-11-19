@@ -1,4 +1,6 @@
 
+use hyper;
+
 
 pub const API_VERSION: u16 = 3;
 
@@ -22,11 +24,6 @@ impl GitLab {
             private_token: private_token.to_string(),
         };
 
-        // FIXME: Connect to GitLab
-
-        let url = gl.build_url("version");
-        println!("url: {:?}", url);
-
         gl
     }
 
@@ -46,6 +43,15 @@ impl GitLab {
                                 API_VERSION,
                                 command,
                                 self.private_token)
+    }
+
+    pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
+        let url = self.build_url("version");
+
+        let client = hyper::Client::new();
+
+        client.get(&url).send()
+
     }
 
     // pub fn projects(&self) -> ProjectManager {
