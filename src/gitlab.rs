@@ -1,4 +1,5 @@
 
+use projects::ProjectManager;
 
 pub const API_VERSION: u16 = 3;
 
@@ -44,4 +45,8 @@ impl GitLab {
                                 command,
                                 self.private_token)
     }
+
+    // pub fn projects(&self) -> ProjectManager {
+    //     ProjectManager()
+    // }
 }

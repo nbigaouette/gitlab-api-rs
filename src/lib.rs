@@ -1,8 +1,10 @@
 // Inspired by http://python-gitlab.readthedocs.io/en/stable/
 
 pub mod gitlab;
+pub mod projects;
 
 pub use gitlab::GitLab;
+pub use projects::ProjectManager;
 
 
 
