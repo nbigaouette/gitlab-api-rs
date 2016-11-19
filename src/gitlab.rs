@@ -1,4 +1,6 @@
 
+use std::io::Read;  // Trait providing read_to_string()
+
 use hyper;
 
 
@@ -54,7 +56,47 @@ impl GitLab {
         self.get("version")
     }
 
+    pub fn projects(&self) {
+        let mut res: hyper::client::Response = self.get("projects").unwrap();
+        println!("####################################################################");
+        println!("res: {:?}", res);
+        println!("####################################################################");
+        println!("Response: {}", res.status);
+        println!("####################################################################");
+        println!("Headers:\n{}", res.headers);
+        println!("####################################################################");
+
+        println!("####################################################################");
+        let mut body = String::new();
+        println!("####################################################################");
+        let result = res.read_to_string(&mut body);
+        println!("####################################################################");
+        println!("body:\n{}", body);
+    }
+
     // pub fn projects(&self) -> ProjectManager {
     //     ProjectManager()
     // }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use std::env;
+    use gitlab::GitLab;
+
+    #[test]
+    fn list_projects() {
+        let token = match env::var("GITLAB_TOKEN") {
+            Ok(val) => val,
+            Err(_)  => panic!("Please set environment variable 'GITLAB_TOKEN'"),
+        };
+
+        let gl = GitLab::new_https("gitlab.com", &token);
+        println!("gl: {:?}", gl);
+
+        gl.projects();
+        // assert_eq!(gl.attempt_connection().unwrap().status, hyper::Ok);
+
+    }
 }
