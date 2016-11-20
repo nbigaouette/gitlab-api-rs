@@ -57,13 +57,15 @@ impl GitLab {
     }
 
     pub fn build_url(&self, command: &str) -> String {
-        format!("{}://{}:{}/api/v{}/{}?private_token={}",
+        format!("{}://{}:{}/api/v{}/{}?private_token={}&page={}&per_page={}",
                                 self.scheme,
                                 self.domain,
                                 self.port,
                                 API_VERSION,
                                 command,
-                                self.private_token)
+                                self.private_token,
+                                self.pagination.page,
+                                self.pagination.per_page)
     }
 
     pub fn get(&self, command: &str) -> Result<hyper::client::Response, hyper::Error> {
