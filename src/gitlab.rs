@@ -4,20 +4,18 @@ use std::io::Read;  // Trait providing read_to_string()
 use std::env;
 
 use hyper;
+use serde;
+use serde_json;
 
 
-use projects;
-use groups;
+use Version;
+use Projects;
+use Groups;
 
 
 pub const API_VERSION: u16 = 3;
 
 
-#[derive(Debug)]
-pub struct Version {
-    pub version: String,
-    pub revision: String,
-}
 
 
 #[derive(Debug)]
@@ -92,6 +90,34 @@ impl GitLab {
         self.pagination = pagination;
     }
 
+    pub fn get<T>(&self, command: &str) -> Result<T, serde_json::Error>
+            where T: serde::Deserialize {
+
+        let url = self.build_url(command);
+        let mut res: hyper::client::Response =
+                        self.client
+                        .get(&url)
+                        .header(hyper::header::Connection::close())
+                        .send()
+                        .unwrap();
+
+        let mut body = String::new();
+        res.read_to_string(&mut body).unwrap();
+
+        serde_json::from_str(&body.as_str())
+    }
+
+    pub fn version(&self) -> Result<Version, serde_json::Error> {
+        self.get("version")
+    }
+
+    pub fn groups(&self) -> Result<Groups, serde_json::Error> {
+        self.get("groups")
+    }
+
+    pub fn projects(&self) -> Result<Projects, serde_json::Error> {
+        self.get("projects")
+    }
 }
 
 
@@ -112,8 +138,8 @@ mod tests {
         gl.set_pagination(Pagination{page: 1, per_page: 100});
         println!("gl: {:?}", gl);
 
-        // let groups = gl.groups().unwrap();
-        // println!("groups: {:?}", groups);
+        let groups = gl.groups().unwrap();
+        println!("groups: {:?}", groups);
     }
 
     #[test]
@@ -128,10 +154,10 @@ mod tests {
         //     gl.set_pagination(Pagination{page: i, per_page: 1});
         //     println!("projects: {:?}", gl.projects().unwrap());
         // }
-        //     println!("projects: {:?}", gl.projects().unwrap());
-        // gl.set_pagination(Pagination{page: 1, per_page: 100});
-        // let projects = gl.projects().unwrap();
-
-        // assert_eq!(gl.attempt_connection().unwrap().status, hyper::Ok);
+        gl.set_pagination(Pagination{page: 1, per_page: 100});
+        let projects = gl.projects().unwrap();
+        for project in projects {
+            println!("{:?}", project.path_with_namespace);
+        }
     }
 }
