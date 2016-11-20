@@ -1,6 +1,6 @@
 
 
-#[derive(Debug, RustcDecodable, RustcEncodable)]
+#[derive(Debug)]
 pub struct ProjectOwner {
     pub name: String,
     pub username: String,
@@ -11,13 +11,13 @@ pub struct ProjectOwner {
 }
 
 
-#[derive(Debug, RustcDecodable, RustcEncodable)]
+#[derive(Debug)]
 struct ProjectNamespaceAvatar {
     url: Option<String>,
 }
 
 
-#[derive(Debug, RustcDecodable, RustcEncodable)]
+#[derive(Debug)]
 struct ProjectNamespace {
     id: i64,
     name: String,
@@ -42,7 +42,7 @@ struct ProjectNamespace {
 }
 
 
-#[derive(Debug, RustcDecodable, RustcEncodable)]
+#[derive(Debug)]
 struct ProjectForkedFrom {
     id: i64,
     http_url_to_repo: String,
@@ -54,19 +54,19 @@ struct ProjectForkedFrom {
 }
 
 
-#[derive(Debug, RustcDecodable, RustcEncodable)]
+#[derive(Debug)]
 struct ProjectAccess {
     access_level: i64,
     notification_level: i64,
 }
 
-#[derive(Debug, RustcDecodable, RustcEncodable)]
+#[derive(Debug)]
 struct ProjectPermissions {
     project_access: Option<ProjectAccess>,
     group_access: Option<ProjectAccess>,
 }
 
-#[derive(Debug, RustcDecodable, RustcEncodable)]
+#[derive(Debug)]
 struct ProjectSharedWithGroup {
     group_id: i64,
     group_name: String,
@@ -76,7 +76,7 @@ struct ProjectSharedWithGroup {
 
 // https://users.rust-lang.org/t/what-am-i-doing-wrong-go-program-is-12x-faster-than-rust/5692/13
 // https://doc.rust-lang.org/rustc-serialize/rustc_serialize/json/index.html
-#[derive(Debug, RustcDecodable, RustcEncodable)]
+#[derive(Debug)]
 pub struct Project {
     id: i64,
     description: String,

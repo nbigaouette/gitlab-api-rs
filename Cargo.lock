@@ -3,7 +3,6 @@ name = "gitlab-api"
 version = "0.1.0"
 dependencies = [
  "hyper 0.9.12 (registry+https://github.com/rust-lang/crates.io-index)",
- "rustc-serialize 0.3.21 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

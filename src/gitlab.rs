@@ -4,7 +4,6 @@ use std::io::Read;  // Trait providing read_to_string()
 use std::env;
 
 use hyper;
-use rustc_serialize;
 
 
 use projects;
@@ -14,7 +13,7 @@ use groups;
 pub const API_VERSION: u16 = 3;
 
 
-#[derive(Debug, RustcDecodable, RustcEncodable)]
+#[derive(Debug)]
 pub struct Version {
     pub version: String,
     pub revision: String,
@@ -93,34 +92,6 @@ impl GitLab {
         self.pagination = pagination;
     }
 
-    pub fn get<T>(&self, command: &str) -> Result<T, rustc_serialize::json::DecoderError>
-            where T: rustc_serialize::Decodable {
-
-        let url = self.build_url(command);
-        let mut res: hyper::client::Response =
-                        self.client
-                        .get(&url)
-                        .header(hyper::header::Connection::close())
-                        .send()
-                        .unwrap();
-
-        let mut body = String::new();
-        res.read_to_string(&mut body).unwrap();
-
-        rustc_serialize::json::decode(body.as_str())
-    }
-
-    pub fn version(&self) -> Result<Version, rustc_serialize::json::DecoderError> {
-        self.get("version")
-    }
-
-    pub fn groups(&self) -> Result<groups::Groups, rustc_serialize::json::DecoderError> {
-        self.get("groups")
-    }
-
-    pub fn projects(&self) -> Result<projects::Projects, rustc_serialize::json::DecoderError> {
-        self.get("projects")
-    }
 }
 
 
@@ -141,8 +112,8 @@ mod tests {
         gl.set_pagination(Pagination{page: 1, per_page: 100});
         println!("gl: {:?}", gl);
 
-        let groups = gl.groups().unwrap();
-        println!("groups: {:?}", groups);
+        // let groups = gl.groups().unwrap();
+        // println!("groups: {:?}", groups);
     }
 
     #[test]
@@ -158,10 +129,9 @@ mod tests {
         //     println!("projects: {:?}", gl.projects().unwrap());
         // }
         //     println!("projects: {:?}", gl.projects().unwrap());
-        gl.set_pagination(Pagination{page: 1, per_page: 100});
-        let projects = gl.projects().unwrap();
+        // gl.set_pagination(Pagination{page: 1, per_page: 100});
+        // let projects = gl.projects().unwrap();
 
         // assert_eq!(gl.attempt_connection().unwrap().status, hyper::Ok);
-
     }
 }
