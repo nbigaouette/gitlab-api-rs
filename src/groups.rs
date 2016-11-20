@@ -14,7 +14,4 @@ pub struct Group {
     pub request_access_enabled: bool,
 }
 
-#[derive(Debug, RustcDecodable, RustcEncodable)]
-pub struct Groups {
-    pub g: Vec<Group>,
-}
+pub type Groups = Vec<Group>;

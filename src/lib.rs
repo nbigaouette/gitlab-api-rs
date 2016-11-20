@@ -9,7 +9,7 @@ pub mod projects;
 
 pub use gitlab::Pagination;
 pub use gitlab::GitLab;
-pub use groups::{Group,Groups};
+pub use groups::Group;
 pub use projects::{Project,Projects};
 
 
