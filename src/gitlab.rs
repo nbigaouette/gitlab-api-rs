@@ -48,7 +48,6 @@ impl GitLab {
             private_token: private_token.to_string(),
             client: match env::var("HTTP_PROXY") {
                 Ok(proxy) => {
-                    println!("proxy: {:?}", proxy);
                     let proxy: Vec<&str> = proxy.trim_left_matches("http://").split(':').collect();
                     let hostname = proxy[0].to_string();
                     let port = proxy[1];
