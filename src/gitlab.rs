@@ -120,7 +120,7 @@ impl GitLab {
     }
 
     pub fn projects(&self) -> Result<projects::Projects, rustc_serialize::json::DecoderError> {
-        self.get("groups")
+        self.get("projects")
     }
 }
 
