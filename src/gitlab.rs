@@ -78,6 +78,21 @@ impl GitLab {
         self.pagination = pagination;
     }
 
+    pub fn version(&self) -> Result<Version, rustc_serialize::json::DecoderError> {
+        let url = self.build_url("version");
+        let mut res: hyper::client::Response =
+                        self.client
+                        .get(&url)
+                        .header(hyper::header::Connection::close())
+                        .send()
+                        .unwrap();
+
+        let mut body = String::new();
+        res.read_to_string(&mut body).unwrap();
+
+        rustc_serialize::json::decode(body.as_str())
+    }
+
     pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
         self.get("version")
     }
