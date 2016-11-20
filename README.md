@@ -2,6 +2,7 @@
 
 Rust wrapper to the GitLab API.
 
+[![Build Status](https://travis-ci.org/nbigaouette/gitlab-api-rs.svg?branch=master)](https://travis-ci.org/nbigaouette/gitlab-api-rs)
 
 
 ## Licensing
