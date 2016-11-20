@@ -1,6 +1,8 @@
 
 use std::io::Read;  // Trait providing read_to_string()
 
+use std::env;
+
 use hyper;
 use rustc_serialize;
 
@@ -44,7 +46,17 @@ impl GitLab {
             domain: domain.to_string(),
             port:   port,
             private_token: private_token.to_string(),
-            client: hyper::Client::new(),
+            client: match env::var("HTTP_PROXY") {
+                Ok(proxy) => {
+                    println!("proxy: {:?}", proxy);
+                    let proxy: Vec<&str> = proxy.trim_left_matches("http://").split(':').collect();
+                    let hostname = proxy[0].to_string();
+                    let port = proxy[1];
+
+                    hyper::Client::with_http_proxy(hostname, port.parse().unwrap())
+                },
+                Err(_) => hyper::Client::new(),
+            },
             pagination: Pagination {page: 1, per_page: 20},
         }
     }
