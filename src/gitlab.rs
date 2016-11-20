@@ -161,6 +161,21 @@ mod tests {
     use gitlab::GitLab;
 
     #[test]
+    fn list_groups() {
+        let token = match env::var("GITLAB_TOKEN") {
+            Ok(val) => val,
+            Err(_)  => panic!("Please set environment variable 'GITLAB_TOKEN'"),
+        };
+
+        let mut gl = GitLab::new_https("gitlab.com", &token);
+        gl.set_pagination(Pagination{page: 1, per_page: 100});
+        println!("gl: {:?}", gl);
+
+        let groups = gl.groups().unwrap();
+        println!("groups: {:?}", groups);
+    }
+
+    #[test]
     fn list_projects() {
         let token = match env::var("GITLAB_TOKEN") {
             Ok(val) => val,
