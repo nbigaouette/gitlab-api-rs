@@ -103,7 +103,7 @@ impl GitLab {
         self.get("version")
     }
 
-    pub fn groups(&self) -> Result<Vec<groups::Group>, rustc_serialize::json::DecoderError> {
+    pub fn groups(&self) -> Result<groups::Groups, rustc_serialize::json::DecoderError> {
         self.get("groups")
     }
 
