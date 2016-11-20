@@ -154,10 +154,13 @@ mod tests {
         };
 
         let mut gl = GitLab::new_https("gitlab.com", &token);
-        for i in 1..82 {
-            gl.set_pagination(Pagination{page: i, per_page: 1});
-            println!("projects: {:?}", gl.projects().unwrap());
-        }
+        // for i in 1..82 {
+        //     gl.set_pagination(Pagination{page: i, per_page: 1});
+        //     println!("projects: {:?}", gl.projects().unwrap());
+        // }
+        //     println!("projects: {:?}", gl.projects().unwrap());
+        gl.set_pagination(Pagination{page: 1, per_page: 100});
+        let projects = gl.projects().unwrap();
 
         // assert_eq!(gl.attempt_connection().unwrap().status, hyper::Ok);
 
