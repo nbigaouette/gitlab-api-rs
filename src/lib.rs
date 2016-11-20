@@ -4,10 +4,12 @@ extern crate hyper;
 extern crate rustc_serialize;
 
 pub mod gitlab;
+pub mod groups;
 pub mod projects;
 
 pub use gitlab::Pagination;
 pub use gitlab::GitLab;
+pub use groups::{Group,Groups};
 pub use projects::{Project,Projects};
 
 

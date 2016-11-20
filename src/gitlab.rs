@@ -6,6 +6,7 @@ use rustc_serialize;
 
 
 use projects;
+use groups;
 
 
 pub const API_VERSION: u16 = 3;
@@ -100,6 +101,10 @@ impl GitLab {
 
     pub fn version(&self) -> Result<Version, rustc_serialize::json::DecoderError> {
         self.get("version")
+    }
+
+    pub fn groups(&self) -> Result<Vec<groups::Group>, rustc_serialize::json::DecoderError> {
+        self.get("groups")
     }
 
     pub fn projects(&self) {
