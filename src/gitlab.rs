@@ -78,7 +78,6 @@ impl GitLab {
     }
 
     pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
-        // self.get("version")
         let url = self.build_url("version");
         // Close connections after each GET.
         let res = self.client.get(&url).header(hyper::header::Connection::close()).send();
