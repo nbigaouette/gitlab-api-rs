@@ -15,4 +15,9 @@ serde_codegen = { version = "0.8", optional = true }
 serde = "0.8"
 serde_derive = { version = "0.8", optional = true }
 serde_json = "0.8"
-hyper = { version = "0.9", default-features = false, features = ["security-framework"] }
+
+
+hyper = "0.9"
+# On OSX, use the following:
+# hyper = { version = "0.9", default-features = false, features = ["security-framework"] }
+
