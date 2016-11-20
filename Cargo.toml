@@ -2,7 +2,17 @@
 name = "gitlab-api"
 version = "0.1.0"
 authors = ["Nicolas Bigaouette <nbigaouette@gmail.com>"]
+build = "build.rs"
+
+[features]
+default = ["serde_codegen"]
+unstable = ["serde_derive"]
+
+[build-dependencies]
+serde_codegen = { version = "0.8", optional = true }
 
 [dependencies]
+serde = "0.8"
+serde_derive = { version = "0.8", optional = true }
+serde_json = "0.8"
 hyper = { version = "0.9", default-features = false, features = ["security-framework"] }
-rustc-serialize = "0.3"

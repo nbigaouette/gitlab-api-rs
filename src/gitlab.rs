@@ -4,21 +4,18 @@ use std::io::Read;  // Trait providing read_to_string()
 use std::env;
 
 use hyper;
-use rustc_serialize;
+use serde;
+use serde_json;
 
 
-use projects;
-use groups;
+use Version;
+use Projects;
+use Groups;
 
 
 pub const API_VERSION: u16 = 3;
 
 
-#[derive(Debug, RustcDecodable, RustcEncodable)]
-pub struct Version {
-    pub version: String,
-    pub revision: String,
-}
 
 
 #[derive(Debug)]
@@ -81,7 +78,6 @@ impl GitLab {
     }
 
     pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
-        // self.get("version")
         let url = self.build_url("version");
         // Close connections after each GET.
         let res = self.client.get(&url).header(hyper::header::Connection::close()).send();
@@ -93,8 +89,8 @@ impl GitLab {
         self.pagination = pagination;
     }
 
-    pub fn get<T>(&self, command: &str) -> Result<T, rustc_serialize::json::DecoderError>
-            where T: rustc_serialize::Decodable {
+    pub fn get<T>(&self, command: &str) -> Result<T, serde_json::Error>
+            where T: serde::Deserialize {
 
         let url = self.build_url(command);
         let mut res: hyper::client::Response =
@@ -107,18 +103,18 @@ impl GitLab {
         let mut body = String::new();
         res.read_to_string(&mut body).unwrap();
 
-        rustc_serialize::json::decode(body.as_str())
+        serde_json::from_str(&body.as_str())
     }
 
-    pub fn version(&self) -> Result<Version, rustc_serialize::json::DecoderError> {
+    pub fn version(&self) -> Result<Version, serde_json::Error> {
         self.get("version")
     }
 
-    pub fn groups(&self) -> Result<groups::Groups, rustc_serialize::json::DecoderError> {
+    pub fn groups(&self) -> Result<Groups, serde_json::Error> {
         self.get("groups")
     }
 
-    pub fn projects(&self) -> Result<projects::Projects, rustc_serialize::json::DecoderError> {
+    pub fn projects(&self) -> Result<Projects, serde_json::Error> {
         self.get("projects")
     }
 }
@@ -157,11 +153,10 @@ mod tests {
         //     gl.set_pagination(Pagination{page: i, per_page: 1});
         //     println!("projects: {:?}", gl.projects().unwrap());
         // }
-        //     println!("projects: {:?}", gl.projects().unwrap());
         gl.set_pagination(Pagination{page: 1, per_page: 100});
         let projects = gl.projects().unwrap();
-
-        // assert_eq!(gl.attempt_connection().unwrap().status, hyper::Ok);
-
+        for project in projects {
+            println!("{:?}", project.path_with_namespace);
+        }
     }
 }

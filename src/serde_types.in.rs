@@ -1,6 +1,41 @@
 
+// https://users.rust-lang.org/t/what-am-i-doing-wrong-go-program-is-12x-faster-than-rust/5692/13
+// https://doc.rust-lang.org/rustc-serialize/rustc_serialize/json/index.html
+// https://serde.rs/codegen-hybrid.html
 
-#[derive(Debug)]
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Version {
+    pub version: String,
+    pub revision: String,
+}
+
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Group {
+    pub id: i64,
+    pub name: String,
+    pub path: String,
+    pub description: String,
+    pub visibility_level: i64,
+    pub lfs_enabled: bool,
+    pub avatar_url: Option<String>,
+    pub web_url: String,
+    pub request_access_enabled: bool,
+}
+
+pub type Groups = Vec<Group>;
+
+
+
+
+
+
+
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ProjectOwner {
     pub name: String,
     pub username: String,
@@ -11,13 +46,13 @@ pub struct ProjectOwner {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 struct ProjectNamespaceAvatar {
     url: Option<String>,
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 struct ProjectNamespace {
     id: i64,
     name: String,
@@ -42,7 +77,7 @@ struct ProjectNamespace {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 struct ProjectForkedFrom {
     id: i64,
     http_url_to_repo: String,
@@ -54,19 +89,19 @@ struct ProjectForkedFrom {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 struct ProjectAccess {
     access_level: i64,
     notification_level: i64,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 struct ProjectPermissions {
     project_access: Option<ProjectAccess>,
     group_access: Option<ProjectAccess>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 struct ProjectSharedWithGroup {
     group_id: i64,
     group_name: String,
@@ -76,7 +111,7 @@ struct ProjectSharedWithGroup {
 
 // https://users.rust-lang.org/t/what-am-i-doing-wrong-go-program-is-12x-faster-than-rust/5692/13
 // https://doc.rust-lang.org/rustc-serialize/rustc_serialize/json/index.html
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Project {
     id: i64,
     description: String,
