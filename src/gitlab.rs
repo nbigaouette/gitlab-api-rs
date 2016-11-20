@@ -11,6 +11,13 @@ use projects;
 pub const API_VERSION: u16 = 3;
 
 
+#[derive(Debug, RustcDecodable, RustcEncodable)]
+pub struct Version {
+    pub version: String,
+    pub revision: String,
+}
+
+
 #[derive(Debug)]
 pub struct Pagination {
     pub page: u16,
