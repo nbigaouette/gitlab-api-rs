@@ -68,18 +68,23 @@ impl GitLab {
                                 self.pagination.per_page)
     }
 
-    pub fn get(&self, command: &str) -> Result<hyper::client::Response, hyper::Error> {
-        let url = self.build_url(&command);
+    pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
+        // self.get("version")
+        let url = self.build_url("version");
         // Close connections after each GET.
-        self.client.get(&url).header(hyper::header::Connection::close()).send()
+        let res = self.client.get(&url).header(hyper::header::Connection::close()).send();
+
+        res
     }
 
     pub fn set_pagination(&mut self, pagination: Pagination) {
         self.pagination = pagination;
     }
 
-    pub fn version(&self) -> Result<Version, rustc_serialize::json::DecoderError> {
-        let url = self.build_url("version");
+    pub fn get<T>(&self, command: &str) -> Result<T, rustc_serialize::json::DecoderError>
+            where T: rustc_serialize::Decodable {
+
+        let url = self.build_url(command);
         let mut res: hyper::client::Response =
                         self.client
                         .get(&url)
@@ -93,12 +98,19 @@ impl GitLab {
         rustc_serialize::json::decode(body.as_str())
     }
 
-    pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
+    pub fn version(&self) -> Result<Version, rustc_serialize::json::DecoderError> {
         self.get("version")
     }
 
     pub fn projects(&self) {
-        let mut res: hyper::client::Response = self.get("projects").unwrap();
+        // let mut res: hyper::client::Response = self.get("projects").unwrap();
+        let url = self.build_url("projects");
+        let mut res: hyper::client::Response =
+                        self.client
+                        .get(&url)
+                        .header(hyper::header::Connection::close())
+                        .send()
+                        .unwrap();
         println!("####################################################################");
         println!("res: {:?}", res);
         println!("####################################################################");
