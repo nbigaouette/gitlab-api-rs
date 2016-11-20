@@ -91,8 +91,4 @@ pub struct Project {
     // //     "group_access": null
 }
 
-#[derive(Debug, RustcDecodable, RustcEncodable)]
-pub struct Projects {
-    pub p: Vec<Project>,
-}
-
+pub type Projects = Vec<Project>;

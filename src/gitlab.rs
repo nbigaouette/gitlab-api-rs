@@ -107,51 +107,9 @@ impl GitLab {
         self.get("groups")
     }
 
-    pub fn projects(&self) {
-        // let mut res: hyper::client::Response = self.get("projects").unwrap();
-        let url = self.build_url("projects");
-        let mut res: hyper::client::Response =
-                        self.client
-                        .get(&url)
-                        .header(hyper::header::Connection::close())
-                        .send()
-                        .unwrap();
-        println!("####################################################################");
-        println!("res: {:?}", res);
-        println!("####################################################################");
-        println!("Response: {}", res.status);
-        println!("####################################################################");
-        println!("Headers:\n{}", res.headers);
-        println!("####################################################################");
-
-
-        // let fresh_request = Request::get(url);
-        // let streaming_request = fresh_request.start();
-        // let mut response = streaming_request.send();
-        // Ok(response.read_to_string())
-
-        // let mut body = Vec::new::<u8>();
-        // body.resize(, 0);
-        // let result = res.read_exact(&body);
-
-        // println!("####################################################################");
-        println!("----------------------------");
-        let mut body = String::new();
-        println!("----------------------------");
-        res.read_to_string(&mut body).unwrap();
-        // println!("####################################################################");
-        // let result = res.read_to_string(&mut body);
-        // println!("####################################################################");
-        // println!("body:\n{}", body);
-
-        let projects: projects::Projects = rustc_serialize::json::decode(body.as_str()).unwrap();
-        println!("{}", projects.p[0].description);
-
+    pub fn projects(&self) -> Result<projects::Projects, rustc_serialize::json::DecoderError> {
+        self.get("groups")
     }
-
-    // pub fn projects(&self) -> ProjectManager {
-    //     ProjectManager()
-    // }
 }
 
 
@@ -159,6 +117,7 @@ impl GitLab {
 mod tests {
     use std::env;
     use gitlab::GitLab;
+    use gitlab::Pagination;
 
     #[test]
     fn list_groups() {
@@ -182,10 +141,11 @@ mod tests {
             Err(_)  => panic!("Please set environment variable 'GITLAB_TOKEN'"),
         };
 
-        let gl = GitLab::new_https("gitlab.com", &token);
+        let mut gl = GitLab::new_https("gitlab.com", &token);
+        gl.set_pagination(Pagination{page: 1, per_page: 100});
         println!("gl: {:?}", gl);
 
-        gl.projects();
+        println!("projects: {:?}", gl.projects().unwrap());
         // assert_eq!(gl.attempt_connection().unwrap().status, hyper::Ok);
 
     }
