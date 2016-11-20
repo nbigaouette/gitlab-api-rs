@@ -6,6 +6,7 @@ extern crate rustc_serialize;
 pub mod gitlab;
 pub mod projects;
 
+pub use gitlab::Pagination;
 pub use gitlab::GitLab;
 pub use projects::{Project,Projects};
 

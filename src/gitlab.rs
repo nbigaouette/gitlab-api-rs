@@ -12,12 +12,19 @@ pub const API_VERSION: u16 = 3;
 
 
 #[derive(Debug)]
+pub struct Pagination {
+    pub page: u16,
+    pub per_page: u16,
+}
+
+#[derive(Debug)]
 pub struct GitLab {
     scheme: String,
     domain: String,
     port: u16,
     private_token: String,
     client: hyper::Client,
+    pagination: Pagination,
 }
 
 
@@ -29,7 +36,8 @@ impl GitLab {
             domain: domain.to_string(),
             port:   port,
             private_token: private_token.to_string(),
-            client: hyper::Client::new()
+            client: hyper::Client::new(),
+            pagination: Pagination {page: 1, per_page: 20},
         }
     }
 
@@ -55,6 +63,10 @@ impl GitLab {
         let url = self.build_url(&command);
         // Close connections after each GET.
         self.client.get(&url).header(hyper::header::Connection::close()).send()
+    }
+
+    pub fn set_pagination(&mut self, pagination: Pagination) {
+        self.pagination = pagination;
     }
 
     pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
