@@ -44,7 +44,7 @@ mod tests {
         assert_eq!(gl.attempt_connection().unwrap().status, hyper::Ok);
 
         // Example from GitLab: https://docs.gitlab.com/ce/api/#basic-usage
-        let expected_url = "https://gitlab.example.com:443/api/v3/projects?private_token=XXXXXXXXXXXXX";
+        let expected_url = "https://gitlab.example.com:443/api/v3/projects?private_token=XXXXXXXXXXXXX&page=1&per_page=20";
         let gl = GitLab::new_https("gitlab.example.com", "XXXXXXXXXXXXX");
         assert_eq!(gl.build_url("projects"), expected_url);
     }
