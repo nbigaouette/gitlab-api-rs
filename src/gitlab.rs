@@ -65,6 +65,21 @@ impl GitLab {
         GitLab::new("https", &domain, 443, &private_token)
     }
 
+    /// Build a URL used to access GitLab instance, including some parameters.
+    ///
+    /// # Examples
+    ///
+    /// Example from GitLab: https://docs.gitlab.com/ce/api/#basic-usage
+    ///
+    /// ```
+    /// use gitlab_api::GitLab;
+    ///
+    /// let expected_url = "https://gitlab.example.com:443/api/v3/projects?private_token=XXXXXXXXXXXXX&page=1&per_page=20";
+    ///
+    /// let gl = GitLab::new_https("gitlab.example.com", "XXXXXXXXXXXXX");
+    ///
+    /// assert_eq!(gl.build_url("projects"), expected_url);
+    /// ```
     pub fn build_url(&self, command: &str) -> String {
         format!("{}://{}:{}/api/v{}/{}?private_token={}&page={}&per_page={}",
                                 self.scheme,
