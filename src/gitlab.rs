@@ -145,8 +145,8 @@ impl GitLab {
         self.get("projects")
     }
 
-    pub fn listing(&mut self) {
-
+    pub fn groups_listing(&mut self) -> GroupsListing {
+        GroupsListing { }
     }
 }
 
