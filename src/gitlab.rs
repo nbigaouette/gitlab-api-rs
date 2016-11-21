@@ -65,6 +65,21 @@ impl GitLab {
         GitLab::new("https", &domain, 443, &private_token)
     }
 
+    /// Build a URL used to access GitLab instance, including some parameters.
+    ///
+    /// # Examples
+    ///
+    /// Example from GitLab: https://docs.gitlab.com/ce/api/#basic-usage
+    ///
+    /// ```
+    /// use gitlab_api::GitLab;
+    ///
+    /// let expected_url = "https://gitlab.example.com:443/api/v3/projects?private_token=XXXXXXXXXXXXX&page=1&per_page=20";
+    ///
+    /// let gl = GitLab::new_https("gitlab.example.com", "XXXXXXXXXXXXX");
+    ///
+    /// assert_eq!(gl.build_url("projects"), expected_url);
+    /// ```
     pub fn build_url(&self, command: &str) -> String {
         format!("{}://{}:{}/api/v{}/{}?private_token={}&page={}&per_page={}",
                                 self.scheme,
@@ -120,43 +135,12 @@ impl GitLab {
 }
 
 
+/*
 #[cfg(test)]
 mod tests {
-    use std::env;
-    use gitlab::GitLab;
-    use gitlab::Pagination;
 
     #[test]
-    fn list_groups() {
-        let token = match env::var("GITLAB_TOKEN") {
-            Ok(val) => val,
-            Err(_)  => panic!("Please set environment variable 'GITLAB_TOKEN'"),
-        };
-
-        let mut gl = GitLab::new_https("gitlab.com", &token);
-        gl.set_pagination(Pagination{page: 1, per_page: 100});
-        println!("gl: {:?}", gl);
-
-        let groups = gl.groups().unwrap();
-        println!("groups: {:?}", groups);
-    }
-
-    #[test]
-    fn list_projects() {
-        let token = match env::var("GITLAB_TOKEN") {
-            Ok(val) => val,
-            Err(_)  => panic!("Please set environment variable 'GITLAB_TOKEN'"),
-        };
-
-        let mut gl = GitLab::new_https("gitlab.com", &token);
-        // for i in 1..82 {
-        //     gl.set_pagination(Pagination{page: i, per_page: 1});
-        //     println!("projects: {:?}", gl.projects().unwrap());
-        // }
-        gl.set_pagination(Pagination{page: 1, per_page: 100});
-        let projects = gl.projects().unwrap();
-        for project in projects {
-            println!("{:?}", project.path_with_namespace);
-        }
+    fn it_works() {
     }
 }
+*/
