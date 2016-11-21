@@ -11,6 +11,7 @@ use serde_json;
 use Version;
 use Projects;
 use Groups;
+use GroupsListing;
 
 
 pub const API_VERSION: u16 = 3;
@@ -31,6 +32,8 @@ pub struct GitLab {
     private_token: String,
     client: hyper::Client,
     pagination: Pagination,
+
+    groups: GroupsListing,
 }
 
 
@@ -62,6 +65,7 @@ impl GitLab {
                 Err(_) => hyper::Client::new(),
             },
             pagination: Pagination {page: 1, per_page: 20},
+            groups: GroupsListing {},
         }
     }
 
@@ -139,6 +143,10 @@ impl GitLab {
 
     pub fn projects(&self) -> Result<Projects, serde_json::Error> {
         self.get("projects")
+    }
+
+    pub fn listing(&mut self) {
+
     }
 }
 
