@@ -32,8 +32,6 @@ pub struct GitLab {
     private_token: String,
     client: hyper::Client,
     pagination: Pagination,
-
-    groups: GroupsListing,
 }
 
 
@@ -65,7 +63,6 @@ impl GitLab {
                 Err(_) => hyper::Client::new(),
             },
             pagination: Pagination {page: 1, per_page: 20},
-            groups: GroupsListing {},
         }
     }
 
