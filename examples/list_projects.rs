@@ -6,9 +6,20 @@ use gitlab::GitLab;
 use gitlab::Pagination;
 
 fn main() {
+    let hostname = match env::var("GITLAB_HOSTNAME") {
+        Ok(val) => val,
+        Err(_)  => {
+            let default = String::from("gitlab.com");
+            println!("Please set environment variable 'GITLAB_HOSTNAME'. Using default '{}'.", default);
+            default
+        },
+    };
+
     let token = match env::var("GITLAB_TOKEN") {
         Ok(val) => val,
-        Err(_)  => panic!("Please set environment variable 'GITLAB_TOKEN'"),
+        Err(_)  => {
+            panic!("Please set environment variable 'GITLAB_TOKEN'. Take it from http://{}/profile/account", hostname);
+        },
     };
 
     let mut gl = GitLab::new_https("gitlab.com", &token);
