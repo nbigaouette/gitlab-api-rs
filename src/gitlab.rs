@@ -142,8 +142,10 @@ impl GitLab {
         self.get("projects")
     }
 
-    pub fn groups_listing(&mut self) -> GroupListing {
-        GroupListing { }
+    // pub fn groups_listing(&mut self) -> GroupListing {
+    pub fn groups_listing(&mut self) {
+        // Default::default()
+        // GroupListing { options: Default::default() }
     }
 }
 
