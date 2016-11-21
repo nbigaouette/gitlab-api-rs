@@ -1,5 +1,6 @@
 
-pub struct GroupsListing {
+use Groups;
+
 // https://docs.gitlab.com/ce/api/groups.html
 // List groups:                 GET /groups
 // List owned groups:           GET /groups/owned
@@ -11,4 +12,16 @@ pub struct GroupsListing {
 // Remove group:                DELETE /groups/:id
 // Search for group:            GET /groups?search=foobar
 
+
+pub struct GroupsListing {
+
+}
+
+
+impl GroupsListing {
+    fn list(&self) -> Groups {
+        let groups: Groups = vec![];
+
+        groups
+    }
 }
