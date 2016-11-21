@@ -1,6 +1,5 @@
 
 use std::io::Read;  // Trait providing read_to_string()
-
 use std::env;
 
 use hyper;
