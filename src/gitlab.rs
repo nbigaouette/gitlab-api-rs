@@ -11,7 +11,7 @@ use serde_json;
 use Version;
 use Projects;
 use Groups;
-use GroupsListing;
+use GroupListing;
 
 
 pub const API_VERSION: u16 = 3;
@@ -142,8 +142,8 @@ impl GitLab {
         self.get("projects")
     }
 
-    pub fn groups_listing(&mut self) -> GroupsListing {
-        GroupsListing { }
+    pub fn groups_listing(&mut self) -> GroupListing {
+        GroupListing { }
     }
 }
 

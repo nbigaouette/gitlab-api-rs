@@ -23,7 +23,7 @@ pub mod projects;
 
 pub use gitlab::Pagination;
 pub use gitlab::GitLab;
-pub use groups::GroupsListing;
+pub use groups::GroupListing;
 // pub use projects::Project;
 
 

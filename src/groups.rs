@@ -13,12 +13,12 @@ use Groups;
 // Search for group:            GET /groups?search=foobar
 
 
-pub struct GroupsListing {
+pub struct GroupListing {
 
 }
 
 
-impl GroupsListing {
+impl GroupListing {
     fn list(&self) -> Groups {
         let groups: Groups = vec![];
 
