@@ -27,6 +27,11 @@ pub use groups::GroupListing;
 // pub use projects::Project;
 
 
+trait BuildQuery {
+    fn build_query(&self) -> String;  // FIXME: Return Result instead.
+}
+
+
 
 #[cfg(test)]
 mod tests {
