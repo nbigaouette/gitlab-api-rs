@@ -28,7 +28,7 @@ pub use gitlab::GitLab;
 
 
 
-
+/*
 #[cfg(test)]
 mod tests {
     use std::env;
@@ -65,3 +65,4 @@ mod tests {
         assert_eq!(gl.build_url("projects"), expected_url);
     }
 }
+*/

@@ -120,6 +120,7 @@ impl GitLab {
 }
 
 
+/*
 #[cfg(test)]
 mod tests {
     use std::env;
@@ -160,3 +161,4 @@ mod tests {
         }
     }
 }
+*/
