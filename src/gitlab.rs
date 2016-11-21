@@ -1,4 +1,5 @@
 
+use std::fmt;
 use std::io::Read;  // Trait providing read_to_string()
 use std::env;
 
@@ -23,7 +24,6 @@ pub struct Pagination {
     pub per_page: u16,
 }
 
-#[derive(Debug)]
 pub struct GitLab {
     scheme: String,
     domain: String,
@@ -31,6 +31,15 @@ pub struct GitLab {
     private_token: String,
     client: hyper::Client,
     pagination: Pagination,
+}
+
+
+// Explicitly implement Debug trait for GitLab so we can hide the token.
+impl fmt::Debug for GitLab {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "GitLab {{ scheme: {}, domain: {}, port: {}, private_token: XXXXXXXXXXXXXXXXXXXX, client: {:?}, pagination: {:?} }}",
+                self.scheme, self.domain, self.port, self.client, self.pagination)
+    }
 }
 
 
