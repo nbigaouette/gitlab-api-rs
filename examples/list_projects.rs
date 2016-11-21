@@ -17,8 +17,9 @@ fn main() {
     //     println!("projects: {:?}", gl.projects().unwrap());
     // }
     gl.set_pagination(Pagination{page: 1, per_page: 100});
-    let projects = gl.projects().unwrap();
-    for project in projects {
-        println!("{:?}", project.path_with_namespace);
-    }
+    let _projects = gl.projects().unwrap();
+    // FIXME: Project's members are private
+    // for project in projects {
+    //     println!("{:?}", project.path_with_namespace);
+    // }
 }
