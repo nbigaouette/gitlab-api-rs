@@ -139,7 +139,7 @@ impl GitLab {
         // FIXME: Properly handle the error. Will require defining our own errors...
         assert_eq!(res.status, hyper::status::StatusCode::Ok);
 
-        serde_json::from_str(&body.as_str())
+        serde_json::from_str(body.as_str())
     }
 
     // pub fn version(&self) -> Result<Version, serde_json::Error> {
