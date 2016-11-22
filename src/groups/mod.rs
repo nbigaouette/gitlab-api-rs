@@ -163,118 +163,94 @@ impl BuildQuery for Listing {
 }
 
 
-#[test]
-fn test_append_group_lister_options_order_by() {
-    let expected_string = "Initialnamepathpathname";
-
-    let mut s = String::from("Initial");
-
-    append_group_lister_options_order_by(ListingOrderBy::Name, &mut s);
-    append_group_lister_options_order_by(ListingOrderBy::Path, &mut s);
-    append_group_lister_options_order_by(ListingOrderBy::Path, &mut s);
-    append_group_lister_options_order_by(ListingOrderBy::Name, &mut s);
-
-    assert_eq!(s, expected_string);
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use BuildQuery;
 
 
-#[test]
-fn test_append_group_lister_options_sort() {
-    let expected_string = "Initialascdescascdesc";
+    #[test]
+    fn groups_build_query_default() {
+        let expected_string = "groups";
+        let listing: Listing = Default::default();
+        let query = listing.build_query();
+        assert_eq!(query, expected_string);
 
-    let mut s = String::from("Initial");
-
-    append_group_lister_options_sort(ListingSort::Asc, &mut s);
-    append_group_lister_options_sort(ListingSort::Desc, &mut s);
-    append_group_lister_options_sort(ListingSort::Asc, &mut s);
-    append_group_lister_options_sort(ListingSort::Desc, &mut s);
-
-    assert_eq!(s, expected_string);
-}
-
-
-#[test]
-fn groups_build_query_default() {
-    let expected_string = "groups";
-    let listing: Listing = Default::default();
-    let query = listing.build_query();
-    assert_eq!(query, expected_string);
-
-    let expected_string = "groups";
-    let listing = Listing::new();
-    let query = listing.build_query();
-    assert_eq!(query, expected_string);
-}
+        let expected_string = "groups";
+        let listing = Listing::new();
+        let query = listing.build_query();
+        assert_eq!(query, expected_string);
+    }
 
 
-#[test]
-fn groups_build_query_skip_groups() {
-    let expected_string = "groups?skip_groups[]=1&skip_groups[]=2&skip_groups[]=3";
-    let query = Listing::new().skip_groups(vec![1, 2, 3]).build_query();
-    assert_eq!(query, expected_string);
-}
+    #[test]
+    fn groups_build_query_skip_groups() {
+        let expected_string = "groups?skip_groups[]=1&skip_groups[]=2&skip_groups[]=3";
+        let query = Listing::new().skip_groups(vec![1, 2, 3]).build_query();
+        assert_eq!(query, expected_string);
+    }
 
 
-#[test]
-fn groups_build_query_all_available() {
-    let expected_string = "groups?all_available=true";
-    let query = Listing::new().all_available(true).build_query();
-    assert_eq!(query, expected_string);
+    #[test]
+    fn groups_build_query_all_available() {
+        let expected_string = "groups?all_available=true";
+        let query = Listing::new().all_available(true).build_query();
+        assert_eq!(query, expected_string);
 
-    let expected_string = "groups?all_available=false";
-    let query = Listing::new().all_available(false).build_query();
-    assert_eq!(query, expected_string);
-}
-
-
-#[test]
-fn groups_build_query_search() {
-    let expected_string = "groups?search=SearchPattern";
-    let query = Listing::new().search(String::from("SearchPattern")).build_query();
-    assert_eq!(query, expected_string);
-}
+        let expected_string = "groups?all_available=false";
+        let query = Listing::new().all_available(false).build_query();
+        assert_eq!(query, expected_string);
+    }
 
 
-#[test]
-fn groups_build_query_order_by_name() {
-    let expected_string = "groups?order_by=name";
-    let query = Listing::new().order_by(ListingOrderBy::Name).build_query();
-    assert_eq!(query, expected_string);
-}
+    #[test]
+    fn groups_build_query_search() {
+        let expected_string = "groups?search=SearchPattern";
+        let query = Listing::new().search(String::from("SearchPattern")).build_query();
+        assert_eq!(query, expected_string);
+    }
 
 
-#[test]
-fn groups_build_query_order_by_path() {
-    let expected_string = "groups?order_by=path";
-    let query = Listing::new().order_by(ListingOrderBy::Path).build_query();
-    assert_eq!(query, expected_string);
-}
+    #[test]
+    fn groups_build_query_order_by_name() {
+        let expected_string = "groups?order_by=name";
+        let query = Listing::new().order_by(ListingOrderBy::Name).build_query();
+        assert_eq!(query, expected_string);
+    }
 
 
-#[test]
-fn groups_build_query_sort() {
-    let expected_string = "groups?sort=asc";
-    let query = Listing::new().sort(ListingSort::Asc).build_query();
-    assert_eq!(query, expected_string);
-
-    let expected_string = "groups?sort=desc";
-    let query = Listing::new().sort(ListingSort::Desc).build_query();
-    assert_eq!(query, expected_string);
-}
+    #[test]
+    fn groups_build_query_order_by_path() {
+        let expected_string = "groups?order_by=path";
+        let query = Listing::new().order_by(ListingOrderBy::Path).build_query();
+        assert_eq!(query, expected_string);
+    }
 
 
+    #[test]
+    fn groups_build_query_sort() {
+        let expected_string = "groups?sort=asc";
+        let query = Listing::new().sort(ListingSort::Asc).build_query();
+        assert_eq!(query, expected_string);
 
-#[test]
-fn groups_build_query_search_order_by_path() {
-    let expected_string = "groups?search=SearchPattern&order_by=path";
-    let query = Listing::new()
-        .order_by(ListingOrderBy::Path)
-        .search(String::from("SearchPattern"))
-        .build_query();
-    assert_eq!(query, expected_string);
-    let query = Listing::new()
-        .search(String::from("SearchPattern"))
-        .order_by(ListingOrderBy::Path)
-        .build_query();
-    assert_eq!(query, expected_string);
+        let expected_string = "groups?sort=desc";
+        let query = Listing::new().sort(ListingSort::Desc).build_query();
+        assert_eq!(query, expected_string);
+    }
+
+
+    #[test]
+    fn groups_build_query_search_order_by_path() {
+        let expected_string = "groups?search=SearchPattern&order_by=path";
+        let query = Listing::new()
+            .order_by(ListingOrderBy::Path)
+            .search(String::from("SearchPattern"))
+            .build_query();
+        assert_eq!(query, expected_string);
+        let query = Listing::new()
+            .search(String::from("SearchPattern"))
+            .order_by(ListingOrderBy::Path)
+            .build_query();
+        assert_eq!(query, expected_string);
+    }
 }
