@@ -111,7 +111,7 @@ impl BuildQuery for Listing {
         });
 
         if !self.skip_groups.is_empty() {
-            query.push_str(&split_char);
+            query.push_str(split_char);
             split_char = &amp_char;
 
             let mut array_split_char = &none_char;
@@ -124,7 +124,7 @@ impl BuildQuery for Listing {
         }
 
         self.all_available.map(|all_available| {
-            query.push_str(&split_char);
+            query.push_str(split_char);
             split_char = &amp_char;
 
             if all_available {
@@ -135,7 +135,7 @@ impl BuildQuery for Listing {
         });
 
         if !self.search.is_empty() {
-            query.push_str(&split_char);
+            query.push_str(split_char);
             split_char = &amp_char;
 
             query.push_str("search=");
@@ -143,7 +143,7 @@ impl BuildQuery for Listing {
         }
 
         self.order_by.map(|order_by| {
-            query.push_str(&split_char);
+            query.push_str(split_char);
             split_char = &amp_char;
 
             query.push_str("order_by=");
@@ -151,7 +151,7 @@ impl BuildQuery for Listing {
         });
 
         self.sort.map(|sort| {
-            query.push_str(&split_char);
+            query.push_str(split_char);
             split_char = &amp_char;
 
             query.push_str("sort=");

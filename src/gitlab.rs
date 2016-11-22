@@ -8,11 +8,8 @@ use serde;
 use serde_json;
 
 
-use Version;
-use Projects;
 use BuildQuery;
 use Groups;
-// use Listing;
 
 
 pub const API_VERSION: u16 = 3;
@@ -76,11 +73,11 @@ impl GitLab {
     }
 
     pub fn new_http(domain: &str, private_token: &str) -> GitLab {
-        GitLab::new("http", &domain, 80, &private_token)
+        GitLab::new("http", domain, 80, private_token)
     }
 
     pub fn new_https(domain: &str, private_token: &str) -> GitLab {
-        GitLab::new("https", &domain, 443, &private_token)
+        GitLab::new("https", domain, 443, private_token)
     }
 
     /// Build a URL used to access GitLab instance, including some parameters.
@@ -101,14 +98,7 @@ impl GitLab {
     /// assert_eq!(gl.build_url("groups?order_by=path"), expected_url);
     /// ```
     pub fn build_url(&self, query: &str) -> String {
-        let expected_url = "https://gitlab.example.com:\
-                            443/api/v3/groups?\
-                            order_by=path&private_token=XXXXXXXXXXXXX&page=1&per_page=20";
-
-        let mut params_splitter = "?";
-        if query.find("?").is_some() {
-            params_splitter = "&";
-        }
+        let params_splitter = if query.find('?').is_some() { "&" } else { "?" };
         format!("{}://{}:{}/api/v{}/{}{}private_token={}&page={}&per_page={}",
                 self.scheme,
                 self.domain,
@@ -124,9 +114,7 @@ impl GitLab {
     pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
         let url = self.build_url("version");
         // Close connections after each GET.
-        let res = self.client.get(&url).header(hyper::header::Connection::close()).send();
-
-        res
+        self.client.get(&url).header(hyper::header::Connection::close()).send()
     }
 
     pub fn set_pagination(&mut self, pagination: Pagination) {
@@ -136,7 +124,7 @@ impl GitLab {
     pub fn get<T>(&self, query: &str) -> Result<T, serde_json::Error>
         where T: serde::Deserialize
     {
-        let url = self.build_url(&query);
+        let url = self.build_url(query);
         info!("url: {:?}", url);
         let mut res: hyper::client::Response = self.client
             .get(&url)
@@ -151,7 +139,7 @@ impl GitLab {
         // FIXME: Properly handle the error. Will require defining our own errors...
         assert_eq!(res.status, hyper::status::StatusCode::Ok);
 
-        serde_json::from_str(&body.as_str())
+        serde_json::from_str(body.as_str())
     }
 
     // pub fn version(&self) -> Result<Version, serde_json::Error> {
