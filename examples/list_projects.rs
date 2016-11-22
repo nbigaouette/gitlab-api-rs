@@ -25,7 +25,7 @@ fn main() {
         }
     };
 
-    let mut gl = GitLab::new_https("gitlab.com", &token);
+    let mut gl = GitLab::new_https(&hostname, &token);
     // for i in 1..82 {
     //     gl.set_pagination(Pagination{page: i, per_page: 1});
     //     println!("projects: {:?}", gl.projects().unwrap());

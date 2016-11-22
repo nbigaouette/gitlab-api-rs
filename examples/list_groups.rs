@@ -8,12 +8,25 @@ use gitlab::{GroupListerOptions, GroupListerOptionsOrderBy};
 
 
 fn main() {
-    let token = match env::var("GITLAB_TOKEN") {
+    let hostname = match env::var("GITLAB_HOSTNAME") {
         Ok(val) => val,
-        Err(_) => panic!("Please set environment variable 'GITLAB_TOKEN'"),
+        Err(_) => {
+            let default = String::from("gitlab.com");
+            println!("Please set environment variable 'GITLAB_HOSTNAME'. Using default '{}'.",
+                     default);
+            default
+        }
     };
 
-    let mut gl = GitLab::new_https("gitlab.com", &token);
+    let token = match env::var("GITLAB_TOKEN") {
+        Ok(val) => val,
+        Err(_) => {
+            panic!("Please set environment variable 'GITLAB_TOKEN'. Take it from \
+                    http://{}/profile/account",
+                   hostname);
+        }
+    };
+    let mut gl = GitLab::new_https(&hostname, &token);
     gl.set_pagination(Pagination {
         page: 1,
         per_page: 100,
