@@ -22,19 +22,12 @@ pub enum ListingOrderBy {
     Path,
 }
 
-// impl Default for ListingOrderBy {
-//     fn default() -> ListingOrderBy { ListingOrderBy::Name }
-// }
 
 #[derive(Debug, Copy, Clone)]
 pub enum ListingSort {
     Asc,
     Desc,
 }
-
-// impl Default for ListingSort {
-//     fn default() -> ListingSort { ListingSort::Asc }
-// }
 
 
 fn append_group_lister_options_order_by(order_by: ListingOrderBy, s: &mut String) {
