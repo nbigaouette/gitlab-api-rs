@@ -98,10 +98,6 @@ impl GitLab {
     /// assert_eq!(gl.build_url("groups?order_by=path"), expected_url);
     /// ```
     pub fn build_url(&self, query: &str) -> String {
-        let expected_url = "https://gitlab.example.com:\
-                            443/api/v3/groups?\
-                            order_by=path&private_token=XXXXXXXXXXXXX&page=1&per_page=20";
-
         let mut params_splitter = "?";
         if query.find("?").is_some() {
             params_splitter = "&";
