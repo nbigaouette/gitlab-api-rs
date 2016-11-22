@@ -191,7 +191,19 @@ fn groups_build_query_default() {
 }
 
 
-// FIXME: Add for 'skip_groups'
+#[test]
+fn groups_build_query_skip_groups() {
+    let expected_string = "groups?skip_groups[]=1&skip_groups[]=2&skip_groups[]=3";
+    let listing = GroupListing {
+        options: GroupListerOptions {
+            skip_groups: Some(vec![1,2,3]),
+            ..Default::default()
+        },
+    };
+    let query = listing.build_query();
+    assert_eq!(query, expected_string);
+}
+
 
 #[test]
 fn groups_build_query_all_available() {
