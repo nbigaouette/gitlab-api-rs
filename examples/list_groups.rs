@@ -29,7 +29,7 @@ fn main() {
                    hostname);
         }
     };
-    let mut gl = GitLab::new_https(&hostname, &token);
+    let mut gl = gitlab::GitLab::new_https(&hostname, &token);
     gl.set_pagination(gitlab::Pagination {
         page: 1,
         per_page: 100,
