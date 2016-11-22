@@ -80,6 +80,7 @@ impl BuildQuery for GroupListing {
         let options = &self.options;
 
         let mut query = String::from("groups");
+        let mut previous_option_present = false;
 
         // FIXME: Add skip_groups
 
@@ -94,26 +95,42 @@ impl BuildQuery for GroupListing {
         });
 
         options.all_available.map(|all_available| {
+            if previous_option_present {
+                query.push_str("&");
+            }
             if all_available {
                 query.push_str("all_available=true")
             } else {
                 query.push_str("all_available=false")
             }
+            previous_option_present = true;
         });
 
         options.search.as_ref().map(|search| {
+            if previous_option_present {
+                query.push_str("&");
+            }
             query.push_str("search=");
             query.push_str(search);
+            previous_option_present = true;
         });
 
         options.order_by.map(|order_by| {
+            if previous_option_present {
+                query.push_str("&");
+            }
             query.push_str("order_by=");
             append_group_lister_options_order_by(order_by, &mut query);
+            previous_option_present = true;
         });
 
         options.sort.map(|sort| {
+            if previous_option_present {
+                query.push_str("&");
+            }
             query.push_str("sort=");
             append_group_lister_options_sort(sort, &mut query);
+            previous_option_present = true;
         });
 
         query
