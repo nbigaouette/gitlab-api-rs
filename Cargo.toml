@@ -21,3 +21,4 @@ hyper = "0.9"
 # On OSX, use the following:
 # hyper = { version = "0.9", default-features = false, features = ["security-framework"] }
 
+clippy = {version = "*", optional = true}
