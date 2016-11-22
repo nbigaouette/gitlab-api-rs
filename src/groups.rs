@@ -164,7 +164,10 @@ fn test_group_lister_build_query() {
 
     let expected_string = "groups?order_by=name";
     let listing = GroupListing {
-        options: GroupListerOptions { order_by: Some(GroupListerOptionsOrderBy::Name), ..Default::default() },
+        options: GroupListerOptions {
+            order_by: Some(GroupListerOptionsOrderBy::Name),
+            ..Default::default()
+        },
     };
     println!("listing: {:?}", listing);
     let query = listing.build_query();
@@ -172,7 +175,10 @@ fn test_group_lister_build_query() {
 
     let expected_string = "groups?order_by=path";
     let listing = GroupListing {
-        options: GroupListerOptions { order_by: Some(GroupListerOptionsOrderBy::Path), ..Default::default() },
+        options: GroupListerOptions {
+            order_by: Some(GroupListerOptionsOrderBy::Path),
+            ..Default::default()
+        },
     };
     println!("listing: {:?}", listing);
     let query = listing.build_query();
