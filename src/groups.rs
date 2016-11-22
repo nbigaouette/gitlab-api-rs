@@ -148,9 +148,7 @@ fn test_append_group_lister_options_sort() {
 
 
 #[test]
-fn test_group_lister_build_query() {
-    // use BuildQuery;
-    // use Groups;
+fn groups_build_query() {
 
     let expected_string = "groups";
     let listing: GroupListing = Default::default();
