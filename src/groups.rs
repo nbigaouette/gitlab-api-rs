@@ -17,13 +17,13 @@ use Groups;
 
 
 #[derive(Debug, Copy, Clone)]
-pub enum GroupListerOptionsOrderBy {
+pub enum ListingOrderBy {
     Name,
     Path,
 }
 
-// impl Default for GroupListerOptionsOrderBy {
-//     fn default() -> GroupListerOptionsOrderBy { GroupListerOptionsOrderBy::Name }
+// impl Default for ListingOrderBy {
+//     fn default() -> ListingOrderBy { ListingOrderBy::Name }
 // }
 
 #[derive(Debug, Copy, Clone)]
@@ -37,10 +37,10 @@ pub enum GroupListerOptionsSort {
 // }
 
 
-fn append_group_lister_options_order_by(order_by: GroupListerOptionsOrderBy, s: &mut String) {
+fn append_group_lister_options_order_by(order_by: ListingOrderBy, s: &mut String) {
     s.push_str(match order_by {
-        GroupListerOptionsOrderBy::Name => "name",
-        GroupListerOptionsOrderBy::Path => "path",
+        ListingOrderBy::Name => "name",
+        ListingOrderBy::Path => "path",
     });
 }
 
@@ -63,7 +63,7 @@ pub struct Listing {
     /// Return list of authorized groups matching the search criteria
     search: String,
     /// Order groups by `name` or `path`. Default is `name`
-    order_by: Option<GroupListerOptionsOrderBy>,
+    order_by: Option<ListingOrderBy>,
     /// Order groups in `asc` or `desc` order. Default is `asc`
     sort: Option<GroupListerOptionsSort>,
 }
@@ -85,7 +85,7 @@ impl Listing {
         self.search = search;
         self
     }
-    pub fn order_by(&mut self, order_by: GroupListerOptionsOrderBy) -> &mut Listing {
+    pub fn order_by(&mut self, order_by: ListingOrderBy) -> &mut Listing {
         self.order_by = Some(order_by);
         self
     }
@@ -174,10 +174,10 @@ fn test_append_group_lister_options_order_by() {
 
     let mut s = String::from("Initial");
 
-    append_group_lister_options_order_by(GroupListerOptionsOrderBy::Name, &mut s);
-    append_group_lister_options_order_by(GroupListerOptionsOrderBy::Path, &mut s);
-    append_group_lister_options_order_by(GroupListerOptionsOrderBy::Path, &mut s);
-    append_group_lister_options_order_by(GroupListerOptionsOrderBy::Name, &mut s);
+    append_group_lister_options_order_by(ListingOrderBy::Name, &mut s);
+    append_group_lister_options_order_by(ListingOrderBy::Path, &mut s);
+    append_group_lister_options_order_by(ListingOrderBy::Path, &mut s);
+    append_group_lister_options_order_by(ListingOrderBy::Name, &mut s);
 
     assert_eq!(s, expected_string);
 }
@@ -243,7 +243,7 @@ fn groups_build_query_search() {
 #[test]
 fn groups_build_query_order_by_name() {
     let expected_string = "groups?order_by=name";
-    let query = Listing::new().order_by(GroupListerOptionsOrderBy::Name).build_query();
+    let query = Listing::new().order_by(ListingOrderBy::Name).build_query();
     assert_eq!(query, expected_string);
 }
 
@@ -251,7 +251,7 @@ fn groups_build_query_order_by_name() {
 #[test]
 fn groups_build_query_order_by_path() {
     let expected_string = "groups?order_by=path";
-    let query = Listing::new().order_by(GroupListerOptionsOrderBy::Path).build_query();
+    let query = Listing::new().order_by(ListingOrderBy::Path).build_query();
     assert_eq!(query, expected_string);
 }
 
@@ -272,8 +272,8 @@ fn groups_build_query_sort() {
 #[test]
 fn groups_build_query_search_order_by_path() {
     let expected_string = "groups?search=SearchPattern&order_by=path";
-    let query = Listing::new().order_by(GroupListerOptionsOrderBy::Path).search(String::from("SearchPattern")).build_query();
+    let query = Listing::new().order_by(ListingOrderBy::Path).search(String::from("SearchPattern")).build_query();
     assert_eq!(query, expected_string);
-    let query = Listing::new().search(String::from("SearchPattern")).order_by(GroupListerOptionsOrderBy::Path).build_query();
+    let query = Listing::new().search(String::from("SearchPattern")).order_by(ListingOrderBy::Path).build_query();
     assert_eq!(query, expected_string);
 }
