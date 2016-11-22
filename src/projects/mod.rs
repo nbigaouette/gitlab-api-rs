@@ -163,3 +163,36 @@ pub struct Listing {
     /// Return only the ID, URL, name, and path of each project
     simple: Option<bool>,
 }
+
+
+impl Listing {
+    pub fn new() -> Listing {
+        Default::default()
+    }
+    pub fn archived(&mut self, archived: bool) -> &mut Listing {
+        self.archived = Some(archived);
+        self
+    }
+    pub fn visibility(&mut self, visibility: ListingVisibility) -> &mut Listing {
+        self.visibility = Some(visibility);
+        self
+    }
+    pub fn order_by(&mut self, order_by: ListingOrderBy) -> &mut Listing {
+        self.order_by = Some(order_by);
+        self
+    }
+    fn sort(&mut self, sort: ListingSort) -> &mut Listing {
+        self.sort = Some(sort);
+        self
+    }
+    pub fn search(&mut self, search: String) -> &mut Listing {
+        self.search = search;
+        self
+    }
+    pub fn simple(&mut self, simple: bool) -> &mut Listing {
+        self.simple = Some(simple);
+        self
+    }
+}
+
+
