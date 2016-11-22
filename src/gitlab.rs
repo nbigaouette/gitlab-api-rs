@@ -163,6 +163,11 @@ impl GitLab {
         let query = listing.build_query();
         self.get(&query)
     }
+
+    pub fn owned_groups(&mut self) -> Result<Groups, serde_json::Error> {
+        let query = ::groups::owned_groups::Listing::new().build_query();
+        self.get(&query)
+    }
 }
 
 

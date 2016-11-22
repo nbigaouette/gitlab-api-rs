@@ -2,6 +2,8 @@
 use BuildQuery;
 use Groups;
 
+pub mod owned_groups;
+
 // https://docs.gitlab.com/ce/api/groups.html
 // List groups:                 GET /groups
 // List owned groups:           GET /groups/owned
