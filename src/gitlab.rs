@@ -124,9 +124,7 @@ impl GitLab {
     pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
         let url = self.build_url("version");
         // Close connections after each GET.
-        let res = self.client.get(&url).header(hyper::header::Connection::close()).send();
-
-        res
+        self.client.get(&url).header(hyper::header::Connection::close()).send()
     }
 
     pub fn set_pagination(&mut self, pagination: Pagination) {
