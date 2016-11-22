@@ -2,6 +2,7 @@
 use BuildQuery;
 
 pub mod owned_groups;
+pub mod projects;
 
 
 // https://docs.gitlab.com/ce/api/groups.html
