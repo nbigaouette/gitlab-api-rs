@@ -98,7 +98,7 @@ impl GitLab {
     /// assert_eq!(gl.build_url("groups?order_by=path"), expected_url);
     /// ```
     pub fn build_url(&self, query: &str) -> String {
-        let params_splitter = if query.find("?").is_some() { "&" } else { "?" };
+        let params_splitter = if query.find('?').is_some() { "&" } else { "?" };
         format!("{}://{}:{}/api/v{}/{}{}private_token={}&page={}&per_page={}",
                 self.scheme,
                 self.domain,
