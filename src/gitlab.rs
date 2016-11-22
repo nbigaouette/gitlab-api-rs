@@ -91,7 +91,8 @@ impl GitLab {
     /// ```
     /// use gitlab_api::GitLab;
     ///
-    /// let expected_url = "https://gitlab.example.com:443/api/v3/projects?private_token=XXXXXXXXXXXXX&page=1&per_page=20";
+    /// let expected_url = "https://gitlab.example.com:\
+    ///                     443/api/v3/projects?private_token=XXXXXXXXXXXXX&page=1&per_page=20";
     ///
     /// let gl = GitLab::new_https("gitlab.example.com", "XXXXXXXXXXXXX");
     ///
