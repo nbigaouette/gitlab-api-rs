@@ -10,8 +10,10 @@ use serde_json;
 
 use Version;
 use Projects;
+use BuildQuery;
 use Groups;
 use GroupListing;
+use GroupListerOptions;
 
 
 pub const API_VERSION: u16 = 3;
@@ -82,79 +84,79 @@ impl GitLab {
         GitLab::new("https", &domain, 443, &private_token)
     }
 
-    /// Build a URL used to access GitLab instance, including some parameters.
-    ///
-    /// # Examples
-    ///
-    /// Example from GitLab: https://docs.gitlab.com/ce/api/#basic-usage
-    ///
-    /// ```
-    /// use gitlab_api::GitLab;
-    ///
-    /// let expected_url = "https://gitlab.example.com:\
-    ///                     443/api/v3/projects?private_token=XXXXXXXXXXXXX&page=1&per_page=20";
-    ///
-    /// let gl = GitLab::new_https("gitlab.example.com", "XXXXXXXXXXXXX");
-    ///
-    /// assert_eq!(gl.build_url("projects"), expected_url);
-    /// ```
-    pub fn build_url(&self, command: &str) -> String {
-        format!("{}://{}:{}/api/v{}/{}?private_token={}&page={}&per_page={}",
-                self.scheme,
-                self.domain,
-                self.port,
-                API_VERSION,
-                command,
-                self.private_token,
-                self.pagination.page,
-                self.pagination.per_page)
-    }
-
-    pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
-        let url = self.build_url("version");
-        // Close connections after each GET.
-        let res = self.client.get(&url).header(hyper::header::Connection::close()).send();
-
-        res
-    }
+    // /// Build a URL used to access GitLab instance, including some parameters.
+    // ///
+    // /// # Examples
+    // ///
+    // /// Example from GitLab: https://docs.gitlab.com/ce/api/#basic-usage
+    // ///
+    // /// ```
+    // /// use gitlab_api::GitLab;
+    // ///
+    // /// let expected_url = "https://gitlab.example.com:\
+    // ///                     443/api/v3/projects?private_token=XXXXXXXXXXXXX&page=1&per_page=20";
+    // ///
+    // /// let gl = GitLab::new_https("gitlab.example.com", "XXXXXXXXXXXXX");
+    // ///
+    // /// assert_eq!(gl.build_url("projects"), expected_url);
+    // /// ```
+    // pub fn build_url(&self, command: &str) -> String {
+    //     format!("{}://{}:{}/api/v{}/{}?private_token={}&page={}&per_page={}",
+    //             self.scheme,
+    //             self.domain,
+    //             self.port,
+    //             API_VERSION,
+    //             command,
+    //             self.private_token,
+    //             self.pagination.page,
+    //             self.pagination.per_page)
+    // }
+    //
+    // pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
+    //     let url = self.build_url("version");
+    //     // Close connections after each GET.
+    //     let res = self.client.get(&url).header(hyper::header::Connection::close()).send();
+    //
+    //     res
+    // }
 
     pub fn set_pagination(&mut self, pagination: Pagination) {
         self.pagination = pagination;
     }
 
-    pub fn get<T>(&self, command: &str) -> Result<T, serde_json::Error>
-        where T: serde::Deserialize
-    {
+    // pub fn get<T>(&self, command: &str) -> Result<T, serde_json::Error>
+    //     where T: serde::Deserialize
+    // {
+    //
+    //     let url = self.build_url(command);
+    //     let mut res: hyper::client::Response = self.client
+    //         .get(&url)
+    //         .header(hyper::header::Connection::close())
+    //         .send()
+    //         .unwrap();
+    //
+    //     let mut body = String::new();
+    //     res.read_to_string(&mut body).unwrap();
+    //
+    //     serde_json::from_str(&body.as_str())
+    // }
+    //
+    // pub fn version(&self) -> Result<Version, serde_json::Error> {
+    //     self.get("version")
+    // }
+    //
+    // pub fn groups(&self) -> Result<Groups, serde_json::Error> {
+    //     self.get("groups")
+    // }
+    //
+    // pub fn projects(&self) -> Result<Projects, serde_json::Error> {
+    //     self.get("projects")
+    // }
 
-        let url = self.build_url(command);
-        let mut res: hyper::client::Response = self.client
-            .get(&url)
-            .header(hyper::header::Connection::close())
-            .send()
-            .unwrap();
-
-        let mut body = String::new();
-        res.read_to_string(&mut body).unwrap();
-
-        serde_json::from_str(&body.as_str())
-    }
-
-    pub fn version(&self) -> Result<Version, serde_json::Error> {
-        self.get("version")
-    }
-
-    pub fn groups(&self) -> Result<Groups, serde_json::Error> {
-        self.get("groups")
-    }
-
-    pub fn projects(&self) -> Result<Projects, serde_json::Error> {
-        self.get("projects")
-    }
-
-    // pub fn groups_listing(&mut self) -> GroupListing {
-    pub fn groups_listing(&mut self) {
-        // Default::default()
-        // GroupListing { options: Default::default() }
+    pub fn groups_listing(&mut self, options: GroupListerOptions) {
+        let listing = GroupListing { options: options };
+        let query = listing.build_query();
+        println!("query: {:?}", query);
     }
 }
 
