@@ -124,7 +124,7 @@ impl GitLab {
     pub fn get<T>(&self, query: &str) -> Result<T, serde_json::Error>
         where T: serde::Deserialize
     {
-        let url = self.build_url(&query);
+        let url = self.build_url(query);
         info!("url: {:?}", url);
         let mut res: hyper::client::Response = self.client
             .get(&url)
