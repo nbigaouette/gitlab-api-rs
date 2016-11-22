@@ -12,7 +12,7 @@ use Version;
 use Projects;
 use BuildQuery;
 use Groups;
-use GroupListing;
+// use Listing;
 
 
 pub const API_VERSION: u16 = 3;
@@ -159,7 +159,7 @@ impl GitLab {
     //     self.get("projects")
     // }
 
-    pub fn groups(&mut self, listing: GroupListing) -> Result<Groups, serde_json::Error> {
+    pub fn groups(&mut self, listing: ::groups::Listing) -> Result<Groups, serde_json::Error> {
         let query = listing.build_query();
         self.get(&query)
     }

@@ -2,10 +2,6 @@
 extern crate gitlab_api as gitlab;
 
 use std::env;
-use gitlab::GitLab;
-use gitlab::Pagination;
-use gitlab::GroupListing;
-use gitlab::GroupListerOptionsOrderBy;
 
 
 fn main() {
@@ -28,13 +24,13 @@ fn main() {
         }
     };
     let mut gl = GitLab::new_https(&hostname, &token);
-    gl.set_pagination(Pagination {
+    gl.set_pagination(gitlab::Pagination {
         page: 1,
         per_page: 100,
     });
     println!("gl: {:?}", gl);
 
     // let groups = gl.groups(Default::default());
-    let groups = gl.groups(GroupListing::new().skip_groups(vec![1,2,3]).clone());
+    let groups = gl.groups(gitlab::groups::Listing::new().skip_groups(vec![1,2,3]).clone());
     println!("groups: {:?}", groups);
 }
