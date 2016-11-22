@@ -77,9 +77,9 @@ pub struct GroupListing {
 impl BuildQuery for GroupListing {
     fn build_query(&self) -> String {
 
-        let mut query = String::from("groups");
-
         let options = &self.options;
+
+        let mut query = String::from("groups");
 
         // FIXME: Add skip_groups
 
