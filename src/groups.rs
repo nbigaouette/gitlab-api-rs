@@ -167,7 +167,6 @@ fn groups_build_query() {
             ..Default::default()
         },
     };
-    println!("listing: {:?}", listing);
     let query = listing.build_query();
     assert_eq!(query, expected_string);
 
@@ -178,7 +177,6 @@ fn groups_build_query() {
             ..Default::default()
         },
     };
-    println!("listing: {:?}", listing);
     let query = listing.build_query();
     assert_eq!(query, expected_string);
 }
