@@ -82,7 +82,9 @@ impl BuildQuery for GroupListing {
         let mut query = String::from("groups");
         let mut previous_option_present = false;
 
-        // FIXME: Add skip_groups
+        let amp_char = "&";
+        let none_char = "";
+        let split_char = &none_char;
 
         // Append a "?", only if one of the `Option` is `Some(_)`
         query.push_str(match (&options.skip_groups,
@@ -92,6 +94,20 @@ impl BuildQuery for GroupListing {
                               &options.sort) {
             (&None, &None, &None, &None, &None) => "",
             _ => "?",
+        });
+
+        options.skip_groups.as_ref().map(|skip_groups| {
+            if previous_option_present && !skip_groups.is_empty() {
+                query.push_str(&amp_char);
+            }
+            let mut array_split_char = &none_char;
+            for &skip_group in skip_groups {
+                query.push_str(array_split_char);
+                query.push_str("skip_groups[]=");
+                query.push_str(&skip_group.to_string());
+                array_split_char = &amp_char;
+            }
+            previous_option_present = true;
         });
 
         options.all_available.map(|all_available| {
