@@ -33,8 +33,7 @@ fn main() {
     });
     println!("gl: {:?}", gl);
 
-    // gl.groups_listing(Default::default());
-    gl.groups_listing(GroupListerOptions { order_by: Some(GroupListerOptionsOrderBy::Path), ..Default::default() });
-    // let groups = gl.groups().unwrap();
-    // println!("groups: {:?}", groups);
+    let groups = gl.groups(Default::default());
+    // let groups = gl.groups(GroupListerOptions { order_by: Some(GroupListerOptionsOrderBy::Path), ..Default::default() });
+    println!("groups: {:?}", groups);
 }
