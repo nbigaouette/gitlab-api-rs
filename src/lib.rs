@@ -45,6 +45,7 @@ mod tests {
     fn unauthorized() {
         let gl = GitLab::new("http", "gitlab.com", 80, "XXXXXXXXXXXXX");
         println!("gl: {:?}", gl);
-        assert_eq!(gl.attempt_connection().unwrap().status, hyper::status::StatusCode::Unauthorized);
+        assert_eq!(gl.attempt_connection().unwrap().status,
+                   hyper::status::StatusCode::Unauthorized);
     }
 }

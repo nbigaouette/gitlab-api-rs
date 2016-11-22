@@ -38,19 +38,24 @@ pub struct GitLab {
 // Explicitly implement Debug trait for GitLab so we can hide the token.
 impl fmt::Debug for GitLab {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "GitLab {{ scheme: {}, domain: {}, port: {}, private_token: XXXXXXXXXXXXXXXXXXXX, client: {:?}, pagination: {:?} }}",
-                self.scheme, self.domain, self.port, self.client, self.pagination)
+        write!(f,
+               "GitLab {{ scheme: {}, domain: {}, port: {}, private_token: XXXXXXXXXXXXXXXXXXXX, \
+                client: {:?}, pagination: {:?} }}",
+               self.scheme,
+               self.domain,
+               self.port,
+               self.client,
+               self.pagination)
     }
 }
 
 
 impl GitLab {
-
     pub fn new(scheme: &str, domain: &str, port: u16, private_token: &str) -> GitLab {
         GitLab {
             scheme: scheme.to_string(),
             domain: domain.to_string(),
-            port:   port,
+            port: port,
             private_token: private_token.to_string(),
             client: match env::var("HTTP_PROXY") {
                 Ok(proxy) => {
@@ -59,10 +64,13 @@ impl GitLab {
                     let port = proxy[1];
 
                     hyper::Client::with_http_proxy(hostname, port.parse().unwrap())
-                },
+                }
                 Err(_) => hyper::Client::new(),
             },
-            pagination: Pagination {page: 1, per_page: 20},
+            pagination: Pagination {
+                page: 1,
+                per_page: 20,
+            },
         }
     }
 
@@ -91,14 +99,14 @@ impl GitLab {
     /// ```
     pub fn build_url(&self, command: &str) -> String {
         format!("{}://{}:{}/api/v{}/{}?private_token={}&page={}&per_page={}",
-                                self.scheme,
-                                self.domain,
-                                self.port,
-                                API_VERSION,
-                                command,
-                                self.private_token,
-                                self.pagination.page,
-                                self.pagination.per_page)
+                self.scheme,
+                self.domain,
+                self.port,
+                API_VERSION,
+                command,
+                self.private_token,
+                self.pagination.page,
+                self.pagination.per_page)
     }
 
     pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
@@ -114,15 +122,15 @@ impl GitLab {
     }
 
     pub fn get<T>(&self, command: &str) -> Result<T, serde_json::Error>
-            where T: serde::Deserialize {
+        where T: serde::Deserialize
+    {
 
         let url = self.build_url(command);
-        let mut res: hyper::client::Response =
-                        self.client
-                        .get(&url)
-                        .header(hyper::header::Connection::close())
-                        .send()
-                        .unwrap();
+        let mut res: hyper::client::Response = self.client
+            .get(&url)
+            .header(hyper::header::Connection::close())
+            .send()
+            .unwrap();
 
         let mut body = String::new();
         res.read_to_string(&mut body).unwrap();
@@ -150,12 +158,11 @@ impl GitLab {
 }
 
 
-/*
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn it_works() {
-    }
-}
-*/
+// #[cfg(test)]
+// mod tests {
+//
+// #[test]
+// fn it_works() {
+// }
+// }
+//

@@ -38,22 +38,18 @@ enum GroupListerOptionsSort {
 
 
 fn append_group_lister_options_order_by(order_by: GroupListerOptionsOrderBy, s: &mut String) {
-    s.push_str(
-        match order_by {
-            GroupListerOptionsOrderBy::Name => "name",
-            GroupListerOptionsOrderBy::Path => "path",
-        }
-    );
+    s.push_str(match order_by {
+        GroupListerOptionsOrderBy::Name => "name",
+        GroupListerOptionsOrderBy::Path => "path",
+    });
 }
 
 
 fn append_group_lister_options_sort(order_by: GroupListerOptionsSort, s: &mut String) {
-    s.push_str(
-        match order_by {
-            GroupListerOptionsSort::Asc => "asc",
-            GroupListerOptionsSort::Desc => "desc",
-        }
-    );
+    s.push_str(match order_by {
+        GroupListerOptionsSort::Asc => "asc",
+        GroupListerOptionsSort::Desc => "desc",
+    });
 }
 
 /// https://docs.gitlab.com/ce/api/groups.html#list-groups
@@ -85,15 +81,21 @@ impl BuildQuery for GroupListing {
         let mut query = String::from("groups");
 
         // Append a "?", only if one of the `Option` is `Some(_)`
-        query.push_str(
-            match (&options.skip_groups, &options.all_available, &options.search, &options.order_by, &options.sort) {
-                (&None, &None, &None, &None, &None) => "",
-                _ => "?",
-            }
-        );
+        query.push_str(match (&options.skip_groups,
+                              &options.all_available,
+                              &options.search,
+                              &options.order_by,
+                              &options.sort) {
+            (&None, &None, &None, &None, &None) => "",
+            _ => "?",
+        });
 
         options.all_available.map(|all_available| {
-            if all_available { query.push_str("all_available=true") } else { query.push_str("all_available=false") }
+            if all_available {
+                query.push_str("all_available=true")
+            } else {
+                query.push_str("all_available=false")
+            }
         });
 
         options.order_by.map(|order_by| {
@@ -161,13 +163,17 @@ fn test_group_lister_build_query() {
     assert_eq!(query, expected_string);
 
     let expected_string = "groups?order_by=name";
-    let listing = GroupListing { options: GroupListerOptions { order_by: Some(GroupListerOptionsOrderBy::Name), ..Default::default() } };
+    let listing = GroupListing {
+        options: GroupListerOptions { order_by: Some(GroupListerOptionsOrderBy::Name), ..Default::default() },
+    };
     println!("listing: {:?}", listing);
     let query = listing.build_query();
     assert_eq!(query, expected_string);
 
     let expected_string = "groups?order_by=path";
-    let listing = GroupListing { options: GroupListerOptions { order_by: Some(GroupListerOptionsOrderBy::Path), ..Default::default() } };
+    let listing = GroupListing {
+        options: GroupListerOptions { order_by: Some(GroupListerOptionsOrderBy::Path), ..Default::default() },
+    };
     println!("listing: {:?}", listing);
     let query = listing.build_query();
     assert_eq!(query, expected_string);
