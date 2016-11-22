@@ -24,9 +24,9 @@ pub mod gitlab;
 pub mod groups;
 pub mod projects;
 
+// Re-export those structs
 pub use gitlab::Pagination;
 pub use gitlab::GitLab;
-pub use groups::{Listing, GroupListerOptionsOrderBy, GroupListerOptionsSort};
 // pub use projects::Project;
 
 
