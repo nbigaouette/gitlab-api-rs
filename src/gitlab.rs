@@ -13,7 +13,6 @@ use Projects;
 use BuildQuery;
 use Groups;
 use GroupListing;
-use GroupListerOptions;
 
 
 pub const API_VERSION: u16 = 3;
@@ -160,8 +159,7 @@ impl GitLab {
     //     self.get("projects")
     // }
 
-    pub fn groups(&mut self, options: GroupListerOptions) -> Result<Groups, serde_json::Error> {
-        let listing = GroupListing { options: options };
+    pub fn groups(&mut self, listing: GroupListing) -> Result<Groups, serde_json::Error> {
         let query = listing.build_query();
         self.get(&query)
     }

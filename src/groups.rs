@@ -52,32 +52,52 @@ fn append_group_lister_options_sort(order_by: GroupListerOptionsSort, s: &mut St
     });
 }
 
+
 /// https://docs.gitlab.com/ce/api/groups.html#list-groups
-#[derive(Default, Debug)]
-pub struct GroupListerOptions {
+#[derive(Default, Debug, Clone)]
+pub struct GroupListing {
     /// Skip the group IDs passes
-    pub skip_groups: Option<Vec<i64>>,
+    skip_groups: Vec<i64>,
     /// Show all the groups you have access to
-    pub all_available: Option<bool>,
+    all_available: Option<bool>,
     /// Return list of authorized groups matching the search criteria
-    pub search: Option<String>,
+    search: String,
     /// Order groups by `name` or `path`. Default is `name`
-    pub order_by: Option<GroupListerOptionsOrderBy>,
+    order_by: Option<GroupListerOptionsOrderBy>,
     /// Order groups in `asc` or `desc` order. Default is `asc`
-    pub sort: Option<GroupListerOptionsSort>,
+    sort: Option<GroupListerOptionsSort>,
 }
 
 
-#[derive(Default, Debug)]
-pub struct GroupListing {
-    pub options: GroupListerOptions,
+impl GroupListing {
+    pub fn new() -> GroupListing {
+        Default::default()
+    }
+    pub fn skip_groups(&mut self, skip_groups: Vec<i64>) -> &mut GroupListing {
+        self.skip_groups = skip_groups;
+        self
+    }
+    pub fn all_available(&mut self, all_available: bool) -> &mut GroupListing {
+        self.all_available = Some(all_available);
+        self
+    }
+    pub fn search(&mut self, search: String) -> &mut GroupListing {
+        self.search = search;
+        self
+    }
+    pub fn order_by(&mut self, order_by: GroupListerOptionsOrderBy) -> &mut GroupListing {
+        self.order_by = Some(order_by);
+        self
+    }
+    fn sort(&mut self, sort: GroupListerOptionsSort) -> &mut GroupListing {
+        self.sort = Some(sort);
+        self
+    }
 }
 
 
 impl BuildQuery for GroupListing {
     fn build_query(&self) -> String {
-
-        let options = &self.options;
 
         let mut query = String::from("groups");
 
@@ -86,31 +106,29 @@ impl BuildQuery for GroupListing {
         let mut split_char = &none_char;
 
         // Append a "?", only if one of the `Option` is `Some(_)`
-        query.push_str(match (&options.skip_groups,
-                              &options.all_available,
-                              &options.search,
-                              &options.order_by,
-                              &options.sort) {
-            (&None, &None, &None, &None, &None) => "",
+        query.push_str(match (self.skip_groups.is_empty(),
+                              &self.all_available,
+                              self.search.is_empty(),
+                              &self.order_by,
+                              &self.sort) {
+            (true, &None, true, &None, &None) => "",
             _ => "?",
         });
 
-        options.skip_groups.as_ref().map(|skip_groups| {
-            if !skip_groups.is_empty() {
-                query.push_str(&split_char);
-                split_char = &amp_char;
+        if !self.skip_groups.is_empty() {
+            query.push_str(&split_char);
+            split_char = &amp_char;
 
-                let mut array_split_char = &none_char;
-                for &skip_group in skip_groups {
-                    query.push_str(array_split_char);
-                    query.push_str("skip_groups[]=");
-                    query.push_str(&skip_group.to_string());
-                    array_split_char = &amp_char;
-                }
+            let mut array_split_char = &none_char;
+            for skip_group in &self.skip_groups {
+                query.push_str(array_split_char);
+                query.push_str("skip_groups[]=");
+                query.push_str(&skip_group.to_string());
+                array_split_char = &amp_char;
             }
-        });
+        }
 
-        options.all_available.map(|all_available| {
+        self.all_available.map(|all_available| {
             query.push_str(&split_char);
             split_char = &amp_char;
 
@@ -121,15 +139,15 @@ impl BuildQuery for GroupListing {
             }
         });
 
-        options.search.as_ref().map(|search| {
+        if !self.search.is_empty() {
             query.push_str(&split_char);
             split_char = &amp_char;
 
             query.push_str("search=");
-            query.push_str(search);
-        });
+            query.push_str(&self.search);
+        }
 
-        options.order_by.map(|order_by| {
+        self.order_by.map(|order_by| {
             query.push_str(&split_char);
             split_char = &amp_char;
 
@@ -137,7 +155,7 @@ impl BuildQuery for GroupListing {
             append_group_lister_options_order_by(order_by, &mut query);
         });
 
-        options.sort.map(|sort| {
+        self.sort.map(|sort| {
             query.push_str(&split_char);
             split_char = &amp_char;
 
@@ -146,15 +164,6 @@ impl BuildQuery for GroupListing {
         });
 
         query
-    }
-}
-
-
-impl GroupListing {
-    fn list(&self) -> Groups {
-        let groups: Groups = vec![];
-
-        groups
     }
 }
 
@@ -197,7 +206,7 @@ fn groups_build_query_default() {
     assert_eq!(query, expected_string);
 
     let expected_string = "groups";
-    let listing = GroupListing { options: Default::default() };
+    let listing = GroupListing::new();
     let query = listing.build_query();
     assert_eq!(query, expected_string);
 }
@@ -206,13 +215,7 @@ fn groups_build_query_default() {
 #[test]
 fn groups_build_query_skip_groups() {
     let expected_string = "groups?skip_groups[]=1&skip_groups[]=2&skip_groups[]=3";
-    let listing = GroupListing {
-        options: GroupListerOptions {
-            skip_groups: Some(vec![1,2,3]),
-            ..Default::default()
-        },
-    };
-    let query = listing.build_query();
+    let query = GroupListing::new().skip_groups(vec![1,2,3]).build_query();
     assert_eq!(query, expected_string);
 }
 
@@ -220,23 +223,11 @@ fn groups_build_query_skip_groups() {
 #[test]
 fn groups_build_query_all_available() {
     let expected_string = "groups?all_available=true";
-    let listing = GroupListing {
-        options: GroupListerOptions {
-            all_available: Some(true),
-            ..Default::default()
-        },
-    };
-    let query = listing.build_query();
+    let query = GroupListing::new().all_available(true).build_query();
     assert_eq!(query, expected_string);
 
     let expected_string = "groups?all_available=false";
-    let listing = GroupListing {
-        options: GroupListerOptions {
-            all_available: Some(false),
-            ..Default::default()
-        },
-    };
-    let query = listing.build_query();
+    let query = GroupListing::new().all_available(false).build_query();
     assert_eq!(query, expected_string);
 }
 
@@ -244,13 +235,7 @@ fn groups_build_query_all_available() {
 #[test]
 fn groups_build_query_search() {
     let expected_string = "groups?search=SearchPattern";
-    let listing = GroupListing {
-        options: GroupListerOptions {
-            search: Some(String::from("SearchPattern")),
-            ..Default::default()
-        },
-    };
-    let query = listing.build_query();
+    let query = GroupListing::new().search(String::from("SearchPattern")).build_query();
     assert_eq!(query, expected_string);
 }
 
@@ -258,13 +243,7 @@ fn groups_build_query_search() {
 #[test]
 fn groups_build_query_order_by_name() {
     let expected_string = "groups?order_by=name";
-    let listing = GroupListing {
-        options: GroupListerOptions {
-            order_by: Some(GroupListerOptionsOrderBy::Name),
-            ..Default::default()
-        },
-    };
-    let query = listing.build_query();
+    let query = GroupListing::new().order_by(GroupListerOptionsOrderBy::Name).build_query();
     assert_eq!(query, expected_string);
 }
 
@@ -272,13 +251,7 @@ fn groups_build_query_order_by_name() {
 #[test]
 fn groups_build_query_order_by_path() {
     let expected_string = "groups?order_by=path";
-    let listing = GroupListing {
-        options: GroupListerOptions {
-            order_by: Some(GroupListerOptionsOrderBy::Path),
-            ..Default::default()
-        },
-    };
-    let query = listing.build_query();
+    let query = GroupListing::new().order_by(GroupListerOptionsOrderBy::Path).build_query();
     assert_eq!(query, expected_string);
 }
 
@@ -286,23 +259,11 @@ fn groups_build_query_order_by_path() {
 #[test]
 fn groups_build_query_sort() {
     let expected_string = "groups?sort=asc";
-    let listing = GroupListing {
-        options: GroupListerOptions {
-            sort: Some(GroupListerOptionsSort::Asc),
-            ..Default::default()
-        },
-    };
-    let query = listing.build_query();
+    let query = GroupListing::new().sort(GroupListerOptionsSort::Asc).build_query();
     assert_eq!(query, expected_string);
 
     let expected_string = "groups?sort=desc";
-    let listing = GroupListing {
-        options: GroupListerOptions {
-            sort: Some(GroupListerOptionsSort::Desc),
-            ..Default::default()
-        },
-    };
-    let query = listing.build_query();
+    let query = GroupListing::new().sort(GroupListerOptionsSort::Desc).build_query();
     assert_eq!(query, expected_string);
 }
 
@@ -311,13 +272,8 @@ fn groups_build_query_sort() {
 #[test]
 fn groups_build_query_search_order_by_path() {
     let expected_string = "groups?search=SearchPattern&order_by=path";
-    let listing = GroupListing {
-        options: GroupListerOptions {
-            order_by: Some(GroupListerOptionsOrderBy::Path),
-            search: Some(String::from("SearchPattern")),
-            ..Default::default()
-        },
-    };
-    let query = listing.build_query();
+    let query = GroupListing::new().order_by(GroupListerOptionsOrderBy::Path).search(String::from("SearchPattern")).build_query();
+    assert_eq!(query, expected_string);
+    let query = GroupListing::new().search(String::from("SearchPattern")).order_by(GroupListerOptionsOrderBy::Path).build_query();
     assert_eq!(query, expected_string);
 }

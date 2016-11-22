@@ -4,7 +4,8 @@ extern crate gitlab_api as gitlab;
 use std::env;
 use gitlab::GitLab;
 use gitlab::Pagination;
-use gitlab::{GroupListerOptions, GroupListerOptionsOrderBy};
+use gitlab::GroupListing;
+use gitlab::GroupListerOptionsOrderBy;
 
 
 fn main() {
@@ -33,7 +34,7 @@ fn main() {
     });
     println!("gl: {:?}", gl);
 
-    let groups = gl.groups(Default::default());
-    // let groups = gl.groups(GroupListerOptions { order_by: Some(GroupListerOptionsOrderBy::Path), ..Default::default() });
+    // let groups = gl.groups(Default::default());
+    let groups = gl.groups(GroupListing::new().skip_groups(vec![1,2,3]).clone());
     println!("groups: {:?}", groups);
 }
