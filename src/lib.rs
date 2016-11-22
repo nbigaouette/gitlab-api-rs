@@ -31,7 +31,7 @@ pub use gitlab::GitLab;
 
 
 trait BuildQuery {
-    fn build_query(&self) -> String;  // FIXME: Return Result instead.
+    fn build_query(&self) -> String;
 }
 
 
