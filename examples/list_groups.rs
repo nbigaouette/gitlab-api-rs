@@ -33,4 +33,7 @@ fn main() {
     // let groups = gl.groups(Default::default());
     let groups = gl.groups(gitlab::groups::Listing::new().skip_groups(vec![1,2,3]).clone());
     println!("groups: {:?}", groups);
+
+    let owned_groups = gl.owned_groups();
+    println!("owned_groups: {:?}", owned_groups);
 }
