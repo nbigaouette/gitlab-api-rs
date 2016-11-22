@@ -2,9 +2,15 @@
 extern crate gitlab_api as gitlab;
 
 use std::env;
+#[macro_use]
+extern crate log;
+extern crate env_logger;
 
 
 fn main() {
+    env_logger::init().unwrap();
+    info!("starting up");
+
     let hostname = match env::var("GITLAB_HOSTNAME") {
         Ok(val) => val,
         Err(_) => {

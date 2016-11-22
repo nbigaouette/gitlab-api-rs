@@ -135,6 +135,7 @@ impl GitLab {
         where T: serde::Deserialize
     {
         let url = self.build_url(&query);
+        info!("url: {:?}", url);
         let mut res: hyper::client::Response = self.client
             .get(&url)
             .header(hyper::header::Connection::close())
@@ -143,6 +144,7 @@ impl GitLab {
 
         let mut body = String::new();
         res.read_to_string(&mut body).unwrap();
+        debug!("body: {:?}", body);
 
         serde_json::from_str(&body.as_str())
     }
@@ -166,6 +168,7 @@ impl GitLab {
 
     pub fn owned_groups(&mut self) -> Result<Groups, serde_json::Error> {
         let query = ::groups::owned_groups::Listing::new().build_query();
+        info!("query: {:?}", query);
         self.get(&query)
     }
 }

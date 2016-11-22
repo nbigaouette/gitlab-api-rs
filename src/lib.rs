@@ -18,6 +18,8 @@ include!("serde_types.in.rs");
 #[cfg(feature = "serde_codegen")]
 include!(concat!(env!("OUT_DIR"), "/serde_types.rs"));
 
+
+#[macro_use] extern crate log;
 extern crate hyper;
 
 pub mod gitlab;
