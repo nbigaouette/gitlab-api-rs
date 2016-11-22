@@ -26,7 +26,7 @@ pub mod projects;
 
 pub use gitlab::Pagination;
 pub use gitlab::GitLab;
-pub use groups::GroupListing;
+pub use groups::{GroupListing, GroupListerOptions, GroupListerOptionsOrderBy, GroupListerOptionsSort};
 // pub use projects::Project;
 
 

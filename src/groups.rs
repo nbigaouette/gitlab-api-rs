@@ -17,7 +17,7 @@ use Groups;
 
 
 #[derive(Debug, Copy, Clone)]
-enum GroupListerOptionsOrderBy {
+pub enum GroupListerOptionsOrderBy {
     Name,
     Path,
 }
@@ -27,7 +27,7 @@ enum GroupListerOptionsOrderBy {
 // }
 
 #[derive(Debug, Copy, Clone)]
-enum GroupListerOptionsSort {
+pub enum GroupListerOptionsSort {
     Asc,
     Desc,
 }
@@ -54,7 +54,7 @@ fn append_group_lister_options_sort(order_by: GroupListerOptionsSort, s: &mut St
 
 /// https://docs.gitlab.com/ce/api/groups.html#list-groups
 #[derive(Default, Debug)]
-struct GroupListerOptions {
+pub struct GroupListerOptions {
     /// Skip the group IDs passes
     pub skip_groups: Option<Vec<i64>>,
     /// Show all the groups you have access to
@@ -70,7 +70,7 @@ struct GroupListerOptions {
 
 #[derive(Default, Debug)]
 pub struct GroupListing {
-    options: GroupListerOptions,
+    pub options: GroupListerOptions,
 }
 
 
