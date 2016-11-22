@@ -264,3 +264,19 @@ fn groups_build_query_sort() {
     let query = listing.build_query();
     assert_eq!(query, expected_string);
 }
+
+
+
+#[test]
+fn groups_build_query_search_order_by_path() {
+    let expected_string = "groups?search=SearchPattern&order_by=path";
+    let listing = GroupListing {
+        options: GroupListerOptions {
+            order_by: Some(GroupListerOptionsOrderBy::Path),
+            search: Some(String::from("SearchPattern")),
+            ..Default::default()
+        },
+    };
+    let query = listing.build_query();
+    assert_eq!(query, expected_string);
+}
