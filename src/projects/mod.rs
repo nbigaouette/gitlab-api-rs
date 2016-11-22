@@ -113,3 +113,53 @@ use BuildQuery;
 //
 // Search for projects by name which are accessible to the authenticated user.
 // GET /projects/search/:query
+
+
+
+
+
+
+// https://docs.gitlab.com/ce/api/projects.html#list-projects
+
+
+#[derive(Debug, Copy, Clone)]
+pub enum ListingVisibility {
+    Public,
+    Internal,
+    Private,
+}
+
+
+#[derive(Debug, Copy, Clone)]
+pub enum ListingOrderBy {
+    Id,
+    Name,
+    Path,
+    CreatedAt,
+    UpdatedAt,
+    LastActivityAt,
+}
+
+
+#[derive(Debug, Copy, Clone)]
+pub enum ListingSort {
+    Asc,
+    Desc,
+}
+
+
+#[derive(Default, Debug, Clone)]
+pub struct Listing {
+    /// Limit by archived status
+    archived:  Option<bool>,
+    /// Limit by visibility.
+    visibility: Option<ListingVisibility>,
+    /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
+    order_by:  Option<ListingOrderBy>,
+    /// Return requests sorted. Default is `ListingSort::Desc`.
+    sort: Option<ListingSort>,
+    /// Return list of authorized projects matching the search criteria.
+    search:  String,
+    /// Return only the ID, URL, name, and path of each project
+    simple: Option<bool>,
+}
