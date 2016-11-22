@@ -76,11 +76,11 @@ impl GitLab {
     }
 
     pub fn new_http(domain: &str, private_token: &str) -> GitLab {
-        GitLab::new("http", &domain, 80, &private_token)
+        GitLab::new("http", domain, 80, &private_token)
     }
 
     pub fn new_https(domain: &str, private_token: &str) -> GitLab {
-        GitLab::new("https", &domain, 443, &private_token)
+        GitLab::new("https", domain, 443, &private_token)
     }
 
     /// Build a URL used to access GitLab instance, including some parameters.
