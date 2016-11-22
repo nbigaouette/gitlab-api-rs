@@ -210,7 +210,7 @@ fn groups_build_query_default() {
 #[test]
 fn groups_build_query_skip_groups() {
     let expected_string = "groups?skip_groups[]=1&skip_groups[]=2&skip_groups[]=3";
-    let query = Listing::new().skip_groups(vec![1,2,3]).build_query();
+    let query = Listing::new().skip_groups(vec![1, 2, 3]).build_query();
     assert_eq!(query, expected_string);
 }
 
@@ -267,8 +267,14 @@ fn groups_build_query_sort() {
 #[test]
 fn groups_build_query_search_order_by_path() {
     let expected_string = "groups?search=SearchPattern&order_by=path";
-    let query = Listing::new().order_by(ListingOrderBy::Path).search(String::from("SearchPattern")).build_query();
+    let query = Listing::new()
+        .order_by(ListingOrderBy::Path)
+        .search(String::from("SearchPattern"))
+        .build_query();
     assert_eq!(query, expected_string);
-    let query = Listing::new().search(String::from("SearchPattern")).order_by(ListingOrderBy::Path).build_query();
+    let query = Listing::new()
+        .search(String::from("SearchPattern"))
+        .order_by(ListingOrderBy::Path)
+        .build_query();
     assert_eq!(query, expected_string);
 }

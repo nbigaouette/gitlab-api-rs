@@ -93,7 +93,8 @@ impl GitLab {
     /// use gitlab_api::GitLab;
     ///
     /// let expected_url = "https://gitlab.example.com:\
-    ///                     443/api/v3/groups?order_by=path&private_token=XXXXXXXXXXXXX&page=1&per_page=20";
+    ///                     443/api/v3/groups?\
+    ///                     order_by=path&private_token=XXXXXXXXXXXXX&page=1&per_page=20";
     ///
     /// let gl = GitLab::new_https("gitlab.example.com", "XXXXXXXXXXXXX");
     ///
@@ -101,7 +102,8 @@ impl GitLab {
     /// ```
     pub fn build_url(&self, query: &str) -> String {
         let expected_url = "https://gitlab.example.com:\
-                     443/api/v3/groups?order_by=path&private_token=XXXXXXXXXXXXX&page=1&per_page=20";
+                            443/api/v3/groups?\
+                            order_by=path&private_token=XXXXXXXXXXXXX&page=1&per_page=20";
 
         let mut params_splitter = "?";
         if query.find("?").is_some() {
