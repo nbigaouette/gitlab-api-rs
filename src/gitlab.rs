@@ -146,6 +146,9 @@ impl GitLab {
         res.read_to_string(&mut body).unwrap();
         debug!("body: {:?}", body);
 
+        // FIXME: Properly handle the error. Will require defining our own errors...
+        assert_eq!(res.status, hyper::status::StatusCode::Ok);
+
         serde_json::from_str(&body.as_str())
     }
 
