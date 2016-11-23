@@ -22,6 +22,11 @@
 //!
 //! You can search for groups by name or path.
 //!
+//! **NOTE**: The _Search for group_ (from
+//! https://docs.gitlab.com/ce/api/groups.html#search-for-group) is performed in this module.
+//!
+//!
+
 
 use BuildQuery;
 
