@@ -5,8 +5,6 @@ use BuildQuery;
 /// Get all details of a group.
 /// GET /groups/:id
 /// https://docs.gitlab.com/ce/api/groups.html#details-of-a-group
-
-
 #[derive(Default, Debug, Clone)]
 pub struct Listing {
     /// Group Id.

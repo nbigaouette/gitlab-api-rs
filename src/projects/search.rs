@@ -56,9 +56,9 @@ pub enum ListingSort {
 #[derive(Default, Debug, Clone)]
 pub struct Listing {
     /// A string contained in the project name.
-    query:  String,
+    query: String,
     /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
-    order_by:  Option<ListingOrderBy>,
+    order_by: Option<ListingOrderBy>,
     /// Return requests sorted. Default is `ListingSort::Desc`.
     sort: Option<ListingSort>,
 }
@@ -67,10 +67,7 @@ pub struct Listing {
 #[allow(dead_code)]
 impl Listing {
     pub fn new(query: String) -> Listing {
-        Listing {
-            query: query,
-            ..Default::default()
-        }
+        Listing { query: query, ..Default::default() }
     }
     pub fn order_by(&mut self, order_by: ListingOrderBy) -> &mut Listing {
         self.order_by = Some(order_by);
@@ -94,8 +91,7 @@ impl BuildQuery for Listing {
 
         // Append a "?" only if at least one of the `Option` is `Some(_)` or if
         // strings contain something.
-        query.push_str(match (&self.order_by,
-                              &self.sort) {
+        query.push_str(match (&self.order_by, &self.sort) {
             (&None, &None) => "",
             _ => "?",
         });
@@ -151,11 +147,14 @@ mod tests {
     #[test]
     fn build_query_order_by() {
         let expected_string = format!("projects/search/{}?order_by=id", TEST_SEARCH_QUERY);
-        let query = Listing::new(TEST_SEARCH_QUERY.to_string()).order_by(ListingOrderBy::Id).build_query();
+        let query =
+            Listing::new(TEST_SEARCH_QUERY.to_string()).order_by(ListingOrderBy::Id).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/search/{}?order_by=name", TEST_SEARCH_QUERY);
-        let query = Listing::new(TEST_SEARCH_QUERY.to_string()).order_by(ListingOrderBy::Name).build_query();
+        let query = Listing::new(TEST_SEARCH_QUERY.to_string())
+            .order_by(ListingOrderBy::Name)
+            .build_query();
         assert_eq!(query, expected_string);
 
         // let expected_string = format!("projects/search/{}?order_by=path", TEST_SEARCH_QUERY);
@@ -163,15 +162,20 @@ mod tests {
         // assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/search/{}?order_by=created_at", TEST_SEARCH_QUERY);
-        let query = Listing::new(TEST_SEARCH_QUERY.to_string()).order_by(ListingOrderBy::CreatedAt).build_query();
+        let query = Listing::new(TEST_SEARCH_QUERY.to_string())
+            .order_by(ListingOrderBy::CreatedAt)
+            .build_query();
         assert_eq!(query, expected_string);
 
         // let expected_string = format!("projects/search/{}?order_by=updated_at", TEST_SEARCH_QUERY);
         // let query = Listing::new(TEST_SEARCH_QUERY.to_string()).order_by(ListingOrderBy::UpdatedAt).build_query();
         // assert_eq!(query, expected_string);
 
-        let expected_string = format!("projects/search/{}?order_by=last_activity_at", TEST_SEARCH_QUERY);
-        let query = Listing::new(TEST_SEARCH_QUERY.to_string()).order_by(ListingOrderBy::LastActivityAt).build_query();
+        let expected_string = format!("projects/search/{}?order_by=last_activity_at",
+                                      TEST_SEARCH_QUERY);
+        let query = Listing::new(TEST_SEARCH_QUERY.to_string())
+            .order_by(ListingOrderBy::LastActivityAt)
+            .build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -179,19 +183,25 @@ mod tests {
     #[test]
     fn build_query_sort() {
         let expected_string = format!("projects/search/{}?sort=asc", TEST_SEARCH_QUERY);
-        let query = Listing::new(TEST_SEARCH_QUERY.to_string()).sort(ListingSort::Asc).build_query();
+        let query =
+            Listing::new(TEST_SEARCH_QUERY.to_string()).sort(ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/search/{}?sort=desc", TEST_SEARCH_QUERY);
-        let query = Listing::new(TEST_SEARCH_QUERY.to_string()).sort(ListingSort::Desc).build_query();
+        let query =
+            Listing::new(TEST_SEARCH_QUERY.to_string()).sort(ListingSort::Desc).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn groups_build_query_multiple() {
-        let expected_string = format!("projects/search/{}?order_by=created_at&sort=desc", TEST_SEARCH_QUERY);
-        let query = Listing::new(TEST_SEARCH_QUERY.to_string()).order_by(ListingOrderBy::CreatedAt).sort(ListingSort::Desc).build_query();
+        let expected_string = format!("projects/search/{}?order_by=created_at&sort=desc",
+                                      TEST_SEARCH_QUERY);
+        let query = Listing::new(TEST_SEARCH_QUERY.to_string())
+            .order_by(ListingOrderBy::CreatedAt)
+            .sort(ListingSort::Desc)
+            .build_query();
         assert_eq!(query, expected_string);
     }
 }

@@ -46,7 +46,7 @@ pub enum ListingId {
 #[derive(Default, Debug, Clone)]
 pub struct Listing {
     /// The ID or NAMESPACE/PROJECT_NAME of the project
-    id:  Option<ListingId>,
+    id: Option<ListingId>,
 }
 
 
@@ -90,8 +90,10 @@ mod tests {
         assert_eq!(query, expected_string);
 
 
-        let expected_string = format!("projects/{}", TEST_PROJECT_NAME.to_string().replace("/", "%2F"));
-        let query = Listing::new(ListingId::NamespaceProject(TEST_PROJECT_NAME.to_string())).build_query();
+        let expected_string = format!("projects/{}",
+                                      TEST_PROJECT_NAME.to_string().replace("/", "%2F"));
+        let query = Listing::new(ListingId::NamespaceProject(TEST_PROJECT_NAME.to_string()))
+            .build_query();
         assert_eq!(query, expected_string);
     }
 }

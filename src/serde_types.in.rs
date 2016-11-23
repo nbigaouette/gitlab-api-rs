@@ -123,7 +123,7 @@ pub struct Project {
     ssh_url_to_repo: String,
     http_url_to_repo: String,
     web_url: String,
-    owner: Option<ProjectOwner>,  // FIXME: Why would a project not have an owner?
+    // owner: Option<ProjectOwner>,  // FIXME: Why would a project not have an owner?
     name: String,
     name_with_namespace: String,
     path: String,
