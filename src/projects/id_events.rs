@@ -7,7 +7,7 @@
 //! Get the events for the specified project.
 //! Sorted from newest to oldest
 //!
-//! ```
+//! ```text
 //! GET /projects/ID/events
 //! ```
 //!

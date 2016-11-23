@@ -9,7 +9,7 @@
 //! If using namespaced projects call make sure that the NAMESPACE/PROJECT_NAME is URL-encoded,
 //! eg. `/api/v3/projects/diaspora%2Fdiaspora` (where `/` is represented by `%2F`).
 //!
-//! ```
+//! ```text
 //! GET /projects/:id
 //! ```
 //!

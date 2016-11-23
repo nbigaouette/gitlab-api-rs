@@ -6,7 +6,7 @@
 //!
 //! Get a list of projects for which the authenticated user is a member.
 //!
-//! ```
+//! ```text
 //! GET /projects
 //! ```
 //!

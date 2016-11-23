@@ -6,7 +6,7 @@
 //!
 //! Search for projects by name which are accessible to the authenticated user.
 //!
-//! ```
+//! ```text
 //! GET /projects/search/QUERY
 //! ```
 //!

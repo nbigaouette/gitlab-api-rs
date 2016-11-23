@@ -6,7 +6,7 @@
 //!
 //! Lists all branches of a project.
 //!
-//! ```
+//! ```text
 //! GET /projects/ID/repository/branches
 //! ```
 //!

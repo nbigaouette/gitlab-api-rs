@@ -6,7 +6,7 @@
 //!
 //! Get a list of project hooks.
 //!
-//! ```
+//! ```text
 //! GET /projects/ID/hooks
 //! ```
 //!

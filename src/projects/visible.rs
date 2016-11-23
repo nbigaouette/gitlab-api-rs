@@ -4,7 +4,7 @@
 //!
 //! # Get a list of projects which the authenticated user can see.
 //!
-//! ```
+//! ```text
 //! GET /projects/visible
 //! ```
 //!

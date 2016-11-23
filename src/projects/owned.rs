@@ -6,7 +6,7 @@
 //!
 //! Get a list of projects which are owned by the authenticated user.
 //!
-//! ```
+//! ```text
 //! GET /projects/owned
 //! ```
 //!
