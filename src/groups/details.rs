@@ -1,10 +1,27 @@
+//! Details of a group
+//!
+//! https://docs.gitlab.com/ce/api/groups.html#details-of-a-group
+//!
+//! # Details of a group
+//!
+//! Get all details of a group.
+//!
+//! ```
+//! GET /groups/ID
+//! ```
+//!
+//! Parameters:
+//!
+//! | Attribute | Type | Required | Description |
+//! | --------- | ---- | -------- | ----------- |
+//! | `id` | integer/string | yes | The ID or path of a group |
+//!
+
+
 use BuildQuery;
 
 // FIXME: Use a type for the project id.
 
-/// Get all details of a group.
-/// GET /groups/:id
-/// https://docs.gitlab.com/ce/api/groups.html#details-of-a-group
 #[derive(Default, Debug, Clone)]
 pub struct Listing {
     /// Group Id.

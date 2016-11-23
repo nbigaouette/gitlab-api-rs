@@ -1,10 +1,34 @@
+//! List a group's projects
+//!
+//! https://docs.gitlab.com/ce/api/groups.html#list-a-group-s-projects
+//!
+//! # List a group's projects
+//!
+//! Get a list of projects in this group.
+//!
+//! ```
+//! GET /groups/ID/projects
+//! ```
+//!
+//! Parameters:
+//!
+//! - `archived` (optional) - if passed, limit by archived status
+//! - `visibility` (optional) - if passed, limit by visibility `public`, `internal`, `private`
+//! - `order_by` (optional) - Return requests ordered by `id`, `name`, `path`, `created_at`,
+//!     `updated_at` or `last_activity_at` fields. Default is `created_at`
+//! - `sort` (optional) - Return requests sorted in `asc` or `desc` order. Default is `desc`
+//! - `search` (optional) - Return list of authorized projects according to a search criteria
+//! - `ci_enabled_first` - Return projects ordered by ci_enabled flag. Projects with enabled
+//!     GitLab CI go first
+//!
+//!
+
+
 use BuildQuery;
+
 
 // FIXME: Use a type for the project id.
 
-/// Get a list of projects in this group.
-/// GET /groups/:id/projects
-/// https://docs.gitlab.com/ce/api/groups.html#list-a-group-s-projects
 #[derive(Debug, Copy, Clone)]
 pub enum ListingVisibility {
     Public,

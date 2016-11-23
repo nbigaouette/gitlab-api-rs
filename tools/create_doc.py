@@ -6,7 +6,8 @@ import sys
 import urllib.request
 
 
-api_filename = "projects.md"
+# api_filename = "projects.md"
+api_filename = "groups.md"
 url = "https://gitlab.com/gitlab-org/gitlab-ce/raw/master/doc/api/" + api_filename
 
 

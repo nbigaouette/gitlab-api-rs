@@ -1,3 +1,27 @@
+//! List groups
+//!
+//! https://docs.gitlab.com/ce/api/groups.html#list-groups
+//!
+//! # List groups
+//!
+//! Get a list of groups. (As user: my groups or all available, as admin: all groups).
+//!
+//! ```text
+//! GET /groups
+//! ```
+//!
+//! Parameters:
+//!
+//! | Attribute | Type | Required | Description |
+//! | --------- | ---- | -------- | ----------- |
+//! | `skip_groups` | array of integers | no | Skip the group IDs passes |
+//! | `all_available` | boolean | no | Show all the groups you have access to |
+//! | `search` | string | no | Return list of authorized groups matching the search criteria |
+//! | `order_by` | string | no | Order groups by `name` or `path`. Default is `name` |
+//! | `sort` | string | no | Order groups in `asc` or `desc` order. Default is `asc` |
+//!
+//! You can search for groups by name or path.
+//!
 
 use BuildQuery;
 
@@ -5,19 +29,11 @@ pub mod owned_groups;
 pub mod projects;
 pub mod details;
 
-
-// https://docs.gitlab.com/ce/api/groups.html
-// List groups:                 GET /groups
-// List owned groups:           GET /groups/owned
-// List a group's projects:     GET /groups/:id/projects
-// Details of a group:          GET /groups/:id
+// TODO:
 // New group:                   POST /groups
 // Transfer project to group:   POST  /groups/:id/projects/:project_id
 // Update group:                PUT /groups/:id
 // Remove group:                DELETE /groups/:id
-// Search for group:            GET /groups?search=foobar
-
-// https://docs.gitlab.com/ce/api/groups.html#list-groups
 
 
 #[derive(Debug, Copy, Clone)]
