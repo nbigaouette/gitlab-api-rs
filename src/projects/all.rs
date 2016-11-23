@@ -23,7 +23,6 @@
 
 use BuildQuery;
 
-use serde;
 use serde_json;
 
 use gitlab::GitLab;
@@ -79,6 +78,7 @@ pub struct Listing {
 }
 
 
+#[allow(dead_code)]
 impl Listing {
     pub fn new() -> Listing {
         Default::default()
@@ -177,7 +177,7 @@ impl BuildQuery for Listing {
 
         if !self.search.is_empty() {
             query.push_str(split_char);
-            split_char = &amp_char;
+            // split_char = &amp_char;
 
             query.push_str("search=");
             query.push_str(&self.search);

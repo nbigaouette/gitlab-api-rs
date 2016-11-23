@@ -22,7 +22,6 @@
 
 use BuildQuery;
 
-use serde;
 use serde_json;
 
 use gitlab::GitLab;

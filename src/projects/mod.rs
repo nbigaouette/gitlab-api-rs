@@ -25,7 +25,6 @@
 
 use BuildQuery;
 
-use serde;
 use serde_json;
 
 use gitlab::GitLab;
@@ -181,6 +180,7 @@ pub struct Listing {
 }
 
 
+#[allow(dead_code)]
 impl Listing {
     pub fn new() -> Listing {
         Default::default()

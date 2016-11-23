@@ -66,6 +66,7 @@ pub struct Listing {
 }
 
 
+#[allow(dead_code)]
 impl Listing {
     pub fn new() -> Listing {
         Default::default()

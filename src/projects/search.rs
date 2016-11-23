@@ -21,7 +21,6 @@
 
 use BuildQuery;
 
-use serde;
 use serde_json;
 
 use gitlab::GitLab;
@@ -65,6 +64,7 @@ pub struct Listing {
 }
 
 
+#[allow(dead_code)]
 impl Listing {
     pub fn new(query: String) -> Listing {
         Listing {
@@ -117,7 +117,7 @@ impl BuildQuery for Listing {
 
         self.sort.map(|sort| {
             query.push_str(split_char);
-            split_char = &amp_char;
+            // split_char = &amp_char;
 
             query.push_str("sort=");
             query.push_str(match sort {
