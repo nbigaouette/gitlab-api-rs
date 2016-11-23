@@ -131,10 +131,13 @@ impl GitLab {
             .header(hyper::header::Connection::close())
             .send()
             .unwrap();
+        info!("res.status: {:?}", res.status);
+        debug!("res.headers: {:?}", res.headers);
+        debug!("res.url: {:?}", res.url);
 
         let mut body = String::new();
         res.read_to_string(&mut body).unwrap();
-        debug!("body: {:?}", body);
+        debug!("body:\n{:?}", body);
 
         // FIXME: Properly handle the error. Will require defining our own errors...
         assert_eq!(res.status, hyper::status::StatusCode::Ok);
