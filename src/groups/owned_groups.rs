@@ -6,7 +6,7 @@
 //!
 //! Get a list of groups which are owned by the authenticated user.
 //!
-//! ```
+//! ```text
 //! GET /groups/owned
 //! ```
 

@@ -6,7 +6,7 @@
 //!
 //! Get all details of a group.
 //!
-//! ```
+//! ```text
 //! GET /groups/ID
 //! ```
 //!

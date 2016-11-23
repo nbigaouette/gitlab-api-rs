@@ -6,7 +6,7 @@
 //!
 //! Get a list of projects in this group.
 //!
-//! ```
+//! ```text
 //! GET /groups/ID/projects
 //! ```
 //!
