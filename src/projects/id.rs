@@ -10,7 +10,7 @@
 //! eg. `/api/v3/projects/diaspora%2Fdiaspora` (where `/` is represented by `%2F`).
 //!
 //! ```text
-//! GET /projects/:id
+//! GET /projects/ID
 //! ```
 //!
 //! Parameters:
