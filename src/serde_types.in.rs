@@ -145,6 +145,7 @@ pub struct Project {
     star_count: i64,
     forks_count: i64,
     open_issues_count: i64,
+    runners_token: Option<String>,
     public_builds: bool,
     shared_with_groups: Vec<ProjectSharedWithGroup>,
     only_allow_merge_if_build_succeeds: bool,
