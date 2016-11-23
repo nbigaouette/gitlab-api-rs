@@ -34,9 +34,16 @@ fn main() {
     //     page: 1,
     //     per_page: 100,
     // });
-    // let _projects = gl.projects().unwrap();
+    let projects = gl.projects(gitlab::projects::Listing::new()).unwrap();
+    println!("projects: {:?}", projects);
     // FIXME: Project's members are private
     // for project in projects {
     //     println!("{:?}", project.path_with_namespace);
     // }
+
+    let projects = gl.projects_all(gitlab::projects::all::Listing::new()).unwrap();
+    println!("projects: {:?}", projects);
+
+    let projects = gl.projects_id(gitlab::projects::id::Listing::new(gitlab::projects::id::ListingId::Id(10))).unwrap();
+    println!("projects: {:?}", projects);
 }
