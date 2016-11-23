@@ -54,6 +54,6 @@ fn main() {
     println!("projects: {:?}", projects);
 
     let listing = projects::id::Listing::new(projects::id::ListingId::Id(10));
-    let projects = gl.projects_id(listing).unwrap();
+    let projects = gl.project_id(listing).unwrap();
     println!("projects: {:?}", projects);
 }

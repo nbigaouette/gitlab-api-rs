@@ -25,11 +25,11 @@ use BuildQuery;
 use serde_json;
 
 use gitlab::GitLab;
-use Projects;
+use Project;
 
 
 impl GitLab {
-    pub fn projects_id(&self, listing: Listing) -> Result<Projects, serde_json::Error> {
+    pub fn project_id(&self, listing: Listing) -> Result<Project, serde_json::Error> {
         let query = listing.build_query();
         self.get(&query)
     }
