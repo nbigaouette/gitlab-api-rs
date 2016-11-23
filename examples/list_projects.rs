@@ -30,10 +30,10 @@ fn main() {
     //     gl.set_pagination(Pagination{page: i, per_page: 1});
     //     println!("projects: {:?}", gl.projects().unwrap());
     // }
-    gl.set_pagination(Pagination {
-        page: 1,
-        per_page: 100,
-    });
+    // gl.set_pagination(Pagination {
+    //     page: 1,
+    //     per_page: 100,
+    // });
     // let _projects = gl.projects().unwrap();
     // FIXME: Project's members are private
     // for project in projects {
