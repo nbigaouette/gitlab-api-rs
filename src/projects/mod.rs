@@ -105,7 +105,8 @@ pub mod visible;
 // PUT /projects/:id/hooks/:hook_id
 //
 //
-// Removes a hook from a project. This is an idempotent method and can be called multiple times. Either the hook is available or not.
+// Removes a hook from a project. This is an idempotent method and can be called multiple times.
+// Either the hook is available or not.
 // DELETE /projects/:id/hooks/:hook_id
 //
 //

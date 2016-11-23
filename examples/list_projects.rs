@@ -44,6 +44,7 @@ fn main() {
     let projects = gl.projects_all(gitlab::projects::all::Listing::new()).unwrap();
     println!("projects: {:?}", projects);
 
-    let projects = gl.projects_id(gitlab::projects::id::Listing::new(gitlab::projects::id::ListingId::Id(10))).unwrap();
+    let listing = gitlab::projects::id::Listing::new(gitlab::projects::id::ListingId::Id(10));
+    let projects = gl.projects_id(listing).unwrap();
     println!("projects: {:?}", projects);
 }

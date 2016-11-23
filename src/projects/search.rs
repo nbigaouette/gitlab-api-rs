@@ -157,19 +157,11 @@ mod tests {
             .build_query();
         assert_eq!(query, expected_string);
 
-        // let expected_string = format!("projects/search/{}?order_by=path", TEST_SEARCH_QUERY);
-        // let query = Listing::new(TEST_SEARCH_QUERY.to_string()).order_by(ListingOrderBy::Path).build_query();
-        // assert_eq!(query, expected_string);
-
         let expected_string = format!("projects/search/{}?order_by=created_at", TEST_SEARCH_QUERY);
         let query = Listing::new(TEST_SEARCH_QUERY.to_string())
             .order_by(ListingOrderBy::CreatedAt)
             .build_query();
         assert_eq!(query, expected_string);
-
-        // let expected_string = format!("projects/search/{}?order_by=updated_at", TEST_SEARCH_QUERY);
-        // let query = Listing::new(TEST_SEARCH_QUERY.to_string()).order_by(ListingOrderBy::UpdatedAt).build_query();
-        // assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/search/{}?order_by=last_activity_at",
                                       TEST_SEARCH_QUERY);
