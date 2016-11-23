@@ -61,6 +61,8 @@ for section in sectionsList:
         print("filename:", filename)
         full_filename = os.path.join(doc_dir, filename)
         with open(full_filename, "w") as f:
+            f.write("//! %s\n" % title)
+            f.write("//!\n")
             f.write("//! # %s\n" % title)
             for line in lines[1:]:
                 f.write("//! %s\n" % line)
