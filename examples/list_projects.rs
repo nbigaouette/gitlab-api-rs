@@ -7,7 +7,7 @@ extern crate log;
 extern crate env_logger;
 
 use gitlab::GitLab;
-use gitlab::Pagination;
+// use gitlab::Pagination;
 use gitlab::projects;
 
 
