@@ -25,6 +25,12 @@
 
 use BuildQuery;
 
+use serde;
+use serde_json;
+
+use gitlab::GitLab;
+use Projects;
+
 
 pub mod all;
 pub mod id_branches;
@@ -121,8 +127,12 @@ pub mod visible;
 //
 
 
-
-
+impl GitLab {
+    pub fn projects(&self, listing: Listing) -> Result<Projects, serde_json::Error> {
+        let query = listing.build_query();
+        self.get(&query)
+    }
+}
 
 
 // https://docs.gitlab.com/ce/api/projects.html#list-projects

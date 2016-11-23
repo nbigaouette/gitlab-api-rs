@@ -23,6 +23,20 @@
 
 use BuildQuery;
 
+use serde;
+use serde_json;
+
+use gitlab::GitLab;
+use Projects;
+
+
+impl GitLab {
+    pub fn projects_all(&self, listing: Listing) -> Result<Projects, serde_json::Error> {
+        let query = listing.build_query();
+        self.get(&query)
+    }
+}
+
 
 #[derive(Debug, Copy, Clone)]
 pub enum ListingVisibility {
