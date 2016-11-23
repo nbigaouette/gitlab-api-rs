@@ -71,7 +71,7 @@ mod tests {
 
 
     #[test]
-    fn projects_build_query_id() {
+    fn build_query_id() {
         let expected_string = format!("projects/{}", TEST_PROJECT_ID);
         let query = Listing::new(ListingId::Id(123)).build_query();
         assert_eq!(query, expected_string);

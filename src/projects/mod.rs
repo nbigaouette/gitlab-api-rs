@@ -303,7 +303,7 @@ mod tests {
 
 
     #[test]
-    fn projects_build_query_default() {
+    fn build_query_default() {
         let expected_string = "projects";
         let listing: Listing = Default::default();
         let query = listing.build_query();
@@ -317,7 +317,7 @@ mod tests {
 
 
     #[test]
-    fn projects_build_query_archived() {
+    fn build_query_archived() {
         let expected_string = "projects?archived=true";
         let query = Listing::new().archived(true).build_query();
         assert_eq!(query, expected_string);
@@ -329,7 +329,7 @@ mod tests {
 
 
     #[test]
-    fn projects_build_query_visibility() {
+    fn build_query_visibility() {
         let expected_string = "projects?visibility=public";
         let query = Listing::new().visibility(ListingVisibility::Public).build_query();
         assert_eq!(query, expected_string);
@@ -345,7 +345,7 @@ mod tests {
 
 
     #[test]
-    fn projects_build_query_order_by() {
+    fn build_query_order_by() {
         let expected_string = "projects?order_by=id";
         let query = Listing::new().order_by(ListingOrderBy::Id).build_query();
         assert_eq!(query, expected_string);
@@ -373,7 +373,7 @@ mod tests {
 
 
     #[test]
-    fn projects_build_query_sort() {
+    fn build_query_sort() {
         let expected_string = "projects?sort=asc";
         let query = Listing::new().sort(ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
@@ -385,7 +385,7 @@ mod tests {
 
 
     #[test]
-    fn projects_build_query_search() {
+    fn build_query_search() {
         let expected_string = "projects?search=SearchPattern";
         let query = Listing::new().search(String::from("SearchPattern")).build_query();
         assert_eq!(query, expected_string);
@@ -393,7 +393,7 @@ mod tests {
 
 
     #[test]
-    fn projects_build_query_simple() {
+    fn build_query_simple() {
         let expected_string = "projects?simple=true";
         let query = Listing::new().simple(true).build_query();
         assert_eq!(query, expected_string);
