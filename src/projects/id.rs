@@ -23,7 +23,6 @@
 use BuildQuery;
 
 
-
 #[derive(Debug, Clone)]
 pub enum ListingId {
     Id(i64),
