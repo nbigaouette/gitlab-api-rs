@@ -1,11 +1,33 @@
+//! List a group's projects
+//!
+//! https://docs.gitlab.com/ce/api/groups.html#list-a-group-s-projects
+//!
+//! # List a group's projects
+//!
+//! Get a list of projects in this group.
+//!
+//! ```
+//! GET /groups/ID/projects
+//! ```
+//!
+//! Parameters:
+//!
+//! - `archived` (optional) - if passed, limit by archived status
+//! - `visibility` (optional) - if passed, limit by visibility `public`, `internal`, `private`
+//! - `order_by` (optional) - Return requests ordered by `id`, `name`, `path`, `created_at`,
+//!     `updated_at` or `last_activity_at` fields. Default is `created_at`
+//! - `sort` (optional) - Return requests sorted in `asc` or `desc` order. Default is `desc`
+//! - `search` (optional) - Return list of authorized projects according to a search criteria
+//! - `ci_enabled_first` - Return projects ordered by ci_enabled flag. Projects with enabled
+//!     GitLab CI go first
+//!
+//!
+
+
 use BuildQuery;
 
+
 // FIXME: Use a type for the project id.
-
-/// Get a list of projects in this group.
-/// GET /groups/:id/projects
-/// https://docs.gitlab.com/ce/api/groups.html#list-a-group-s-projects
-
 
 #[derive(Debug, Copy, Clone)]
 pub enum ListingVisibility {
@@ -54,10 +76,7 @@ pub struct Listing {
 
 impl Listing {
     pub fn new(id: i64) -> Listing {
-        Listing {
-            id: id,
-            ..Default::default()
-        }
+        Listing { id: id, ..Default::default() }
     }
     pub fn archived(&mut self, archived: bool) -> &mut Listing {
         self.archived = Some(archived);
@@ -83,7 +102,6 @@ impl Listing {
         self.ci_enabled_first = Some(ci_enabled_first);
         self
     }
-
 }
 
 
@@ -213,15 +231,21 @@ mod tests {
     #[test]
     fn groups_build_query_visibility() {
         let expected_string = format!("groups/{}/projects?visibility=public", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).visibility(ListingVisibility::Public).build_query();
+        let query = Listing::new(TEST_PROJECT_ID.clone())
+            .visibility(ListingVisibility::Public)
+            .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?visibility=internal", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).visibility(ListingVisibility::Internal).build_query();
+        let query = Listing::new(TEST_PROJECT_ID.clone())
+            .visibility(ListingVisibility::Internal)
+            .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?visibility=private", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).visibility(ListingVisibility::Private).build_query();
+        let query = Listing::new(TEST_PROJECT_ID.clone())
+            .visibility(ListingVisibility::Private)
+            .build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -229,27 +253,35 @@ mod tests {
     #[test]
     fn groups_build_query_order_by() {
         let expected_string = format!("groups/{}/projects?order_by=id", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::Id).build_query();
+        let query =
+            Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::Id).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?order_by=name", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::Name).build_query();
+        let query =
+            Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::Name).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?order_by=path", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::Path).build_query();
+        let query =
+            Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::Path).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?order_by=created_at", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::CreatedAt).build_query();
+        let query =
+            Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::CreatedAt).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?order_by=updated_at", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::UpdatedAt).build_query();
+        let query =
+            Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::UpdatedAt).build_query();
         assert_eq!(query, expected_string);
 
-        let expected_string = format!("groups/{}/projects?order_by=last_activity_at", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::LastActivityAt).build_query();
+        let expected_string = format!("groups/{}/projects?order_by=last_activity_at",
+                                      TEST_PROJECT_ID);
+        let query = Listing::new(TEST_PROJECT_ID.clone())
+            .order_by(ListingOrderBy::LastActivityAt)
+            .build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -269,7 +301,9 @@ mod tests {
     #[test]
     fn groups_build_query_search() {
         let expected_string = format!("groups/{}/projects?search=SearchPattern", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).search(String::from("SearchPattern")).build_query();
+        let query = Listing::new(TEST_PROJECT_ID.clone())
+            .search(String::from("SearchPattern"))
+            .build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -288,8 +322,12 @@ mod tests {
 
     #[test]
     fn groups_build_query_multiple() {
-        let expected_string = format!("groups/{}/projects?archived=true&ci_enabled_first=true", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).archived(true).ci_enabled_first(true).build_query();
+        let expected_string = format!("groups/{}/projects?archived=true&ci_enabled_first=true",
+                                      TEST_PROJECT_ID);
+        let query = Listing::new(TEST_PROJECT_ID.clone())
+            .archived(true)
+            .ci_enabled_first(true)
+            .build_query();
         assert_eq!(query, expected_string);
     }
 }

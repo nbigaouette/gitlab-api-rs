@@ -29,7 +29,7 @@ pub struct GitLab {
     port: u16,
     private_token: String,
     client: hyper::Client,
-    pagination: Pagination,
+    pagination: Option<Pagination>,
 }
 
 
@@ -65,10 +65,7 @@ impl GitLab {
                 }
                 Err(_) => hyper::Client::new(),
             },
-            pagination: Pagination {
-                page: 1,
-                per_page: 20,
-            },
+            pagination: None,
         }
     }
 
@@ -90,8 +87,7 @@ impl GitLab {
     /// use gitlab_api::GitLab;
     ///
     /// let expected_url = "https://gitlab.example.com:\
-    ///                     443/api/v3/groups?\
-    ///                     order_by=path&private_token=XXXXXXXXXXXXX&page=1&per_page=20";
+    ///                     443/api/v3/groups?order_by=path&private_token=XXXXXXXXXXXXX";
     ///
     /// let gl = GitLab::new_https("gitlab.example.com", "XXXXXXXXXXXXX");
     ///
@@ -99,16 +95,20 @@ impl GitLab {
     /// ```
     pub fn build_url(&self, query: &str) -> String {
         let params_splitter = if query.find('?').is_some() { "&" } else { "?" };
-        format!("{}://{}:{}/api/v{}/{}{}private_token={}&page={}&per_page={}",
-                self.scheme,
-                self.domain,
-                self.port,
-                API_VERSION,
-                query,
-                params_splitter,
-                self.private_token,
-                self.pagination.page,
-                self.pagination.per_page)
+        let mut url = format!("{}://{}:{}/api/v{}/{}{}private_token={}",
+                              self.scheme,
+                              self.domain,
+                              self.port,
+                              API_VERSION,
+                              query,
+                              params_splitter,
+                              self.private_token);
+
+        self.pagination.as_ref().map(|pagination| {
+            url.push_str(&format!("&page={}&per_page={}", pagination.page, pagination.per_page));
+        });
+
+        url
     }
 
     pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
@@ -118,7 +118,7 @@ impl GitLab {
     }
 
     pub fn set_pagination(&mut self, pagination: Pagination) {
-        self.pagination = pagination;
+        self.pagination = Some(pagination);
     }
 
     pub fn get<T>(&self, query: &str) -> Result<T, serde_json::Error>

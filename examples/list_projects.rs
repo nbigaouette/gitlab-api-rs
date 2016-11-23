@@ -4,6 +4,8 @@ extern crate gitlab_api as gitlab;
 use std::env;
 use gitlab::GitLab;
 use gitlab::Pagination;
+use gitlab::projects;
+
 
 fn main() {
     let hostname = match env::var("GITLAB_HOSTNAME") {
@@ -30,13 +32,21 @@ fn main() {
     //     gl.set_pagination(Pagination{page: i, per_page: 1});
     //     println!("projects: {:?}", gl.projects().unwrap());
     // }
-    gl.set_pagination(Pagination {
-        page: 1,
-        per_page: 100,
-    });
-    // let _projects = gl.projects().unwrap();
+    // gl.set_pagination(Pagination {
+    //     page: 1,
+    //     per_page: 100,
+    // });
+    let projects = gl.projects(projects::Listing::new()).unwrap();
+    println!("projects: {:?}", projects);
     // FIXME: Project's members are private
     // for project in projects {
     //     println!("{:?}", project.path_with_namespace);
     // }
+
+    let projects = gl.projects_all(projects::all::Listing::new()).unwrap();
+    println!("projects: {:?}", projects);
+
+    let listing = projects::id::Listing::new(projects::id::ListingId::Id(10));
+    let projects = gl.projects_id(listing).unwrap();
+    println!("projects: {:?}", projects);
 }

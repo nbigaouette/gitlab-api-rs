@@ -1,7 +1,19 @@
+//! List owned groups
+//!
+//! https://docs.gitlab.com/ce/api/groups.html#list-owned-groups
+//!
+//! # List owned groups
+//!
+//! Get a list of groups which are owned by the authenticated user.
+//!
+//! ```
+//! GET /groups/owned
+//! ```
+
+
 use BuildQuery;
 
 
-/// https://docs.gitlab.com/ce/api/groups.html#list-owned-groups
 #[derive(Default, Debug, Clone)]
 pub struct Listing {
 }
