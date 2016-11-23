@@ -39,12 +39,8 @@ pub struct Listing {
 
 
 impl Listing {
-    pub fn new() -> Listing {
-        Default::default()
-    }
-    pub fn id(&mut self, id: ListingId) -> &mut Listing {
-        self.id = Some(id);
-        self
+    pub fn new(id: ListingId) -> Listing {
+        Listing { id: Some(id) }
     }
 }
 
@@ -52,24 +48,9 @@ impl Listing {
 impl BuildQuery for Listing {
     fn build_query(&self) -> String {
 
-        let mut query = String::from("projects");
-
-        let amp_char = "&";
-        let none_char = "";
-        let mut split_char = &none_char;
-
-        // Append a "?" only if at least one of the `Option` is `Some(_)` or if
-        // strings contain something.
-        query.push_str(match &self.id {
-            &None => "",
-            _ => "?",
-        });
+        let mut query = String::from("projects/");
 
         self.id.clone().map(|id| {
-            query.push_str(split_char);
-            split_char = &amp_char;
-
-            query.push_str("id=");
             query.push_str(&match id {
                 ListingId::Id(id) => id.to_string(),
                 ListingId::NamespaceProject(s) => s.replace("/", "%2F"),
@@ -86,29 +67,19 @@ mod tests {
     use super::*;
     use BuildQuery;
 
-
-    #[test]
-    fn projects_build_query_default() {
-        let expected_string = "projects";
-        let listing: Listing = Default::default();
-        let query = listing.build_query();
-        assert_eq!(query, expected_string);
-
-        let expected_string = "projects";
-        let listing = Listing::new();
-        let query = listing.build_query();
-        assert_eq!(query, expected_string);
-    }
+    const TEST_PROJECT_ID: i64 = 123;
+    const TEST_PROJECT_NAME: &'static str = "group/project";
 
 
     #[test]
     fn projects_build_query_id() {
-        let expected_string = "projects?id=123";
-        let query = Listing::new().id(ListingId::Id(123)).build_query();
+        let expected_string = format!("projects/{}", TEST_PROJECT_ID);
+        let query = Listing::new(ListingId::Id(123)).build_query();
         assert_eq!(query, expected_string);
 
-        let expected_string = "projects?id=group%2Fproject";
-        let query = Listing::new().id(ListingId::NamespaceProject("group/project".to_string())).build_query();
+
+        let expected_string = format!("projects/{}", TEST_PROJECT_NAME.to_string().replace("/", "%2F"));
+        let query = Listing::new(ListingId::NamespaceProject(TEST_PROJECT_NAME.to_string())).build_query();
         assert_eq!(query, expected_string);
     }
 }
