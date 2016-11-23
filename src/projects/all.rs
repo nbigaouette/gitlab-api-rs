@@ -1,5 +1,7 @@
 //! List ALL projects
 //!
+//! https://docs.gitlab.com/ce/api/projects.html#list-all-projects
+//!
 //! # List ALL projects
 //!
 //! Get a list of all GitLab projects (admin only).

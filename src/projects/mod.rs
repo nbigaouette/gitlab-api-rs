@@ -1,5 +1,7 @@
 //! List projects
 //!
+//! https://docs.gitlab.com/ce/api/projects.html
+//!
 //! # List projects
 //!
 //! Get a list of projects for which the authenticated user is a member.
@@ -36,7 +38,6 @@ pub mod search;
 pub mod starred;
 pub mod visible;
 
-// https://docs.gitlab.com/ce/api/projects.html
 
 // TODO:
 //

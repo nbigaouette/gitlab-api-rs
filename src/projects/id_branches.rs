@@ -1,5 +1,7 @@
 //! List branches
 //!
+//! https://docs.gitlab.com/ce/api/projects.html#list-branches
+//!
 //! # List branches
 //!
 //! Lists all branches of a project.

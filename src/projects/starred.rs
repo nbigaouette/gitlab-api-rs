@@ -1,5 +1,7 @@
 //! List starred projects
 //!
+//! https://docs.gitlab.com/ce/api/projects.html#list-starred-projects
+//!
 //! # List starred projects
 //!
 //! Get a list of projects which are starred by the authenticated user.

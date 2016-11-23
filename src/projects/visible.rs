@@ -1,5 +1,7 @@
 //! Get a list of projects which the authenticated user can see.
 //!
+//! https://docs.gitlab.com/ce/api/projects.html#list-projects
+//!
 //! # Get a list of projects which the authenticated user can see.
 //!
 //! ```

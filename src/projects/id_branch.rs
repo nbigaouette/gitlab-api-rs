@@ -1,5 +1,7 @@
 //! Single branch
 //!
+//! https://docs.gitlab.com/ce/api/projects.html#single-branch
+//!
 //! # Single branch
 //!
 //! A specific branch of a project.

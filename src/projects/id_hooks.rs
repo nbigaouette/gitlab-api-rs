@@ -1,5 +1,7 @@
 //! List project hooks
 //!
+//! https://docs.gitlab.com/ce/api/projects.html#list-project-hooks
+//!
 //! # List project hooks
 //!
 //! Get a list of project hooks.

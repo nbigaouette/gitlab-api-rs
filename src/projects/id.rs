@@ -1,5 +1,7 @@
 //! Get project by id.
 //!
+//! https://docs.gitlab.com/ce/api/projects.html#get-single-project
+//!
 //! # Get single project
 //!
 //! Get a specific project, identified by project ID or NAMESPACE/PROJECT_NAME, which is owned by

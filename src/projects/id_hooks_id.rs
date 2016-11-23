@@ -1,5 +1,7 @@
 //! Get project hook
 //!
+//! https://docs.gitlab.com/ce/api/projects.html#get-project-hook
+//!
 //! # Get project hook
 //!
 //! Get a specific hook for a project.

@@ -1,5 +1,7 @@
 //! Search for projects by name
 //!
+//! https://docs.gitlab.com/ce/api/projects.html#search-for-projects-by-name
+//!
 //! # Search for projects by name
 //!
 //! Search for projects by name which are accessible to the authenticated user.

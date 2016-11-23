@@ -1,5 +1,7 @@
 //! List owned projects
 //!
+//! https://docs.gitlab.com/ce/api/projects.html#list-owned-projects
+//!
 //! # List owned projects
 //!
 //! Get a list of projects which are owned by the authenticated user.
