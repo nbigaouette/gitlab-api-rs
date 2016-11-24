@@ -41,8 +41,8 @@ trait BuildQuery {
 
 #[cfg(test)]
 mod tests {
-    use gitlab::GitLab;
-    use hyper;
+    // use gitlab::GitLab;
+    // use hyper;
 
     // #[test]
     // fn unauthorized() {
