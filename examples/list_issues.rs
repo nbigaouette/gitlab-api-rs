@@ -46,4 +46,8 @@ fn main() {
     let listing = issues::Listing::new().state(issues::ListingState::Closed).clone();
     let closed_issues = gl.issues(listing).unwrap();
     println!("closed_issues: {:?}", closed_issues);
+
+    let listing = issues::single::Listing::new(142, 739);
+    let issue = gl.issue(listing).unwrap();
+    println!("issue: {:?}", issue);
 }
