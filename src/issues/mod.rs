@@ -26,6 +26,8 @@ use serde_json;
 use gitlab::GitLab;
 use Issues;
 
+pub mod single;
+
 
 impl GitLab {
     pub fn issues(&self, listing: Listing) -> Result<Issues, serde_json::Error> {
