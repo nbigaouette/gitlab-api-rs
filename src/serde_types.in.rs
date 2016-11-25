@@ -229,7 +229,7 @@ pub struct Issue {
     updated_at: String,  // FIXME: Use date type?
     labels: Vec<String>,
     milestone: Option<Milestone>,
-    assignee: Option<String>,
+    assignee: Option<User>,
     author: User,
     subscribed: bool,
     user_notes_count: i64,
