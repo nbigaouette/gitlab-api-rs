@@ -26,6 +26,7 @@ extern crate hyper;
 pub mod gitlab;
 pub mod groups;
 pub mod projects;
+pub mod issues;
 
 // Re-export those structs
 pub use gitlab::Pagination;
@@ -41,8 +42,8 @@ trait BuildQuery {
 
 #[cfg(test)]
 mod tests {
-    use gitlab::GitLab;
-    use hyper;
+    // use gitlab::GitLab;
+    // use hyper;
 
     // #[test]
     // fn unauthorized() {

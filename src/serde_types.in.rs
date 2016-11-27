@@ -4,6 +4,8 @@
 // https://serde.rs/codegen-hybrid.html
 
 
+// FIXME: Maje sure that all structs above Issue are not using `String`s instead of `Enum`s.
+
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Version {
@@ -156,3 +158,87 @@ pub struct Project {
 }
 
 pub type Projects = Vec<Project>;
+
+
+
+
+#[derive(Debug, Serialize, Deserialize)]
+enum IssueState {
+    #[serde(rename = "opened")]
+    Opened,
+
+    #[serde(rename = "closed")]
+    Closed,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+enum IssueAuthorState {
+    #[serde(rename = "active")]
+    Active,
+
+    #[serde(rename = "blocked")]
+    Blocked,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+enum MilestoneState {
+    #[serde(rename = "active")]
+    Active,
+
+    #[serde(rename = "closed")]
+    Closed,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Milestone {
+    id: i64,
+    iid: i64,
+    project_id: i64,
+    title: String,
+    description: String,
+    state: MilestoneState,
+    created_at: String,  // FIXME: Use date type?
+    updated_at: String,  // FIXME: Use date type?
+    due_date: Option<String>  // FIXME: Use date type?
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+struct User {
+    name: String,
+    username: String,
+    id: i64,
+    state: IssueAuthorState,
+    avatar_url: Option<String>,
+    web_url: Option<String>
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Issue {
+    id: i64,
+    iid: i64,
+    project_id: i64,
+    title: String,
+    description: String,
+    state: IssueState,
+    created_at: String,  // FIXME: Use date type?
+    updated_at: String,  // FIXME: Use date type?
+    labels: Vec<String>,
+    milestone: Option<Milestone>,
+    assignee: Option<User>,
+    author: User,
+    subscribed: bool,
+    user_notes_count: i64,
+    upvotes: i64,
+    downvotes: i64,
+    due_date: Option<String>,  // FIXME: Use date type?
+    confidential: bool,
+    web_url: Option<String>
+}
+
+
+pub type Issues = Vec<Issue>;
