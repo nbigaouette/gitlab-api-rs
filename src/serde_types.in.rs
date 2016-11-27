@@ -5,6 +5,9 @@
 
 
 // FIXME: Make sure that all structs above Issue are not using `String`s instead of `Enum`s.
+// FIXME: Harmonize the different state enums (e.g. IssueState, MergeRequestState, Authors)
+// FIXME: Use a type for sha1
+// FIXME: Use chrono crate for dates
 
 
 #[derive(Debug, Serialize, Deserialize)]
