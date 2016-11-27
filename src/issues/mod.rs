@@ -27,6 +27,7 @@ use gitlab::GitLab;
 use Issues;
 
 pub mod group;
+pub mod project;
 pub mod single;
 
 
