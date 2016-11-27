@@ -4,7 +4,7 @@
 // https://serde.rs/codegen-hybrid.html
 
 
-// FIXME: Maje sure that all structs above Issue are not using `String`s instead of `Enum`s.
+// FIXME: Make sure that all structs above Issue are not using `String`s instead of `Enum`s.
 
 
 #[derive(Debug, Serialize, Deserialize)]
