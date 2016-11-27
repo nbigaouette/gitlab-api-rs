@@ -50,4 +50,8 @@ fn main() {
     let listing = issues::single::Listing::new(142, 739);
     let issue = gl.issue(listing).unwrap();
     println!("issue: {:?}", issue);
+
+    let listing = issues::group::Listing::new(21).state(issues::group::ListingState::Closed).clone();
+    let group_issues = gl.group_issues(listing).unwrap();
+    println!("group_issues: {:?}", group_issues);
 }
