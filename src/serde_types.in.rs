@@ -176,7 +176,7 @@ enum IssueState {
 
 
 #[derive(Debug, Serialize, Deserialize)]
-enum IssueAuthorState {
+enum UserState {
     #[serde(rename = "active")]
     Active,
 
@@ -214,7 +214,7 @@ struct User {
     name: String,
     username: String,
     id: i64,
-    state: IssueAuthorState,
+    state: UserState,
     avatar_url: Option<String>,
     web_url: Option<String>
 }
