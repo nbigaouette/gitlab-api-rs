@@ -35,27 +35,6 @@ use gitlab::GitLab;
 use Issues;
 
 
-#[derive(Debug, Copy, Clone)]
-pub enum ListingState {
-    Opened,
-    Closed,
-}
-
-
-#[derive(Debug, Copy, Clone)]
-pub enum ListingOrderBy {
-    CreatedAt,
-    UpdatedAt,
-}
-
-
-#[derive(Debug, Copy, Clone)]
-pub enum ListingSort {
-    Asc,
-    Desc,
-}
-
-
 impl GitLab {
     pub fn group_issues(&self, listing: Listing) -> Result<Issues, serde_json::Error> {
         let query = listing.build_query();
@@ -69,15 +48,15 @@ pub struct Listing {
     /// The ID of a group
     id: i64,
     /// State of issues to return.
-    state: Option<ListingState>,
+    state: Option<::issues::ListingState>,
     /// Labels of issues to return.
     labels: Vec<String>,
     /// The milestone title
     milestone: String,
-    /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
-    order_by: Option<ListingOrderBy>,
-    /// Return requests sorted. Default is `ListingSort::Desc`.
-    sort: Option<ListingSort>,
+    /// Return requests ordered by. Default is `::issues::ListingOrderBy::CreatedAt`.
+    order_by: Option<::issues::ListingOrderBy>,
+    /// Return requests sorted. Default is `::issues::ListingSort::Desc`.
+    sort: Option<::issues::ListingSort>,
 }
 
 
@@ -86,7 +65,7 @@ impl Listing {
     pub fn new(id: i64) -> Listing {
         Listing {id: id, ..Default::default()}
     }
-    pub fn state(&mut self, state: ListingState) -> &mut Listing {
+    pub fn state(&mut self, state: ::issues::ListingState) -> &mut Listing {
         self.state = Some(state);
         self
     }
@@ -98,11 +77,11 @@ impl Listing {
         self.milestone = milestone;
         self
     }
-    pub fn order_by(&mut self, order_by: ListingOrderBy) -> &mut Listing {
+    pub fn order_by(&mut self, order_by: ::issues::ListingOrderBy) -> &mut Listing {
         self.order_by = Some(order_by);
         self
     }
-    fn sort(&mut self, sort: ListingSort) -> &mut Listing {
+    fn sort(&mut self, sort: ::issues::ListingSort) -> &mut Listing {
         self.sort = Some(sort);
         self
     }
@@ -133,8 +112,8 @@ impl BuildQuery for Listing {
 
             query.push_str("state=");
             query.push_str(match state {
-                ListingState::Opened => "opened",
-                ListingState::Closed => "closed",
+                ::issues::ListingState::Opened => "opened",
+                ::issues::ListingState::Closed => "closed",
             });
         });
 
@@ -166,8 +145,8 @@ impl BuildQuery for Listing {
 
             query.push_str("order_by=");
             query.push_str(match order_by {
-                ListingOrderBy::CreatedAt => "created_at",
-                ListingOrderBy::UpdatedAt => "updated_at",
+                ::issues::ListingOrderBy::CreatedAt => "created_at",
+                ::issues::ListingOrderBy::UpdatedAt => "updated_at",
             });
         });
 
@@ -177,8 +156,8 @@ impl BuildQuery for Listing {
 
             query.push_str("sort=");
             query.push_str(match sort {
-                ListingSort::Asc => "asc",
-                ListingSort::Desc => "desc",
+                ::issues::ListingSort::Asc => "asc",
+                ::issues::ListingSort::Desc => "desc",
             });
         });
 
@@ -204,11 +183,11 @@ mod tests {
     #[test]
     fn build_query_state() {
         let expected_string = "groups/123/issues?state=opened";
-        let query = Listing::new(123).state(ListingState::Opened).build_query();
+        let query = Listing::new(123).state(::issues::ListingState::Opened).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "groups/123/issues?state=closed";
-        let query = Listing::new(123).state(ListingState::Closed).build_query();
+        let query = Listing::new(123).state(::issues::ListingState::Closed).build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -224,11 +203,11 @@ mod tests {
     #[test]
     fn build_query_order_by() {
         let expected_string = "groups/123/issues?order_by=created_at";
-        let query = Listing::new(123).order_by(ListingOrderBy::CreatedAt).build_query();
+        let query = Listing::new(123).order_by(::issues::ListingOrderBy::CreatedAt).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "groups/123/issues?order_by=updated_at";
-        let query = Listing::new(123).order_by(ListingOrderBy::UpdatedAt).build_query();
+        let query = Listing::new(123).order_by(::issues::ListingOrderBy::UpdatedAt).build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -236,11 +215,11 @@ mod tests {
     #[test]
     fn build_query_sort() {
         let expected_string = "groups/123/issues?sort=asc";
-        let query = Listing::new(123).sort(ListingSort::Asc).build_query();
+        let query = Listing::new(123).sort(::issues::ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "groups/123/issues?sort=desc";
-        let query = Listing::new(123).sort(ListingSort::Desc).build_query();
+        let query = Listing::new(123).sort(::issues::ListingSort::Desc).build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -248,7 +227,7 @@ mod tests {
     #[test]
     fn build_query_multiple() {
         let expected_string = "groups/123/issues?order_by=created_at&sort=asc";
-        let query = Listing::new(123).sort(ListingSort::Asc).order_by(ListingOrderBy::CreatedAt).build_query();
+        let query = Listing::new(123).sort(::issues::ListingSort::Asc).order_by(::issues::ListingOrderBy::CreatedAt).build_query();
         assert_eq!(query, expected_string);
     }
 }
