@@ -258,6 +258,8 @@ enum MergeRequestState {
     Opened,
     #[serde(rename = "closed")]
     Closed,
+    #[serde(rename = "all")]
+    All,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
