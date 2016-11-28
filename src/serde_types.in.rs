@@ -250,7 +250,7 @@ pub type Issues = Vec<Issue>;
 
 
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub enum MergeRequestState {
     #[serde(rename = "merged")]
     Merged,
