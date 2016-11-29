@@ -30,6 +30,7 @@
 use BuildQuery;
 
 use serde_json;
+use serde_urlencoded;
 
 use gitlab::GitLab;
 use MergeRequests;
@@ -40,6 +41,13 @@ use MergeRequestState;
 pub mod single;
 
 
+// Include serializable types
+#[cfg(feature = "serde_derive")]
+include!("merge_requests/serde_types.in.rs");
+#[cfg(feature = "serde_codegen")]
+include!(concat!(env!("OUT_DIR"), "/merge_requests/serde_types.rs"));
+
+
 impl GitLab {
     pub fn merge_requests(&self, listing: Listing) -> Result<MergeRequests, serde_json::Error> {
         let query = listing.build_query();
@@ -47,34 +55,6 @@ impl GitLab {
     }
 }
 
-
-#[derive(Debug, Copy, Clone)]
-pub enum ListingOrderBy {
-    CreatedAt,
-    UpdatedAt,
-}
-
-
-#[derive(Debug, Copy, Clone)]
-pub enum ListingSort {
-    Asc,
-    Desc,
-}
-
-
-#[derive(Default, Debug, Clone)]
-pub struct Listing {
-    /// Project id
-    id: i64,
-    /// Merge request's IID
-    iid: Vec<i64>,
-    /// State of the requests
-    state: Option<MergeRequestState>,
-    /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
-    order_by: Option<ListingOrderBy>,
-    /// Return requests sorted. Default is `ListingSort::Desc`.
-    sort: Option<ListingSort>,
-}
 
 
 #[allow(dead_code)]
@@ -94,7 +74,7 @@ impl Listing {
         self.order_by = Some(order_by);
         self
     }
-    fn sort(&mut self, sort: ListingSort) -> &mut Listing {
+    fn sort(&mut self, sort: ::ListingSort) -> &mut Listing {
         self.sort = Some(sort);
         self
     }
@@ -168,8 +148,8 @@ impl BuildQuery for Listing {
 
             query.push_str("sort=");
             query.push_str(match sort {
-                ListingSort::Asc => "asc",
-                ListingSort::Desc => "desc",
+                ::ListingSort::Asc => "asc",
+                ::ListingSort::Desc => "desc",
             });
         });
 
@@ -197,10 +177,6 @@ mod tests {
         assert_eq!(query, expected_string);
     }
 
-    // /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
-    // order_by: Option<ListingOrderBy>,
-    // /// Return requests sorted. Default is `ListingSort::Desc`.
-    // sort: Option<ListingSort>,
 
     #[test]
     fn build_query_iid() {
@@ -241,11 +217,11 @@ mod tests {
     #[test]
     fn build_query_sort() {
         let expected_string = "projects/123/merge_requests?sort=asc";
-        let query = Listing::new(123).sort(ListingSort::Asc).build_query();
+        let query = Listing::new(123).sort(::ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "projects/123/merge_requests?sort=desc";
-        let query = Listing::new(123).sort(ListingSort::Desc).build_query();
+        let query = Listing::new(123).sort(::ListingSort::Desc).build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -253,7 +229,7 @@ mod tests {
     #[test]
     fn build_query_multiple() {
         let expected_string = "projects/123/merge_requests?iid[]=456&iid[]=789&order_by=created_at&sort=asc";
-        let query = Listing::new(123).iid(vec![456,789]).sort(ListingSort::Asc).order_by(ListingOrderBy::CreatedAt).build_query();
+        let query = Listing::new(123).iid(vec![456,789]).sort(::ListingSort::Asc).order_by(ListingOrderBy::CreatedAt).build_query();
         assert_eq!(query, expected_string);
     }
 }

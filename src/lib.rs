@@ -11,6 +11,7 @@ extern crate serde_derive;
 
 extern crate serde;
 extern crate serde_json;
+extern crate serde_urlencoded;
 
 #[cfg(feature = "serde_derive")]
 include!("serde_types.in.rs");

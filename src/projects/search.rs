@@ -46,21 +46,14 @@ pub enum ListingOrderBy {
 }
 
 
-#[derive(Debug, Copy, Clone)]
-pub enum ListingSort {
-    Asc,
-    Desc,
-}
-
-
 #[derive(Default, Debug, Clone)]
 pub struct Listing {
     /// A string contained in the project name.
     query: String,
     /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
     order_by: Option<ListingOrderBy>,
-    /// Return requests sorted. Default is `ListingSort::Desc`.
-    sort: Option<ListingSort>,
+    /// Return requests sorted. Default is `::ListingSort::Desc`.
+    sort: Option<::ListingSort>,
 }
 
 
@@ -73,7 +66,7 @@ impl Listing {
         self.order_by = Some(order_by);
         self
     }
-    fn sort(&mut self, sort: ListingSort) -> &mut Listing {
+    fn sort(&mut self, sort: ::ListingSort) -> &mut Listing {
         self.sort = Some(sort);
         self
     }
@@ -117,8 +110,8 @@ impl BuildQuery for Listing {
 
             query.push_str("sort=");
             query.push_str(match sort {
-                ListingSort::Asc => "asc",
-                ListingSort::Desc => "desc",
+                ::ListingSort::Asc => "asc",
+                ::ListingSort::Desc => "desc",
             });
         });
 
@@ -176,12 +169,12 @@ mod tests {
     fn build_query_sort() {
         let expected_string = format!("projects/search/{}?sort=asc", TEST_SEARCH_QUERY);
         let query =
-            Listing::new(TEST_SEARCH_QUERY.to_string()).sort(ListingSort::Asc).build_query();
+            Listing::new(TEST_SEARCH_QUERY.to_string()).sort(::ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/search/{}?sort=desc", TEST_SEARCH_QUERY);
         let query =
-            Listing::new(TEST_SEARCH_QUERY.to_string()).sort(ListingSort::Desc).build_query();
+            Listing::new(TEST_SEARCH_QUERY.to_string()).sort(::ListingSort::Desc).build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -192,7 +185,7 @@ mod tests {
                                       TEST_SEARCH_QUERY);
         let query = Listing::new(TEST_SEARCH_QUERY.to_string())
             .order_by(ListingOrderBy::CreatedAt)
-            .sort(ListingSort::Desc)
+            .sort(::ListingSort::Desc)
             .build_query();
         assert_eq!(query, expected_string);
     }

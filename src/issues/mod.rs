@@ -53,14 +53,6 @@ pub enum ListingOrderBy {
 }
 
 
-#[derive(Debug, Copy, Clone)]
-pub enum ListingSort {
-    Asc,
-    Desc,
-}
-
-
-
 #[derive(Default, Debug, Clone)]
 pub struct Listing {
     /// State of issues to return.
@@ -69,8 +61,8 @@ pub struct Listing {
     labels: Vec<String>,
     /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
     order_by: Option<ListingOrderBy>,
-    /// Return requests sorted. Default is `ListingSort::Desc`.
-    sort: Option<ListingSort>,
+    /// Return requests sorted. Default is `::ListingSort::Desc`.
+    sort: Option<::ListingSort>,
 }
 
 
@@ -91,7 +83,7 @@ impl Listing {
         self.order_by = Some(order_by);
         self
     }
-    fn sort(&mut self, sort: ListingSort) -> &mut Listing {
+    fn sort(&mut self, sort: ::ListingSort) -> &mut Listing {
         self.sort = Some(sort);
         self
     }
@@ -160,8 +152,8 @@ impl BuildQuery for Listing {
 
             query.push_str("sort=");
             query.push_str(match sort {
-                ListingSort::Asc => "asc",
-                ListingSort::Desc => "desc",
+                ::ListingSort::Asc => "asc",
+                ::ListingSort::Desc => "desc",
             });
         });
 
@@ -224,11 +216,11 @@ mod tests {
     #[test]
     fn build_query_sort() {
         let expected_string = "issues?sort=asc";
-        let query = Listing::new().sort(ListingSort::Asc).build_query();
+        let query = Listing::new().sort(::ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "issues?sort=desc";
-        let query = Listing::new().sort(ListingSort::Desc).build_query();
+        let query = Listing::new().sort(::ListingSort::Desc).build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -236,7 +228,7 @@ mod tests {
     #[test]
     fn build_query_multiple() {
         let expected_string = "issues?order_by=created_at&sort=asc";
-        let query = Listing::new().sort(ListingSort::Asc).order_by(ListingOrderBy::CreatedAt).build_query();
+        let query = Listing::new().sort(::ListingSort::Asc).order_by(ListingOrderBy::CreatedAt).build_query();
         assert_eq!(query, expected_string);
     }
 }

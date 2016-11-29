@@ -49,7 +49,7 @@ impl fmt::Debug for GitLab {
 
 
 impl GitLab {
-    pub fn new(scheme: &str, domain: &str, port: u16, private_token: &str) -> GitLab {
+    pub fn _new(scheme: &str, domain: &str, port: u16, private_token: &str) -> GitLab {
         GitLab {
             scheme: scheme.to_string(),
             domain: domain.to_string(),
@@ -69,12 +69,13 @@ impl GitLab {
         }
     }
 
-    pub fn new_http(domain: &str, private_token: &str) -> GitLab {
-        GitLab::new("http", domain, 80, private_token)
+    pub fn new_insecure(domain: &str, private_token: &str) -> GitLab {
+        warn!("Using insecure http:// protocol: Token will be sent in clear!");
+        GitLab::_new("http", domain, 80, private_token)
     }
 
-    pub fn new_https(domain: &str, private_token: &str) -> GitLab {
-        GitLab::new("https", domain, 443, private_token)
+    pub fn new(domain: &str, private_token: &str) -> GitLab {
+        GitLab::_new("https", domain, 443, private_token)
     }
 
     /// Build a URL used to access GitLab instance, including some parameters.
@@ -89,7 +90,7 @@ impl GitLab {
     /// let expected_url = "https://gitlab.example.com:\
     ///                     443/api/v3/groups?order_by=path&private_token=XXXXXXXXXXXXX";
     ///
-    /// let gl = GitLab::new_https("gitlab.example.com", "XXXXXXXXXXXXX");
+    /// let gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXX");
     ///
     /// assert_eq!(gl.build_url("groups?order_by=path"), expected_url);
     /// ```

@@ -4,6 +4,7 @@
 // https://serde.rs/codegen-hybrid.html
 
 
+// FIXME: Use https://github.com/nox/serde_urlencoded
 // FIXME: Make sure that all structs above Issue are not using `String`s instead of `Enum`s.
 // FIXME: Harmonize the different state enums (e.g. IssueState, MergeRequestState, Authors)
 // FIXME: Move all enums here (ListingOrderBy, ListingSort, etc.)
@@ -12,6 +13,81 @@
 // FIXME: Use unsigned integers where it makes sense (id, iid, etc.)
 // FIXME: Verify all `match` in push_str() in build_query(): They should contain all members.
 // FIXME: Get rid of build_query(), use serde's Serialize instead.
+// FIXME: Write nicer wrappers, getting rid of Listing.
+
+
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum ListingSort {
+    #[serde(rename = "asc")]
+    Asc,
+    #[serde(rename = "desc")]
+    Desc,
+}
+
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum ListingVisibility {
+    #[serde(rename = "public")]
+    Public,
+    #[serde(rename = "internal")]
+    Internal,
+    #[serde(rename = "private")]
+    Private,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+enum IssueState {
+    #[serde(rename = "opened")]
+    Opened,
+
+    #[serde(rename = "closed")]
+    Closed,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+enum UserState {
+    #[serde(rename = "active")]
+    Active,
+
+    #[serde(rename = "blocked")]
+    Blocked,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+enum MilestoneState {
+    #[serde(rename = "active")]
+    Active,
+
+    #[serde(rename = "closed")]
+    Closed,
+}
+
+
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+pub enum MergeRequestState {
+    #[serde(rename = "merged")]
+    Merged,
+    #[serde(rename = "opened")]
+    Opened,
+    #[serde(rename = "closed")]
+    Closed,
+    #[serde(rename = "all")]
+    All,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+enum MergeRequestStatus {
+    #[serde(rename = "can_be_merged")]
+    CanBeMerged,
+    #[serde(rename = "cannot_be_merged")]
+    CannotBeMerged,
+    #[serde(rename = "unchecked")]
+    Unchecked,
+}
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -19,7 +95,6 @@ pub struct Version {
     pub version: String,
     pub revision: String,
 }
-
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -168,37 +243,6 @@ pub type Projects = Vec<Project>;
 
 
 
-
-#[derive(Debug, Serialize, Deserialize)]
-enum IssueState {
-    #[serde(rename = "opened")]
-    Opened,
-
-    #[serde(rename = "closed")]
-    Closed,
-}
-
-
-#[derive(Debug, Serialize, Deserialize)]
-enum UserState {
-    #[serde(rename = "active")]
-    Active,
-
-    #[serde(rename = "blocked")]
-    Blocked,
-}
-
-
-#[derive(Debug, Serialize, Deserialize)]
-enum MilestoneState {
-    #[serde(rename = "active")]
-    Active,
-
-    #[serde(rename = "closed")]
-    Closed,
-}
-
-
 #[derive(Debug, Serialize, Deserialize)]
 struct Milestone {
     id: i64,
@@ -253,28 +297,6 @@ pub type Issues = Vec<Issue>;
 
 
 
-
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
-pub enum MergeRequestState {
-    #[serde(rename = "merged")]
-    Merged,
-    #[serde(rename = "opened")]
-    Opened,
-    #[serde(rename = "closed")]
-    Closed,
-    #[serde(rename = "all")]
-    All,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-enum MergeRequestStatus {
-    #[serde(rename = "can_be_merged")]
-    CanBeMerged,
-    #[serde(rename = "cannot_be_merged")]
-    CannotBeMerged,
-    #[serde(rename = "unchecked")]
-    Unchecked,
-}
 
 
 #[derive(Debug, Serialize, Deserialize)]

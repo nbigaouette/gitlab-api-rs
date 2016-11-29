@@ -34,7 +34,7 @@ fn main() {
         }
     };
 
-    let gl = GitLab::new_https(&hostname, &token);
+    let gl = GitLab::new(&hostname, &token);
 
     let issues = gl.issues(issues::Listing::new()).unwrap();
     println!("issues: {:?}", issues);

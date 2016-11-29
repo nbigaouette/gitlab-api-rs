@@ -139,14 +139,6 @@ impl GitLab {
 
 
 #[derive(Debug, Copy, Clone)]
-pub enum ListingVisibility {
-    Public,
-    Internal,
-    Private,
-}
-
-
-#[derive(Debug, Copy, Clone)]
 pub enum ListingOrderBy {
     Id,
     Name,
@@ -157,23 +149,16 @@ pub enum ListingOrderBy {
 }
 
 
-#[derive(Debug, Copy, Clone)]
-pub enum ListingSort {
-    Asc,
-    Desc,
-}
-
-
 #[derive(Default, Debug, Clone)]
 pub struct Listing {
     /// Limit by archived status
     archived: Option<bool>,
     /// Limit by visibility.
-    visibility: Option<ListingVisibility>,
+    visibility: Option<::ListingVisibility>,
     /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
     order_by: Option<ListingOrderBy>,
-    /// Return requests sorted. Default is `ListingSort::Desc`.
-    sort: Option<ListingSort>,
+    /// Return requests sorted. Default is `::ListingSort::Desc`.
+    sort: Option<::ListingSort>,
     /// Return list of authorized projects matching the search criteria.
     search: String,
     /// Return only the ID, URL, name, and path of each project
@@ -190,7 +175,7 @@ impl Listing {
         self.archived = Some(archived);
         self
     }
-    pub fn visibility(&mut self, visibility: ListingVisibility) -> &mut Listing {
+    pub fn visibility(&mut self, visibility: ::ListingVisibility) -> &mut Listing {
         self.visibility = Some(visibility);
         self
     }
@@ -198,7 +183,7 @@ impl Listing {
         self.order_by = Some(order_by);
         self
     }
-    fn sort(&mut self, sort: ListingSort) -> &mut Listing {
+    fn sort(&mut self, sort: ::ListingSort) -> &mut Listing {
         self.sort = Some(sort);
         self
     }
@@ -251,9 +236,9 @@ impl BuildQuery for Listing {
 
             query.push_str("visibility=");
             query.push_str(match visibility {
-                ListingVisibility::Public => "public",
-                ListingVisibility::Internal => "internal",
-                ListingVisibility::Private => "private",
+                ::ListingVisibility::Public => "public",
+                ::ListingVisibility::Internal => "internal",
+                ::ListingVisibility::Private => "private",
             });
         });
 
@@ -278,8 +263,8 @@ impl BuildQuery for Listing {
 
             query.push_str("sort=");
             query.push_str(match sort {
-                ListingSort::Asc => "asc",
-                ListingSort::Desc => "desc",
+                ::ListingSort::Asc => "asc",
+                ::ListingSort::Desc => "desc",
             });
         });
 
@@ -342,15 +327,15 @@ mod tests {
     #[test]
     fn build_query_visibility() {
         let expected_string = "projects?visibility=public";
-        let query = Listing::new().visibility(ListingVisibility::Public).build_query();
+        let query = Listing::new().visibility(::ListingVisibility::Public).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "projects?visibility=internal";
-        let query = Listing::new().visibility(ListingVisibility::Internal).build_query();
+        let query = Listing::new().visibility(::ListingVisibility::Internal).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "projects?visibility=private";
-        let query = Listing::new().visibility(ListingVisibility::Private).build_query();
+        let query = Listing::new().visibility(::ListingVisibility::Private).build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -386,11 +371,11 @@ mod tests {
     #[test]
     fn build_query_sort() {
         let expected_string = "projects?sort=asc";
-        let query = Listing::new().sort(ListingSort::Asc).build_query();
+        let query = Listing::new().sort(::ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "projects?sort=desc";
-        let query = Listing::new().sort(ListingSort::Desc).build_query();
+        let query = Listing::new().sort(::ListingSort::Desc).build_query();
         assert_eq!(query, expected_string);
     }
 
