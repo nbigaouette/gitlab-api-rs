@@ -38,11 +38,63 @@ pub enum ListingVisibility {
 
 
 #[derive(Debug, Serialize, Deserialize)]
+enum IssueState {
+    #[serde(rename = "opened")]
+    Opened,
+
+    #[serde(rename = "closed")]
+    Closed,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+enum UserState {
+    #[serde(rename = "active")]
+    Active,
+
+    #[serde(rename = "blocked")]
+    Blocked,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+enum MilestoneState {
+    #[serde(rename = "active")]
+    Active,
+
+    #[serde(rename = "closed")]
+    Closed,
+}
+
+
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+pub enum MergeRequestState {
+    #[serde(rename = "merged")]
+    Merged,
+    #[serde(rename = "opened")]
+    Opened,
+    #[serde(rename = "closed")]
+    Closed,
+    #[serde(rename = "all")]
+    All,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+enum MergeRequestStatus {
+    #[serde(rename = "can_be_merged")]
+    CanBeMerged,
+    #[serde(rename = "cannot_be_merged")]
+    CannotBeMerged,
+    #[serde(rename = "unchecked")]
+    Unchecked,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Version {
     pub version: String,
     pub revision: String,
 }
-
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -191,37 +243,6 @@ pub type Projects = Vec<Project>;
 
 
 
-
-#[derive(Debug, Serialize, Deserialize)]
-enum IssueState {
-    #[serde(rename = "opened")]
-    Opened,
-
-    #[serde(rename = "closed")]
-    Closed,
-}
-
-
-#[derive(Debug, Serialize, Deserialize)]
-enum UserState {
-    #[serde(rename = "active")]
-    Active,
-
-    #[serde(rename = "blocked")]
-    Blocked,
-}
-
-
-#[derive(Debug, Serialize, Deserialize)]
-enum MilestoneState {
-    #[serde(rename = "active")]
-    Active,
-
-    #[serde(rename = "closed")]
-    Closed,
-}
-
-
 #[derive(Debug, Serialize, Deserialize)]
 struct Milestone {
     id: i64,
@@ -276,28 +297,6 @@ pub type Issues = Vec<Issue>;
 
 
 
-
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
-pub enum MergeRequestState {
-    #[serde(rename = "merged")]
-    Merged,
-    #[serde(rename = "opened")]
-    Opened,
-    #[serde(rename = "closed")]
-    Closed,
-    #[serde(rename = "all")]
-    All,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-enum MergeRequestStatus {
-    #[serde(rename = "can_be_merged")]
-    CanBeMerged,
-    #[serde(rename = "cannot_be_merged")]
-    CannotBeMerged,
-    #[serde(rename = "unchecked")]
-    Unchecked,
-}
 
 
 #[derive(Debug, Serialize, Deserialize)]
