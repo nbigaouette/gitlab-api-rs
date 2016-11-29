@@ -12,7 +12,12 @@ fn main() {
 
     let src = Path::new("src/serde_types.in.rs");
     let dst = Path::new(&out_dir).join("serde_types.rs");
+    serde_codegen::expand(&src, &dst).unwrap();
 
+    let src = Path::new("src/merge_requests/serde_types.in.rs");
+    let dst = Path::new(&out_dir).join("merge_requests");
+    std::fs::create_dir_all(&dst).expect(&format!("Cannot create directory {:?}!", dst));
+    let dst = dst.join("serde_types.rs");
     serde_codegen::expand(&src, &dst).unwrap();
 }
 
