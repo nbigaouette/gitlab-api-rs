@@ -69,7 +69,7 @@ impl GitLab {
         }
     }
 
-    pub fn new_http(domain: &str, private_token: &str) -> GitLab {
+    pub fn new_insecure(domain: &str, private_token: &str) -> GitLab {
         GitLab::new("http", domain, 80, private_token)
     }
 
