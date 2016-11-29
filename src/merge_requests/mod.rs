@@ -30,6 +30,7 @@
 use BuildQuery;
 
 use serde_json;
+use serde_urlencoded;
 
 use gitlab::GitLab;
 use MergeRequests;
@@ -40,6 +41,13 @@ use MergeRequestState;
 pub mod single;
 
 
+// Include serializable types
+#[cfg(feature = "serde_derive")]
+include!("merge_requests/serde_types.in.rs");
+#[cfg(feature = "serde_codegen")]
+include!(concat!(env!("OUT_DIR"), "/merge_requests/serde_types.rs"));
+
+
 impl GitLab {
     pub fn merge_requests(&self, listing: Listing) -> Result<MergeRequests, serde_json::Error> {
         let query = listing.build_query();
@@ -47,34 +55,6 @@ impl GitLab {
     }
 }
 
-
-#[derive(Debug, Copy, Clone)]
-pub enum ListingOrderBy {
-    CreatedAt,
-    UpdatedAt,
-}
-
-
-#[derive(Debug, Copy, Clone)]
-pub enum ListingSort {
-    Asc,
-    Desc,
-}
-
-
-#[derive(Default, Debug, Clone)]
-pub struct Listing {
-    /// Project id
-    id: i64,
-    /// Merge request's IID
-    iid: Vec<i64>,
-    /// State of the requests
-    state: Option<MergeRequestState>,
-    /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
-    order_by: Option<ListingOrderBy>,
-    /// Return requests sorted. Default is `ListingSort::Desc`.
-    sort: Option<ListingSort>,
-}
 
 
 #[allow(dead_code)]
