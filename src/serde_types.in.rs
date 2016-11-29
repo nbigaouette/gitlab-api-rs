@@ -305,7 +305,7 @@ pub struct MergeRequest {
     subscribed: bool,
     user_notes_count: i64,
     should_remove_source_branch: Option<bool>,
-    force_remove_source_branch: bool,
+    force_remove_source_branch: Option<bool>,
     web_url: String
 }
 
