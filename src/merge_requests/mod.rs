@@ -37,7 +37,7 @@ use MergeRequests;
 // Types from serde_types.in.rs
 use MergeRequestState;
 
-// pub mod group;
+pub mod single;
 
 
 impl GitLab {
