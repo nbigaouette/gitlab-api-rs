@@ -26,6 +26,17 @@ pub enum ListingSort {
 }
 
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum ListingVisibility {
+    #[serde(rename = "public")]
+    Public,
+    #[serde(rename = "internal")]
+    Internal,
+    #[serde(rename = "private")]
+    Private,
+}
+
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Version {
     pub version: String,

@@ -139,14 +139,6 @@ impl GitLab {
 
 
 #[derive(Debug, Copy, Clone)]
-pub enum ListingVisibility {
-    Public,
-    Internal,
-    Private,
-}
-
-
-#[derive(Debug, Copy, Clone)]
 pub enum ListingOrderBy {
     Id,
     Name,
@@ -162,7 +154,7 @@ pub struct Listing {
     /// Limit by archived status
     archived: Option<bool>,
     /// Limit by visibility.
-    visibility: Option<ListingVisibility>,
+    visibility: Option<::ListingVisibility>,
     /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
     order_by: Option<ListingOrderBy>,
     /// Return requests sorted. Default is `::ListingSort::Desc`.
@@ -183,7 +175,7 @@ impl Listing {
         self.archived = Some(archived);
         self
     }
-    pub fn visibility(&mut self, visibility: ListingVisibility) -> &mut Listing {
+    pub fn visibility(&mut self, visibility: ::ListingVisibility) -> &mut Listing {
         self.visibility = Some(visibility);
         self
     }
@@ -244,9 +236,9 @@ impl BuildQuery for Listing {
 
             query.push_str("visibility=");
             query.push_str(match visibility {
-                ListingVisibility::Public => "public",
-                ListingVisibility::Internal => "internal",
-                ListingVisibility::Private => "private",
+                ::ListingVisibility::Public => "public",
+                ::ListingVisibility::Internal => "internal",
+                ::ListingVisibility::Private => "private",
             });
         });
 
@@ -335,15 +327,15 @@ mod tests {
     #[test]
     fn build_query_visibility() {
         let expected_string = "projects?visibility=public";
-        let query = Listing::new().visibility(ListingVisibility::Public).build_query();
+        let query = Listing::new().visibility(::ListingVisibility::Public).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "projects?visibility=internal";
-        let query = Listing::new().visibility(ListingVisibility::Internal).build_query();
+        let query = Listing::new().visibility(::ListingVisibility::Internal).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "projects?visibility=private";
-        let query = Listing::new().visibility(ListingVisibility::Private).build_query();
+        let query = Listing::new().visibility(::ListingVisibility::Private).build_query();
         assert_eq!(query, expected_string);
     }
 
