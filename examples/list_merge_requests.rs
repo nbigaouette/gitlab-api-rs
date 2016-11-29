@@ -33,7 +33,7 @@ fn main() {
         }
     };
 
-    let gl = GitLab::new_https(&hostname, &token);
+    let gl = GitLab::new(&hostname, &token);
 
     let merge_request = gl.merge_request(merge_requests::single::Listing::new(142, 418)).unwrap();
     println!("merge_request: {:?}", merge_request);

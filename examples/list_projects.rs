@@ -34,7 +34,7 @@ fn main() {
         }
     };
 
-    let gl = GitLab::new_https(&hostname, &token);
+    let gl = GitLab::new(&hostname, &token);
     // for i in 1..82 {
     //     gl.set_pagination(Pagination{page: i, per_page: 1});
     //     println!("projects: {:?}", gl.projects().unwrap());

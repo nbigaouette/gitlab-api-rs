@@ -73,7 +73,7 @@ impl GitLab {
         GitLab::new("http", domain, 80, private_token)
     }
 
-    pub fn new_https(domain: &str, private_token: &str) -> GitLab {
+    pub fn new(domain: &str, private_token: &str) -> GitLab {
         GitLab::new("https", domain, 443, private_token)
     }
 
@@ -89,7 +89,7 @@ impl GitLab {
     /// let expected_url = "https://gitlab.example.com:\
     ///                     443/api/v3/groups?order_by=path&private_token=XXXXXXXXXXXXX";
     ///
-    /// let gl = GitLab::new_https("gitlab.example.com", "XXXXXXXXXXXXX");
+    /// let gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXX");
     ///
     /// assert_eq!(gl.build_url("groups?order_by=path"), expected_url);
     /// ```
