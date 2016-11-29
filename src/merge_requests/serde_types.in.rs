@@ -11,7 +11,7 @@ pub struct Listing {
     /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
     order_by: Option<ListingOrderBy>,
     /// Return requests sorted. Default is `ListingSort::Desc`.
-    sort: Option<ListingSort>,
+    sort: Option<::ListingSort>,
 }
 
 
@@ -21,13 +21,4 @@ pub enum ListingOrderBy {
     CreatedAt,
     #[serde(rename = "updated_at")]
     UpdatedAt,
-}
-
-
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub enum ListingSort {
-    #[serde(rename = "asc")]
-    Asc,
-    #[serde(rename = "desc")]
-    Desc,
 }

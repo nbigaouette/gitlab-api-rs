@@ -48,13 +48,6 @@ pub enum ListingOrderBy {
 }
 
 
-#[derive(Debug, Copy, Clone)]
-pub enum ListingSort {
-    Asc,
-    Desc,
-}
-
-
 #[derive(Default, Debug, Clone)]
 pub struct Listing {
     /// Group Id.
@@ -65,8 +58,8 @@ pub struct Listing {
     visibility: Option<ListingVisibility>,
     /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
     order_by: Option<ListingOrderBy>,
-    /// Return requests sorted. Default is `ListingSort::Desc`.
-    sort: Option<ListingSort>,
+    /// Return requests sorted. Default is `::ListingSort::Desc`.
+    sort: Option<::ListingSort>,
     /// Return list of authorized projects according to a search criteria.
     search: String,
     /// Return projects ordered by `ci_enabled` flag. Projects with enabled GitLab CI go first.
@@ -90,7 +83,7 @@ impl Listing {
         self.order_by = Some(order_by);
         self
     }
-    pub fn sort(&mut self, sort: ListingSort) -> &mut Listing {
+    pub fn sort(&mut self, sort: ::ListingSort) -> &mut Listing {
         self.sort = Some(sort);
         self
     }
@@ -168,8 +161,8 @@ impl BuildQuery for Listing {
 
             query.push_str("sort=");
             query.push_str(match sort {
-                ListingSort::Asc => "asc",
-                ListingSort::Desc => "desc",
+                ::ListingSort::Asc => "asc",
+                ::ListingSort::Desc => "desc",
             });
         });
 
@@ -289,11 +282,11 @@ mod tests {
     #[test]
     fn groups_build_query_sort() {
         let expected_string = format!("groups/{}/projects?sort=asc", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).sort(ListingSort::Asc).build_query();
+        let query = Listing::new(TEST_PROJECT_ID.clone()).sort(::ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?sort=desc", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).sort(ListingSort::Desc).build_query();
+        let query = Listing::new(TEST_PROJECT_ID.clone()).sort(::ListingSort::Desc).build_query();
         assert_eq!(query, expected_string);
     }
 

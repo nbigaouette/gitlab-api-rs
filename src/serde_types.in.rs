@@ -16,6 +16,16 @@
 // FIXME: Write nicer wrappers, getting rid of Listing.
 
 
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum ListingSort {
+    #[serde(rename = "asc")]
+    Asc,
+    #[serde(rename = "desc")]
+    Desc,
+}
+
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Version {
     pub version: String,

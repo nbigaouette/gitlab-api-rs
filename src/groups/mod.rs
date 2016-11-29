@@ -48,13 +48,6 @@ pub enum ListingOrderBy {
 }
 
 
-#[derive(Debug, Copy, Clone)]
-pub enum ListingSort {
-    Asc,
-    Desc,
-}
-
-
 fn append_group_lister_options_order_by(order_by: ListingOrderBy, s: &mut String) {
     s.push_str(match order_by {
         ListingOrderBy::Name => "name",
@@ -63,10 +56,10 @@ fn append_group_lister_options_order_by(order_by: ListingOrderBy, s: &mut String
 }
 
 
-fn append_group_lister_options_sort(order_by: ListingSort, s: &mut String) {
+fn append_group_lister_options_sort(order_by: ::ListingSort, s: &mut String) {
     s.push_str(match order_by {
-        ListingSort::Asc => "asc",
-        ListingSort::Desc => "desc",
+        ::ListingSort::Asc => "asc",
+        ::ListingSort::Desc => "desc",
     });
 }
 
@@ -83,7 +76,7 @@ pub struct Listing {
     /// Order groups by `name` or `path`. Default is `name`
     order_by: Option<ListingOrderBy>,
     /// Order groups in `asc` or `desc` order. Default is `asc`
-    sort: Option<ListingSort>,
+    sort: Option<::ListingSort>,
 }
 
 
@@ -108,7 +101,7 @@ impl Listing {
         self.order_by = Some(order_by);
         self
     }
-    fn sort(&mut self, sort: ListingSort) -> &mut Listing {
+    fn sort(&mut self, sort: ::ListingSort) -> &mut Listing {
         self.sort = Some(sort);
         self
     }
@@ -254,11 +247,11 @@ mod tests {
     #[test]
     fn groups_build_query_sort() {
         let expected_string = "groups?sort=asc";
-        let query = Listing::new().sort(ListingSort::Asc).build_query();
+        let query = Listing::new().sort(::ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "groups?sort=desc";
-        let query = Listing::new().sort(ListingSort::Desc).build_query();
+        let query = Listing::new().sort(::ListingSort::Desc).build_query();
         assert_eq!(query, expected_string);
     }
 

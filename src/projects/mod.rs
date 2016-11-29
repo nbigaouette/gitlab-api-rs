@@ -157,13 +157,6 @@ pub enum ListingOrderBy {
 }
 
 
-#[derive(Debug, Copy, Clone)]
-pub enum ListingSort {
-    Asc,
-    Desc,
-}
-
-
 #[derive(Default, Debug, Clone)]
 pub struct Listing {
     /// Limit by archived status
@@ -172,8 +165,8 @@ pub struct Listing {
     visibility: Option<ListingVisibility>,
     /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
     order_by: Option<ListingOrderBy>,
-    /// Return requests sorted. Default is `ListingSort::Desc`.
-    sort: Option<ListingSort>,
+    /// Return requests sorted. Default is `::ListingSort::Desc`.
+    sort: Option<::ListingSort>,
     /// Return list of authorized projects matching the search criteria.
     search: String,
     /// Return only the ID, URL, name, and path of each project
@@ -198,7 +191,7 @@ impl Listing {
         self.order_by = Some(order_by);
         self
     }
-    fn sort(&mut self, sort: ListingSort) -> &mut Listing {
+    fn sort(&mut self, sort: ::ListingSort) -> &mut Listing {
         self.sort = Some(sort);
         self
     }
@@ -278,8 +271,8 @@ impl BuildQuery for Listing {
 
             query.push_str("sort=");
             query.push_str(match sort {
-                ListingSort::Asc => "asc",
-                ListingSort::Desc => "desc",
+                ::ListingSort::Asc => "asc",
+                ::ListingSort::Desc => "desc",
             });
         });
 
@@ -386,11 +379,11 @@ mod tests {
     #[test]
     fn build_query_sort() {
         let expected_string = "projects?sort=asc";
-        let query = Listing::new().sort(ListingSort::Asc).build_query();
+        let query = Listing::new().sort(::ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "projects?sort=desc";
-        let query = Listing::new().sort(ListingSort::Desc).build_query();
+        let query = Listing::new().sort(::ListingSort::Desc).build_query();
         assert_eq!(query, expected_string);
     }
 

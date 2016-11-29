@@ -60,8 +60,8 @@ pub struct Listing {
     milestone: String,
     /// Return requests ordered by. Default is `::issues::ListingOrderBy::CreatedAt`.
     order_by: Option<::issues::ListingOrderBy>,
-    /// Return requests sorted. Default is `::issues::ListingSort::Desc`.
-    sort: Option<::issues::ListingSort>,
+    /// Return requests sorted. Default is `::ListingSort::Desc`.
+    sort: Option<::ListingSort>,
 }
 
 
@@ -90,7 +90,7 @@ impl Listing {
         self.order_by = Some(order_by);
         self
     }
-    fn sort(&mut self, sort: ::issues::ListingSort) -> &mut Listing {
+    fn sort(&mut self, sort: ::ListingSort) -> &mut Listing {
         self.sort = Some(sort);
         self
     }
@@ -165,8 +165,8 @@ impl BuildQuery for Listing {
 
             query.push_str("sort=");
             query.push_str(match sort {
-                ::issues::ListingSort::Asc => "asc",
-                ::issues::ListingSort::Desc => "desc",
+                ::ListingSort::Asc => "asc",
+                ::ListingSort::Desc => "desc",
             });
         });
 
@@ -233,11 +233,11 @@ mod tests {
     #[test]
     fn build_query_sort() {
         let expected_string = "projects/123/issues?sort=asc";
-        let query = Listing::new(123).sort(::issues::ListingSort::Asc).build_query();
+        let query = Listing::new(123).sort(::ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "projects/123/issues?sort=desc";
-        let query = Listing::new(123).sort(::issues::ListingSort::Desc).build_query();
+        let query = Listing::new(123).sort(::ListingSort::Desc).build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -245,7 +245,7 @@ mod tests {
     #[test]
     fn build_query_multiple() {
         let expected_string = "projects/123/issues?order_by=created_at&sort=asc";
-        let query = Listing::new(123).sort(::issues::ListingSort::Asc).order_by(::issues::ListingOrderBy::CreatedAt).build_query();
+        let query = Listing::new(123).sort(::ListingSort::Asc).order_by(::issues::ListingOrderBy::CreatedAt).build_query();
         assert_eq!(query, expected_string);
     }
 }
