@@ -49,7 +49,7 @@ impl fmt::Debug for GitLab {
 
 
 impl GitLab {
-    pub fn new(scheme: &str, domain: &str, port: u16, private_token: &str) -> GitLab {
+    pub fn _new(scheme: &str, domain: &str, port: u16, private_token: &str) -> GitLab {
         GitLab {
             scheme: scheme.to_string(),
             domain: domain.to_string(),
@@ -71,11 +71,11 @@ impl GitLab {
 
     pub fn new_insecure(domain: &str, private_token: &str) -> GitLab {
         warn!("Using insecure http:// protocol: Token will be sent in clear!");
-        GitLab::new("http", domain, 80, private_token)
+        GitLab::_new("http", domain, 80, private_token)
     }
 
     pub fn new(domain: &str, private_token: &str) -> GitLab {
-        GitLab::new("https", domain, 443, private_token)
+        GitLab::_new("https", domain, 443, private_token)
     }
 
     /// Build a URL used to access GitLab instance, including some parameters.
