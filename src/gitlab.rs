@@ -70,6 +70,7 @@ impl GitLab {
     }
 
     pub fn new_insecure(domain: &str, private_token: &str) -> GitLab {
+        warn!("Using insecure http:// protocol: Token will be sent in clear!");
         GitLab::new("http", domain, 80, private_token)
     }
 
