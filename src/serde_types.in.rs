@@ -14,7 +14,6 @@
 // FIXME: Verify all `match` in push_str() in build_query(): They should contain all members.
 // FIXME: Get rid of build_query(), use serde's Serialize instead.
 // FIXME: Write nicer wrappers, getting rid of Listing.
-// FIXME: Rename GitLab::new_https() to new() and new_http() to new_insecure()
 
 
 #[derive(Debug, Serialize, Deserialize)]
