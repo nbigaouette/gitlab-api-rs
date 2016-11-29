@@ -27,6 +27,7 @@ pub mod gitlab;
 pub mod groups;
 pub mod projects;
 pub mod issues;
+pub mod merge_requests;
 
 // Re-export those structs
 pub use gitlab::Pagination;
