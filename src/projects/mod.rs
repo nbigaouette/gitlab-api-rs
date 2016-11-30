@@ -152,7 +152,7 @@ pub enum ListingOrderBy {
 
 
 custom_derive!{
-    #[derive(Default, Debug, Builder)]
+    #[derive(Default, Debug, Clone, Builder)]
     pub struct ProjectsLister {
         /// Limit by archived status
         archived: Option<bool>,
