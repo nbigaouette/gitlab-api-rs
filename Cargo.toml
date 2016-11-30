@@ -20,6 +20,8 @@ serde = "0.8"
 serde_derive = { version = "0.8", optional = true }
 serde_json = "0.8"
 serde_urlencoded = "0.3"
+derive_builder = "0.2"
+custom_derive = "0.1"
 
 
 hyper = "0.9"

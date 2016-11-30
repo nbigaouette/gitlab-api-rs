@@ -151,11 +151,23 @@ pub enum ListingOrderBy {
 
 
 
-#[derive(Default, Debug)]
-pub struct ProjectsLister {
-
+custom_derive!{
+    #[derive(Default, Debug, Builder)]
+    pub struct ProjectsLister {
+        /// Limit by archived status
+        archived: Option<bool>,
+        /// Limit by visibility.
+        visibility: Option<::ListingVisibility>,
+        /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
+        order_by: Option<ListingOrderBy>,
+        /// Return requests sorted. Default is `::ListingSort::Desc`.
+        sort: Option<::ListingSort>,
+        /// Return list of authorized projects matching the search criteria.
+        search: String,
+        /// Return only the ID, URL, name, and path of each project
+        simple: Option<bool>,
+    }
 }
-
 
 impl ProjectsLister {
     /// Commit the lister: Query GitLab and return a list of projects.
