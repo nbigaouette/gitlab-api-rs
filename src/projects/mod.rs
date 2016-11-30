@@ -128,7 +128,7 @@ pub mod visible;
 
 
 impl GitLab {
-    pub fn projects(&self, listing: Listing) -> Result<Projects, serde_json::Error> {
+    pub fn projects_list(&self, listing: Listing) -> Result<Projects, serde_json::Error> {
         let query = listing.build_query();
         self.get(&query)
     }
