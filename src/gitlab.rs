@@ -153,10 +153,10 @@ impl GitLab {
     // pub fn groups(&self) -> Result<Groups, serde_json::Error> {
     //     self.get("groups")
     // }
-    //
-    // pub fn projects(&self) -> Result<Projects, serde_json::Error> {
-    //     self.get("projects")
-    // }
+
+    pub fn projects(&self) -> ::projects::ProjectsLister {
+        Default::default()
+    }
 
     pub fn groups(&mut self, listing: ::groups::Listing) -> Result<Groups, serde_json::Error> {
         let query = listing.build_query();
