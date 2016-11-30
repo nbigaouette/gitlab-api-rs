@@ -28,6 +28,7 @@ use BuildQuery;
 use serde_json;
 
 use gitlab::GitLab;
+use Project;
 use Projects;
 
 
@@ -147,6 +148,34 @@ pub enum ListingOrderBy {
     UpdatedAt,
     LastActivityAt,
 }
+
+
+
+#[derive(Default, Debug)]
+pub struct ProjectsLister {
+
+}
+
+
+impl ProjectsLister {
+    /// Commit the lister: Query GitLab and return a list of projects.
+    pub fn list(&mut self) -> Projects {
+        Default::default()
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #[derive(Default, Debug, Clone)]
