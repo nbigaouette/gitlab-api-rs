@@ -72,6 +72,10 @@ impl GitLab {
         GitLab::_new("https", domain, 443, private_token)
     }
 
+    pub fn http_proxy(&self) -> Option<&str> {
+        self.http_proxy.as_ref().map(|proxy| &**proxy)
+    }
+
     /// Build a URL used to access GitLab instance, including some parameters.
     ///
     /// # Examples
