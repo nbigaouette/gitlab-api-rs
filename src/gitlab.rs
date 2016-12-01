@@ -59,18 +59,6 @@ impl GitLab {
             port: port,
             private_token: private_token.to_string(),
             http_proxy: env::var("HTTP_PROXY").ok(),
-            // client: match env::var("HTTP_PROXY") {
-            //     Ok(proxy) => {
-            //         let proxy: Vec<&str> = proxy.trim_left_matches("http://").split(':').collect();
-            //         let hostname = proxy[0].to_string();
-            //         let port = proxy[1];
-            //
-            //         info!("Using HTTP proxy {} on port {}", hostname, port);
-            //
-            //         hyper::Client::with_http_proxy(hostname, port.parse().unwrap())
-            //     }
-            //     Err(_) => hyper::Client::new(),
-            // },
             pagination: None,
         }
     }
