@@ -48,7 +48,7 @@ fn main() {
 // // Owned
 // let projects = gl.projects().owned().archived(...).visibility(...).order_by(...).sort(...).search(...).list()
 
-    let gl = GitLab::new_insecure(&hostname, &token);
+    let gl = GitLab::new(&hostname, &token);
 
     // let projects = gl.projects().list();
     let projects = gl.projects().archived(false).list();
