@@ -188,7 +188,7 @@ impl<'a> ProjectsLister<'a> {
     pub fn list(&self) -> Projects {
         // let url = serde_urlencoded::to_string(&self);
         let url = self.build_query();
-        println!("url: {:?}", url);
+        debug!("url: {:?}", url);
 
         Default::default()
     }
