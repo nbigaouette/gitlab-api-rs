@@ -51,7 +51,7 @@ fn main() {
     let gl = GitLab::new_insecure(&hostname, &token);
 
     // let projects = gl.projects().list();
-    let projects = gl.projects().archived(true).list();
+    let projects = gl.projects().archived(false).list();
     println!("projects: {:?}", projects);
 
 
