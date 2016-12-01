@@ -17,18 +17,20 @@ pub const API_VERSION: u16 = 3;
 
 
 
-#[derive(Debug)]
+#[derive(Default, Clone, Copy, Debug)]
 pub struct Pagination {
     pub page: u16,
     pub per_page: u16,
 }
 
+#[derive(Default, Clone)]
 pub struct GitLab {
     scheme: String,
     domain: String,
     port: u16,
     private_token: String,
-    client: hyper::Client,
+    // client: hyper::Client,
+    http_proxy: Option<String>,
     pagination: Option<Pagination>,
 }
 
@@ -38,11 +40,12 @@ impl fmt::Debug for GitLab {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f,
                "GitLab {{ scheme: {}, domain: {}, port: {}, private_token: XXXXXXXXXXXXXXXXXXXX, \
-                client: {:?}, pagination: {:?} }}",
+                pagination: {:?} }}",
                self.scheme,
                self.domain,
                self.port,
-               self.client,
+            // client: {:?}, \
+            //    self.client,
                self.pagination)
     }
 }
@@ -55,16 +58,19 @@ impl GitLab {
             domain: domain.to_string(),
             port: port,
             private_token: private_token.to_string(),
-            client: match env::var("HTTP_PROXY") {
-                Ok(proxy) => {
-                    let proxy: Vec<&str> = proxy.trim_left_matches("http://").split(':').collect();
-                    let hostname = proxy[0].to_string();
-                    let port = proxy[1];
-
-                    hyper::Client::with_http_proxy(hostname, port.parse().unwrap())
-                }
-                Err(_) => hyper::Client::new(),
-            },
+            http_proxy: env::var("HTTP_PROXY").ok(),
+            // client: match env::var("HTTP_PROXY") {
+            //     Ok(proxy) => {
+            //         let proxy: Vec<&str> = proxy.trim_left_matches("http://").split(':').collect();
+            //         let hostname = proxy[0].to_string();
+            //         let port = proxy[1];
+            //
+            //         info!("Using HTTP proxy {} on port {}", hostname, port);
+            //
+            //         hyper::Client::with_http_proxy(hostname, port.parse().unwrap())
+            //     }
+            //     Err(_) => hyper::Client::new(),
+            // },
             pagination: None,
         }
     }
@@ -112,11 +118,11 @@ impl GitLab {
         url
     }
 
-    pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
-        let url = self.build_url("version");
-        // Close connections after each GET.
-        self.client.get(&url).header(hyper::header::Connection::close()).send()
-    }
+    // pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
+    //     let url = self.build_url("version");
+    //     // Close connections after each GET.
+    //     self.client.get(&url).header(hyper::header::Connection::close()).send()
+    // }
 
     pub fn set_pagination(&mut self, pagination: Pagination) {
         self.pagination = Some(pagination);
@@ -127,23 +133,24 @@ impl GitLab {
     {
         let url = self.build_url(query);
         info!("url: {:?}", url);
-        let mut res: hyper::client::Response = self.client
-            .get(&url)
-            .header(hyper::header::Connection::close())
-            .send()
-            .unwrap();
-        info!("res.status: {:?}", res.status);
-        debug!("res.headers: {:?}", res.headers);
-        debug!("res.url: {:?}", res.url);
-
-        let mut body = String::new();
-        res.read_to_string(&mut body).unwrap();
-        debug!("body:\n{:?}", body);
-
-        // FIXME: Properly handle the error. Will require defining our own errors...
-        assert_eq!(res.status, hyper::status::StatusCode::Ok);
-
-        serde_json::from_str(body.as_str())
+        unimplemented!();
+        // let mut res: hyper::client::Response = self.client
+        //     .get(&url)
+        //     .header(hyper::header::Connection::close())
+        //     .send()
+        //     .unwrap();
+        // info!("res.status: {:?}", res.status);
+        // debug!("res.headers: {:?}", res.headers);
+        // debug!("res.url: {:?}", res.url);
+        //
+        // let mut body = String::new();
+        // res.read_to_string(&mut body).unwrap();
+        // debug!("body:\n{:?}", body);
+        //
+        // // FIXME: Properly handle the error. Will require defining our own errors...
+        // assert_eq!(res.status, hyper::status::StatusCode::Ok);
+        //
+        // serde_json::from_str(body.as_str())
     }
 
     // pub fn version(&self) -> Result<Version, serde_json::Error> {
@@ -155,12 +162,13 @@ impl GitLab {
     // }
 
     pub fn projects(&self) -> ::projects::ProjectsLister {
-        Default::default()
+        ::projects::ProjectsLister::new(&self)
     }
 
     pub fn groups(&mut self, listing: ::groups::Listing) -> Result<Groups, serde_json::Error> {
         let query = listing.build_query();
-        self.get(&query)
+        // self.get(&query)
+        unimplemented!();
     }
 
     pub fn owned_groups(&mut self) -> Result<Groups, serde_json::Error> {
