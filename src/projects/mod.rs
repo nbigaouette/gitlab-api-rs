@@ -23,8 +23,10 @@
 //!
 
 
+use std::io::Read;  // Trait providing read_to_string()
 use BuildQuery;
 
+use hyper;
 use serde_json;
 use serde_urlencoded;
 
@@ -190,7 +192,43 @@ impl<'a> ProjectsLister<'a> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
-        Default::default()
+        let client = self.gl.http_proxy().map_or_else(|| {
+            hyper::Client::new()
+        }, |proxy| {
+            let proxy: Vec<&str> = proxy.trim_left_matches("http://").split(':').collect();
+            let hostname = proxy[0].to_string();
+            let port = proxy[1];
+
+            info!("Using HTTP proxy {} on port {}", hostname, port);
+
+            hyper::Client::with_http_proxy(hostname, port.parse().unwrap())
+        });
+        debug!("client: {:?}", client);
+
+        let url = self.gl.build_url(&query);
+        debug!("url: {:?}", url);
+
+        // FIXME: Properly handle the error. Will require defining our own errors...
+
+        // Close connections after each GET.
+        let mut response = client.get(&url)
+                            .header(hyper::header::Connection::close())
+                            .send()
+                            .unwrap();
+
+        debug!("response: {:?}", response);
+
+        info!("response.status: {:?}", response.status);
+        debug!("response.headers: {:?}", response.headers);
+        debug!("response.url: {:?}", response.url);
+
+        let mut body = String::new();
+        response.read_to_string(&mut body).unwrap();
+        debug!("body:\n{:?}", body);
+
+        assert_eq!(response.status, hyper::status::StatusCode::Ok);
+
+        serde_json::from_str(body.as_str()).unwrap()
     }
 }
 
