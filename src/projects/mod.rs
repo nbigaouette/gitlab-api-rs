@@ -303,9 +303,6 @@ mod tests {
 
         let projects_lister = gl.projects();
         let query = projects_lister.build_query();
-        // println!("gl: {:?}", gl);
-        // println!("projects_lister: {:?}", projects_lister);
-        // println!("query: {:?}", query);
         assert_eq!(query, expected_string);
 
         let query = gl.projects().build_query();
