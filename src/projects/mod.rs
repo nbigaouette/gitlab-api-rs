@@ -307,111 +307,175 @@ mod tests {
 
         let query = gl.projects().build_query();
         assert_eq!(query, expected_string);
-
-        // let projects = gl.projects().list();
-        // let listing: Listing = Default::default();
-        // let query = listing.build_query();
-        // assert_eq!(query, expected_string);
-        //
-        // let expected_string = "projects";
-        // let listing = Listing::new();
-        // let query = listing.build_query();
-        // assert_eq!(query, expected_string);
     }
 
 
-    // #[test]
-    // fn build_query_archived() {
-    //     let expected_string = "projects?archived=true";
-    //     let query = Listing::new().archived(true).build_query();
-    //     assert_eq!(query, expected_string);
-    //
-    //     let expected_string = "projects?archived=false";
-    //     let query = Listing::new().archived(false).build_query();
-    //     assert_eq!(query, expected_string);
-    // }
-    //
-    //
-    // #[test]
-    // fn build_query_visibility() {
-    //     let expected_string = "projects?visibility=public";
-    //     let query = Listing::new().visibility(::ListingVisibility::Public).build_query();
-    //     assert_eq!(query, expected_string);
-    //
-    //     let expected_string = "projects?visibility=internal";
-    //     let query = Listing::new().visibility(::ListingVisibility::Internal).build_query();
-    //     assert_eq!(query, expected_string);
-    //
-    //     let expected_string = "projects?visibility=private";
-    //     let query = Listing::new().visibility(::ListingVisibility::Private).build_query();
-    //     assert_eq!(query, expected_string);
-    // }
-    //
-    //
-    // #[test]
-    // fn build_query_order_by() {
-    //     let expected_string = "projects?order_by=id";
-    //     let query = Listing::new().order_by(ListingOrderBy::Id).build_query();
-    //     assert_eq!(query, expected_string);
-    //
-    //     let expected_string = "projects?order_by=name";
-    //     let query = Listing::new().order_by(ListingOrderBy::Name).build_query();
-    //     assert_eq!(query, expected_string);
-    //
-    //     let expected_string = "projects?order_by=path";
-    //     let query = Listing::new().order_by(ListingOrderBy::Path).build_query();
-    //     assert_eq!(query, expected_string);
-    //
-    //     let expected_string = "projects?order_by=created_at";
-    //     let query = Listing::new().order_by(ListingOrderBy::CreatedAt).build_query();
-    //     assert_eq!(query, expected_string);
-    //
-    //     let expected_string = "projects?order_by=updated_at";
-    //     let query = Listing::new().order_by(ListingOrderBy::UpdatedAt).build_query();
-    //     assert_eq!(query, expected_string);
-    //
-    //     let expected_string = "projects?order_by=last_activity_at";
-    //     let query = Listing::new().order_by(ListingOrderBy::LastActivityAt).build_query();
-    //     assert_eq!(query, expected_string);
-    // }
-    //
-    //
-    // #[test]
-    // fn build_query_sort() {
-    //     let expected_string = "projects?sort=asc";
-    //     let query = Listing::new().sort(::ListingSort::Asc).build_query();
-    //     assert_eq!(query, expected_string);
-    //
-    //     let expected_string = "projects?sort=desc";
-    //     let query = Listing::new().sort(::ListingSort::Desc).build_query();
-    //     assert_eq!(query, expected_string);
-    // }
-    //
-    //
-    // #[test]
-    // fn build_query_search() {
-    //     let expected_string = "projects?search=SearchPattern";
-    //     let query = Listing::new().search(String::from("SearchPattern")).build_query();
-    //     assert_eq!(query, expected_string);
-    // }
-    //
-    //
-    // #[test]
-    // fn build_query_simple() {
-    //     let expected_string = "projects?simple=true";
-    //     let query = Listing::new().simple(true).build_query();
-    //     assert_eq!(query, expected_string);
-    //
-    //     let expected_string = "projects?simple=false";
-    //     let query = Listing::new().simple(false).build_query();
-    //     assert_eq!(query, expected_string);
-    // }
-    //
-    //
-    // #[test]
-    // fn groups_build_query_multiple() {
-    //     let expected_string = "projects?archived=true&simple=true";
-    //     let query = Listing::new().archived(true).simple(true).build_query();
-    //     assert_eq!(query, expected_string);
-    // }
+    #[test]
+    fn build_query_archived() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = "projects?archived=true";
+
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.archived(true).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().archived(true).build_query();
+        assert_eq!(query, expected_string);
+
+        let expected_string = "projects?archived=false";
+
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.archived(false).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().archived(false).build_query();
+        assert_eq!(query, expected_string);
+    }
+
+
+    #[test]
+    fn build_query_visibility() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = "projects?visibility=public";
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.visibility(::ListingVisibility::Public).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().visibility(::ListingVisibility::Public).build_query();
+        assert_eq!(query, expected_string);
+
+        let expected_string = "projects?visibility=internal";
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.visibility(::ListingVisibility::Internal).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().visibility(::ListingVisibility::Internal).build_query();
+        assert_eq!(query, expected_string);
+
+        let expected_string = "projects?visibility=private";
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.visibility(::ListingVisibility::Private).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().visibility(::ListingVisibility::Private).build_query();
+        assert_eq!(query, expected_string);
+    }
+
+
+    #[test]
+    fn build_query_order_by() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = "projects?order_by=id";
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.order_by(ListingOrderBy::Id).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().order_by(ListingOrderBy::Id).build_query();
+        assert_eq!(query, expected_string);
+
+        let expected_string = "projects?order_by=name";
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.order_by(ListingOrderBy::Name).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().order_by(ListingOrderBy::Name).build_query();
+        assert_eq!(query, expected_string);
+
+        let expected_string = "projects?order_by=path";
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.order_by(ListingOrderBy::Path).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().order_by(ListingOrderBy::Path).build_query();
+        assert_eq!(query, expected_string);
+
+        let expected_string = "projects?order_by=created_at";
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.order_by(ListingOrderBy::CreatedAt).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().order_by(ListingOrderBy::CreatedAt).build_query();
+        assert_eq!(query, expected_string);
+
+        let expected_string = "projects?order_by=updated_at";
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.order_by(ListingOrderBy::UpdatedAt).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().order_by(ListingOrderBy::UpdatedAt).build_query();
+        assert_eq!(query, expected_string);
+
+        let expected_string = "projects?order_by=last_activity_at";
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.order_by(ListingOrderBy::LastActivityAt).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().order_by(ListingOrderBy::LastActivityAt).build_query();
+        assert_eq!(query, expected_string);
+    }
+
+
+    #[test]
+    fn build_query_sort() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = "projects?sort=asc";
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.sort(::ListingSort::Asc).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().sort(::ListingSort::Asc).build_query();
+        assert_eq!(query, expected_string);
+
+        let expected_string = "projects?sort=desc";
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.sort(::ListingSort::Desc).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().sort(::ListingSort::Desc).build_query();
+        assert_eq!(query, expected_string);
+    }
+
+
+    #[test]
+    fn build_query_search() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = "projects?search=SearchPattern";
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.search(String::from("SearchPattern")).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().search(String::from("SearchPattern")).build_query();
+        assert_eq!(query, expected_string);
+    }
+
+
+    #[test]
+    fn build_query_simple() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = "projects?simple=true";
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.simple(true).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().simple(true).build_query();
+        assert_eq!(query, expected_string);
+
+        let expected_string = "projects?simple=false";
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.simple(false).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().simple(false).build_query();
+        assert_eq!(query, expected_string);
+    }
+
+
+    #[test]
+    fn groups_build_query_multiple() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = "projects?archived=true&simple=true";
+        let mut projects_lister = gl.projects();
+        let query = projects_lister.archived(true).simple(true).build_query();
+        assert_eq!(query, expected_string);
+        let query = gl.projects().archived(true).simple(true).build_query();
+        assert_eq!(query, expected_string);
+    }
 }
