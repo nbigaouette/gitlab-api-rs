@@ -23,7 +23,7 @@ pub struct Pagination {
     pub per_page: u16,
 }
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct GitLab {
     scheme: String,
     domain: String,
