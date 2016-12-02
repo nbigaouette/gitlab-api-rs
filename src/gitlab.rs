@@ -29,7 +29,6 @@ pub struct GitLab {
     domain: String,
     port: u16,
     private_token: String,
-    http_proxy: Option<String>,
     pagination: Option<Pagination>,
     client: hyper::Client,
 }
@@ -58,9 +57,17 @@ impl GitLab {
             domain: domain.to_string(),
             port: port,
             private_token: private_token.to_string(),
-            http_proxy: env::var("HTTP_PROXY").ok(),
             pagination: None,
-            client: hyper::Client::new(),
+            client: match env::var("HTTP_PROXY") {
+                Ok(proxy) => {
+                    let proxy: Vec<&str> = proxy.trim_left_matches("http://").split(':').collect();
+                    let hostname = proxy[0].to_string();
+                    let port = proxy[1];
+
+                    hyper::Client::with_http_proxy(hostname, port.parse().unwrap())
+                }
+                Err(_) => hyper::Client::new(),
+            },
         }
     }
 
@@ -71,10 +78,6 @@ impl GitLab {
 
     pub fn new(domain: &str, private_token: &str) -> GitLab {
         GitLab::_new("https", domain, 443, private_token)
-    }
-
-    pub fn http_proxy(&self) -> Option<&str> {
-        self.http_proxy.as_ref().map(|proxy| &**proxy)
     }
 
     /// Build a URL used to access GitLab instance, including some parameters.
