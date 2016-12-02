@@ -25,9 +25,8 @@ serde_urlencoded = "0.3"
 derive_builder = { git = "https://github.com/nbigaouette/rust-derive-builder.git", rev = "249d9fc03b9e7ae54f170dc68c87f24d2e4be4a0"}
 custom_derive = "0.1"
 
+clippy = {version = "*", optional = true}
 
 hyper = "0.9"
 # On OSX, use the following:
 # hyper = { version = "0.9", default-features = false, features = ["security-framework"] }
-
-clippy = {version = "*", optional = true}
