@@ -25,9 +25,14 @@ serde_urlencoded = "0.3"
 derive_builder = { git = "https://github.com/nbigaouette/rust-derive-builder.git", rev = "249d9fc03b9e7ae54f170dc68c87f24d2e4be4a0"}
 custom_derive = "0.1"
 
-
-hyper = "0.9"
-# On OSX, use the following:
-# hyper = { version = "0.9", default-features = false, features = ["security-framework"] }
-
 clippy = {version = "*", optional = true}
+
+# Compilation on OSX will fail in case you don't do one of these two things:
+# 1) Use this instead to link against "security-framework":
+#        hyper = { version = "0.9.13", default-features = false, features = ["security-framework"] }
+# 2) Install OpenSSL using homebrew and export these variables:
+#        export OPENSSL_INCLUDE_DIR=`brew --prefix openssl`/include
+#        export OPENSSL_LIB_DIR=`brew --prefix openssl`/lib
+#        export DEP_OPENSSL_INCLUDE=`brew --prefix openssl`/include
+# See http://stackoverflow.com/q/39709542/178154
+hyper = "0.9.13"
