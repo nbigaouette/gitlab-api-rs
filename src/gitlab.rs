@@ -157,7 +157,7 @@ impl GitLab {
     // }
 
     pub fn projects(&self) -> ::projects::ProjectsLister {
-        ::projects::ProjectsLister::new(&self)
+        ::projects::ProjectsLister::new(self)
     }
 
     // pub fn groups(&mut self, listing: ::groups::Listing) -> Result<Groups, serde_json::Error> {
