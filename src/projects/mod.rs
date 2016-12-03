@@ -73,6 +73,11 @@ impl<'a> ProjectsLister<'a> {
         }
     }
 
+    pub fn owned(&self) -> owned::ProjectsLister {
+        // assert_eq!(self, ProjectsLister::new(self.gl));
+        owned::ProjectsLister::new(self.gl)
+    }
+
     pub fn archived(&'a mut self, archived: bool) -> &'a mut ProjectsLister {
         self.internal.archived = Some(archived);
         self
