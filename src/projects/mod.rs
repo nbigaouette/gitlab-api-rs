@@ -153,8 +153,8 @@ pub enum ListingOrderBy {
 }
 
 
-custom_derive!{
-    #[derive(Debug, Clone, Builder)]
+macro_attr! {
+    #[derive(Debug, Clone, Builder!)]
     pub struct ProjectsLister<'a> {
         gl: &'a ::GitLab,
         /// Limit by archived status

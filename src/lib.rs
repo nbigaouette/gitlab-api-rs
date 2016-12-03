@@ -25,7 +25,7 @@ extern crate log;
 extern crate hyper;
 
 #[macro_use]
-extern crate custom_derive;
+extern crate macro_attr;
 #[macro_use]
 extern crate derive_builder;
 
