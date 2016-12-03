@@ -19,6 +19,12 @@ fn main() {
     std::fs::create_dir_all(&dst).expect(&format!("Cannot create directory {:?}!", dst));
     let dst = dst.join("serde_types.rs");
     serde_codegen::expand(&src, &dst).unwrap();
+
+    let src = Path::new("src/projects/serde_types.in.rs");
+    let dst = Path::new(&out_dir).join("projects");
+    std::fs::create_dir_all(&dst).expect(&format!("Cannot create directory {:?}!", dst));
+    let dst = dst.join("serde_types.rs");
+    serde_codegen::expand(&src, &dst).unwrap();
 }
 
 #[cfg(not(feature = "serde_codegen"))]

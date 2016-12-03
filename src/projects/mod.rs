@@ -142,34 +142,14 @@ pub mod visible;
 // https://docs.gitlab.com/ce/api/projects.html#list-projects
 
 
-#[derive(Debug, Copy, Clone)]
-pub enum ListingOrderBy {
-    Id,
-    Name,
-    Path,
-    CreatedAt,
-    UpdatedAt,
-    LastActivityAt,
-}
 
 
-macro_attr! {
-    #[derive(Debug, Clone, Builder!)]
-    struct ProjectListerInternal {
-        /// Limit by archived status
-        archived: Option<bool>,
-        /// Limit by visibility.
-        visibility: Option<::ListingVisibility>,
-        /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
-        order_by: Option<ListingOrderBy>,
-        /// Return requests sorted. Default is `::ListingSort::Desc`.
-        sort: Option<::ListingSort>,
-        /// Return list of authorized projects matching the search criteria.
-        search: String,
-        /// Return only the ID, URL, name, and path of each project
-        simple: Option<bool>,
-    }
-}
+#[cfg(feature = "serde_derive")]
+include!("serde_types.in.rs");
+
+#[cfg(feature = "serde_codegen")]
+include!(concat!(env!("OUT_DIR"), "/projects/serde_types.rs"));
+
 
 macro_attr! {
     #[derive(Debug, Clone, Builder!)]
