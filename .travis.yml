@@ -8,6 +8,7 @@ addons:
       - libelf-dev
       - libdw-dev
       - binutils-dev # optional: only required for the --verify flag of coveralls
+cache: cargo
 
 # load travis-cargo
 before_script:
@@ -35,7 +36,6 @@ after_success:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then travis-cargo coveralls --no-sudo --verify; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./kcov/build/src/kcov --verify --coveralls-id=$TRAVIS_JOB_ID --exclude-pattern=/.cargo target/kcov target/debug/gitlab_api-*; fi
 
-# cache: cargo
 # rust:
 #   - stable
 #   - beta
