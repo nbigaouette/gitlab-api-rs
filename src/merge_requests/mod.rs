@@ -43,7 +43,7 @@ pub mod single;
 
 // Include serializable types
 #[cfg(feature = "serde_derive")]
-include!("merge_requests/serde_types.in.rs");
+include!("serde_types.in.rs");
 #[cfg(feature = "serde_codegen")]
 include!(concat!(env!("OUT_DIR"), "/merge_requests/serde_types.rs"));
 
