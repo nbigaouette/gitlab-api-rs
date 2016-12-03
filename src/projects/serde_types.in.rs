@@ -35,5 +35,14 @@ struct ProjectListerInternal {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct OwnedProjectListerInternal {
-
+    /// Limit by archived status
+    archived: Option<bool>,
+    /// Limit by visibility.
+    visibility: Option<::ListingVisibility>,
+    /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
+    order_by: Option<ListingOrderBy>,
+    /// Return requests sorted. Default is `::ListingSort::Desc`.
+    sort: Option<::ListingSort>,
+    /// Return list of authorized projects matching the search criteria.
+    search: Option<String>,
 }
