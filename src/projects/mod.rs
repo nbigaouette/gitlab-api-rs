@@ -73,7 +73,7 @@ impl<'a> ProjectsLister<'a> {
         }
     }
 
-    pub fn owned(&self) -> owned::ProjectsLister {
+    pub fn owned(self) -> owned::ProjectsLister<'a> {
         // assert_eq!(self, ProjectsLister::new(self.gl));
         owned::ProjectsLister::new(self.gl)
     }
