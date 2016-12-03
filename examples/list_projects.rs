@@ -53,6 +53,8 @@ fn main() {
     let projects = gl.projects().archived(false).list();
     println!("projects: {:?}", projects);
 
+    let projects = gl.projects().owned().archived(false).list();
+    println!("projects: {:?}", projects);
 
 
 
