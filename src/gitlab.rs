@@ -43,8 +43,6 @@ impl fmt::Debug for GitLab {
                self.scheme,
                self.domain,
                self.port,
-            // client: {:?}, \
-            //    self.client,
                self.pagination)
     }
 }
