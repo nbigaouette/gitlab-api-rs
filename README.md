@@ -2,11 +2,10 @@
 
 Rust wrapper to the GitLab API.
 
-[![Build Status](https://travis-ci.org/nbigaouette/gitlab-api-rs.svg?branch=master)](https://travis-ci.org/nbigaouette/gitlab-api-rs)
 [![Crates.io](https://img.shields.io/crates/v/gitlab-api.svg)](https://crates.io/crates/gitlab-api)
-[![License](https://img.shields.io/crates/l/gitlab-api.svg)]()
+[![Build Status](https://travis-ci.org/nbigaouette/gitlab-api-rs.svg?branch=master)](https://travis-ci.org/nbigaouette/gitlab-api-rs)
+[![License](https://img.shields.io/crates/l/gitlab-api.svg)](#Licensing)
 [![Coverage Status](https://coveralls.io/repos/github/nbigaouette/gitlab-api-rs/badge.svg?branch=master)](https://coveralls.io/github/nbigaouette/gitlab-api-rs?branch=master)
-[![Latest Version](https://img.shields.io/crates/v/gitlab-api.svg)](https://crates.io/crates/gitlab-api)
 
 ## Synopsis
 
