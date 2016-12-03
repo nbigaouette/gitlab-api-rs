@@ -2,6 +2,11 @@
 name = "gitlab-api"
 version = "0.2.0"
 authors = ["Nicolas Bigaouette <nbigaouette@gmail.com>"]
+description = "Wrapper for GitLab API v3"
+license = "MIT/Apache-2.0"
+repository = "https://github.com/nbigaouette/gitlab-api-rs"
+readme = "README.md"
+keywords = ["gitlab", "git"]
 build = "build.rs"
 
 [features]
