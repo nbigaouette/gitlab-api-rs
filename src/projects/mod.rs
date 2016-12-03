@@ -219,91 +219,12 @@ impl<'a> ProjectsLister<'a> {
 impl<'a> BuildQuery for ProjectsLister<'a> {
     fn build_query(&self) -> String {
 
+        let encoded = serde_urlencoded::to_string(&self.internal).unwrap();
         let mut query = String::from("projects");
-
-        let amp_char = "&";
-        let none_char = "";
-        let mut split_char = &none_char;
-
-        // Append a "?" only if at least one of the `Option` is `Some(_)` or if
-        // strings contain something.
-        query.push_str(match (&self.internal.archived,
-                              &self.internal.visibility,
-                              &self.internal.order_by,
-                              &self.internal.sort,
-                              self.internal.search.is_empty(),
-                              &self.internal.simple) {
-            (&None, &None, &None, &None, true, &None) => "",
-            _ => "?",
-        });
-
-        self.internal.archived.map(|archived| {
-            query.push_str(split_char);
-            split_char = &amp_char;
-
-            if archived {
-                query.push_str("archived=true")
-            } else {
-                query.push_str("archived=false")
-            }
-        });
-
-        self.internal.visibility.map(|visibility| {
-            query.push_str(split_char);
-            split_char = &amp_char;
-
-            query.push_str("visibility=");
-            query.push_str(match visibility {
-                ::ListingVisibility::Public => "public",
-                ::ListingVisibility::Internal => "internal",
-                ::ListingVisibility::Private => "private",
-            });
-        });
-
-        self.internal.order_by.map(|order_by| {
-            query.push_str(split_char);
-            split_char = &amp_char;
-
-            query.push_str("order_by=");
-            query.push_str(match order_by {
-                ListingOrderBy::Id => "id",
-                ListingOrderBy::Name => "name",
-                ListingOrderBy::Path => "path",
-                ListingOrderBy::CreatedAt => "created_at",
-                ListingOrderBy::UpdatedAt => "updated_at",
-                ListingOrderBy::LastActivityAt => "last_activity_at",
-            });
-        });
-
-        self.internal.sort.map(|sort| {
-            query.push_str(split_char);
-            split_char = &amp_char;
-
-            query.push_str("sort=");
-            query.push_str(match sort {
-                ::ListingSort::Asc => "asc",
-                ::ListingSort::Desc => "desc",
-            });
-        });
-
-        if !self.internal.search.is_empty() {
-            query.push_str(split_char);
-            split_char = &amp_char;
-
-            query.push_str("search=");
-            query.push_str(&self.internal.search);
+        if !encoded.is_empty() {
+            query.push_str("?");
+            query.push_str(&encoded);
         }
-
-        self.internal.simple.map(|simple| {
-            query.push_str(split_char);
-            split_char = &amp_char;
-
-            if simple {
-                query.push_str("simple=true")
-            } else {
-                query.push_str("simple=false")
-            }
-        });
 
         query
     }
