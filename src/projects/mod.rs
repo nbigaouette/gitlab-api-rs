@@ -174,6 +174,36 @@ impl<'a> ProjectsLister<'a> {
         }
     }
 
+    pub fn archived(&'a mut self, archived: bool) -> &'a mut ProjectsLister {
+        self.internal.archived = Some(archived);
+        self
+    }
+
+    pub fn visibility(&'a mut self, visibility: ::ListingVisibility) -> &'a mut ProjectsLister {
+        self.internal.visibility = Some(visibility);
+        self
+    }
+
+    pub fn order_by(&'a mut self, order_by: ListingOrderBy) -> &'a mut ProjectsLister {
+        self.internal.order_by = Some(order_by);
+        self
+    }
+
+    pub fn sort(&'a mut self, sort: ::ListingSort) -> &'a mut ProjectsLister {
+        self.internal.sort = Some(sort);
+        self
+    }
+
+    pub fn search(&'a mut self, search: String) -> &'a mut ProjectsLister {
+        self.internal.search = Some(search);
+        self
+    }
+
+    pub fn simple(&'a mut self, simple: bool) -> &'a mut ProjectsLister {
+        self.internal.simple = Some(simple);
+        self
+    }
+
     /// Commit the lister: Query GitLab and return a list of projects.
     pub fn list(&self) -> Projects {
         // let query = serde_urlencoded::to_string(&self);
