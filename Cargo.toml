@@ -22,8 +22,6 @@ serde_json = "0.8"
 serde_urlencoded = "0.3"
 # See https://github.com/colin-kiegel/rust-derive-builder/pull/29
 # derive_builder = "0.2"
-derive_builder = { git = "https://github.com/nbigaouette/rust-derive-builder.git", rev = "249d9fc03b9e7ae54f170dc68c87f24d2e4be4a0"}
-macro-attr = "0.2.0"
 
 clippy = {version = "*", optional = true}
 

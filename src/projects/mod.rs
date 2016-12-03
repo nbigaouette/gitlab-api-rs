@@ -151,13 +151,12 @@ include!("serde_types.in.rs");
 include!(concat!(env!("OUT_DIR"), "/projects/serde_types.rs"));
 
 
-macro_attr! {
-    #[derive(Debug, Clone, Builder!)]
-    pub struct ProjectsLister<'a> {
-        gl: &'a ::GitLab,
-        internal: ProjectListerInternal,
-    }
+#[derive(Debug, Clone)]
+pub struct ProjectsLister<'a> {
+    gl: &'a ::GitLab,
+    internal: ProjectListerInternal,
 }
+
 
 impl<'a> ProjectsLister<'a> {
 
@@ -169,7 +168,7 @@ impl<'a> ProjectsLister<'a> {
                 visibility: None,
                 order_by: None,
                 sort: None,
-                search: "".into(),
+                search: None,
                 simple: None,
             },
         }

@@ -24,11 +24,6 @@ include!(concat!(env!("OUT_DIR"), "/serde_types.rs"));
 extern crate log;
 extern crate hyper;
 
-#[macro_use]
-extern crate macro_attr;
-#[macro_use]
-extern crate derive_builder;
-
 
 pub mod gitlab;
 pub mod groups;
