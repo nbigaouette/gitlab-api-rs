@@ -32,5 +32,6 @@ Depends (directly) only on `serde`, `serde_json` and `hyper`.
 
 ## Licensing
 
-The code in these two libraries is dual-licensed under the MIT license and the
-Apache License (version 2.0). See [LICENSE-APACHE](./LICENSE-APACHE) and [LICENSE-MIT](./LICENSE-MIT) for details.
+gitlab-api-rs is distributed under the terms of both the MIT license and the Apache License (Version 2.0).
+
+See [LICENSE-APACHE](./LICENSE-APACHE) and [LICENSE-MIT](./LICENSE-MIT) for details.
