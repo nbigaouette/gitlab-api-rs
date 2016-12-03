@@ -30,27 +30,6 @@ use Projects;
 use projects::{OwnedProjectListerInternal, ListingOrderBy};
 
 
-
-// impl GitLab {
-//     pub fn projects_owned(&self, listing: Listing) -> Result<Projects, serde_json::Error> {
-//         let query = listing.build_query();
-//         self.get(&query)
-//     }
-// }
-
-
-// #[derive(Debug, Copy, Clone)]
-// pub enum ListingOrderBy {
-//     Id,
-//     Name,
-//     Path,
-//     CreatedAt,
-//     UpdatedAt,
-//     LastActivityAt,
-// }
-
-
-
 #[derive(Debug, Clone)]
 pub struct ProjectsLister<'a> {
     gl: &'a ::GitLab,
@@ -117,55 +96,13 @@ impl<'a> BuildQuery for ProjectsLister<'a> {
             query.push_str("?");
             query.push_str(&encoded);
         }
+        debug!("query: {}", query);
 
         query
     }
 }
 
 
-// #[derive(Default, Debug, Clone)]
-// pub struct Listing {
-//     /// Limit by archived status
-//     archived: Option<bool>,
-//     /// Limit by visibility.
-//     visibility: Option<::ListingVisibility>,
-//     /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
-//     order_by: Option<ListingOrderBy>,
-//     /// Return requests sorted. Default is `::ListingSort::Desc`.
-//     sort: Option<::ListingSort>,
-//     /// Return list of authorized projects matching the search criteria.
-//     search: String,
-// }
-
-
-// #[allow(dead_code)]
-// impl Listing {
-//     pub fn new() -> Listing {
-//         Default::default()
-//     }
-//     pub fn archived(&mut self, archived: bool) -> &mut Listing {
-//         self.archived = Some(archived);
-//         self
-//     }
-//     pub fn visibility(&mut self, visibility: ::ListingVisibility) -> &mut Listing {
-//         self.visibility = Some(visibility);
-//         self
-//     }
-//     pub fn order_by(&mut self, order_by: ListingOrderBy) -> &mut Listing {
-//         self.order_by = Some(order_by);
-//         self
-//     }
-//     fn sort(&mut self, sort: ::ListingSort) -> &mut Listing {
-//         self.sort = Some(sort);
-//         self
-//     }
-//     pub fn search(&mut self, search: String) -> &mut Listing {
-//         self.search = search;
-//         self
-//     }
-// }
-//
-//
 // impl BuildQuery for Listing {
 //     fn build_query(&self) -> String {
 //
