@@ -4,6 +4,11 @@ Rust wrapper to the GitLab API.
 
 [![Build Status](https://travis-ci.org/nbigaouette/gitlab-api-rs.svg?branch=master)](https://travis-ci.org/nbigaouette/gitlab-api-rs)
 
+[![Crates.io](https://img.shields.io/crates/v/gitlab-api-rs.svg)](https://crates.io/crates/gitlab-api)
+
+[![Crates.io](https://img.shields.io/crates/l/gitlab-api-rs.svg)]()
+
+
 ## Synopsis
 
 [GitLab](https://about.gitlab.com/) is an amazing tool of which I am a big fan. For most of the tasks, the web UI is more than enough but for some tasks nothing beats scripting them. The [GitLab API](https://docs.gitlab.com/ce/api/) is there to allow scripting actions on the GitLab server.
