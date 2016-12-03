@@ -2,6 +2,7 @@
 
 #![cfg_attr(feature="clippy", feature(plugin))]
 #![cfg_attr(feature="clippy", plugin(clippy))]
+#![cfg_attr(feature="cargo-clippy", allow(doc_markdown))]
 
 #![cfg_attr(feature = "serde_derive", feature(proc_macro))]
 
