@@ -60,7 +60,7 @@ impl GitLab {
 #[allow(dead_code)]
 impl Listing {
     pub fn new(id: i64) -> Listing {
-        Listing {id: id, ..Default::default()}
+        Listing { id: id, ..Default::default() }
     }
     pub fn iid(&mut self, iid: Vec<i64>) -> &mut Listing {
         self.iid = iid;
@@ -92,10 +92,7 @@ impl BuildQuery for Listing {
 
         // Append a "?" only if at least one of the `Option` is `Some(_)` or if
         // strings contain something.
-        query.push_str(match (self.iid.is_empty(),
-                              &self.state,
-                              &self.order_by,
-                              &self.sort) {
+        query.push_str(match (self.iid.is_empty(), &self.state, &self.order_by, &self.sort) {
             (true, &None, &None, &None) => "",
             _ => "?",
         });
@@ -167,7 +164,7 @@ mod tests {
     #[test]
     fn build_query_default() {
         let expected_string = "projects/123/merge_requests";
-        let listing = Listing {id: 123, ..Default::default()};
+        let listing = Listing { id: 123, ..Default::default() };
         let query = listing.build_query();
         assert_eq!(query, expected_string);
 
@@ -185,7 +182,7 @@ mod tests {
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/123/merge_requests?iid[]=456&iid[]=789");
-        let query = Listing::new(123).iid(vec![456,789]).build_query();
+        let query = Listing::new(123).iid(vec![456, 789]).build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -229,7 +226,11 @@ mod tests {
     #[test]
     fn build_query_multiple() {
         let expected_string = "projects/123/merge_requests?iid[]=456&iid[]=789&order_by=created_at&sort=asc";
-        let query = Listing::new(123).iid(vec![456,789]).sort(::ListingSort::Asc).order_by(ListingOrderBy::CreatedAt).build_query();
+        let query = Listing::new(123)
+            .iid(vec![456, 789])
+            .sort(::ListingSort::Asc)
+            .order_by(ListingOrderBy::CreatedAt)
+            .build_query();
         assert_eq!(query, expected_string);
     }
 }

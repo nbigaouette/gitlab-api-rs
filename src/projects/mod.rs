@@ -64,7 +64,6 @@ pub struct ProjectsLister<'a> {
 
 
 impl<'a> ProjectsLister<'a> {
-
     pub fn new(gl: &'a ::GitLab) -> ProjectsLister {
         ProjectsLister {
             gl: gl,

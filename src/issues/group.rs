@@ -63,7 +63,7 @@ pub struct Listing {
 #[allow(dead_code)]
 impl Listing {
     pub fn new(id: i64) -> Listing {
-        Listing {id: id, ..Default::default()}
+        Listing { id: id, ..Default::default() }
     }
     pub fn state(&mut self, state: ::issues::ListingState) -> &mut Listing {
         self.state = Some(state);
@@ -98,10 +98,7 @@ impl BuildQuery for Listing {
 
         // Append a "?" only if at least one of the `Option` is `Some(_)` or if
         // strings contain something.
-        query.push_str(match (&self.state,
-                              self.labels.is_empty(),
-                              &self.order_by,
-                              &self.sort) {
+        query.push_str(match (&self.state, self.labels.is_empty(), &self.order_by, &self.sort) {
             (&None, true, &None, &None) => "",
             _ => "?",
         });
@@ -195,7 +192,9 @@ mod tests {
     #[test]
     fn build_query_skip_groups() {
         let expected_string = "groups/123/issues?labels=label1,label2,label3";
-        let query = Listing::new(123).labels(vec![String::from("label1"), String::from("label2"), String::from("label3")]).build_query();
+        let query = Listing::new(123)
+            .labels(vec![String::from("label1"), String::from("label2"), String::from("label3")])
+            .build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -227,7 +226,10 @@ mod tests {
     #[test]
     fn build_query_multiple() {
         let expected_string = "groups/123/issues?order_by=created_at&sort=asc";
-        let query = Listing::new(123).sort(::ListingSort::Asc).order_by(::issues::ListingOrderBy::CreatedAt).build_query();
+        let query = Listing::new(123)
+            .sort(::ListingSort::Asc)
+            .order_by(::issues::ListingOrderBy::CreatedAt)
+            .build_query();
         assert_eq!(query, expected_string);
     }
 }

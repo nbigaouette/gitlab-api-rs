@@ -45,7 +45,10 @@ pub struct Listing {
 
 impl Listing {
     pub fn new(id: i64, mr_id: i64) -> Listing {
-        Listing {id: id, mr_id: mr_id}
+        Listing {
+            id: id,
+            mr_id: mr_id,
+        }
     }
 }
 
@@ -65,7 +68,10 @@ mod tests {
     #[test]
     fn build_query_default() {
         let expected_string = "projects/123/merge_requests/456";
-        let listing = Listing {id: 123, mr_id: 456};
+        let listing = Listing {
+            id: 123,
+            mr_id: 456,
+        };
         let query = listing.build_query();
         assert_eq!(query, expected_string);
 

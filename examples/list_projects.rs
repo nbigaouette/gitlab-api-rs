@@ -34,19 +34,19 @@ fn main() {
         }
     };
 
-// // Projects
-// // List projects
-// let projects = gl.projects().list()
-// let projects = gl.projects().archived(...).visibility(...).order_by(...).sort(...).search(...).simple(...).list()
-// // List all projects (admin)
-// let projects = gl.projects().all().list()
-// let projects = gl.projects().all().archived(...).visibility(...).order_by(...).sort(...).search(...).list()
-// // Single project
-// let project = gl.projects().id(142).list()
-// // Search
-// let projects = gl.projects().search(...).list()
-// // Owned
-// let projects = gl.projects().owned().archived(...).visibility(...).order_by(...).sort(...).search(...).list()
+    // // Projects
+    // // List projects
+    // let projects = gl.projects().list()
+    // let projects = gl.projects().archived(...).visibility(...).order_by(...).sort(...).search(...).simple(...).list()
+    // // List all projects (admin)
+    // let projects = gl.projects().all().list()
+    // let projects = gl.projects().all().archived(...).visibility(...).order_by(...).sort(...).search(...).list()
+    // // Single project
+    // let project = gl.projects().id(142).list()
+    // // Search
+    // let projects = gl.projects().search(...).list()
+    // // Owned
+    // let projects = gl.projects().owned().archived(...).visibility(...).order_by(...).sort(...).search(...).list()
 
     let gl = GitLab::new(&hostname, &token);
 
