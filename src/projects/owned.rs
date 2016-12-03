@@ -27,6 +27,8 @@ use serde_json;
 
 use gitlab::GitLab;
 use Projects;
+use projects::OwnedProjectListerInternal;
+
 
 
 impl GitLab {
@@ -45,6 +47,14 @@ pub enum ListingOrderBy {
     CreatedAt,
     UpdatedAt,
     LastActivityAt,
+}
+
+
+
+#[derive(Debug, Clone)]
+pub struct ProjectsLister<'a> {
+    gl: &'a ::GitLab,
+    internal: OwnedProjectListerInternal,
 }
 
 
