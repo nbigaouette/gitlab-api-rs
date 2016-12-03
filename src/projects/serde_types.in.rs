@@ -31,3 +31,9 @@ struct ProjectListerInternal {
     /// Return only the ID, URL, name, and path of each project
     simple: Option<bool>,
 }
+
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct OwnedProjectListerInternal {
+
+}
