@@ -2,6 +2,7 @@
 
 #![cfg_attr(feature="clippy", feature(plugin))]
 #![cfg_attr(feature="clippy", plugin(clippy))]
+#![cfg_attr(feature="cargo-clippy", allow(doc_markdown))]
 
 #![cfg_attr(feature = "serde_derive", feature(proc_macro))]
 
@@ -24,8 +25,9 @@ include!(concat!(env!("OUT_DIR"), "/serde_types.rs"));
 extern crate log;
 extern crate hyper;
 
+
 pub mod gitlab;
-pub mod groups;
+// pub mod groups;
 pub mod projects;
 pub mod issues;
 pub mod merge_requests;

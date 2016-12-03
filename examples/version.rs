@@ -1,4 +1,4 @@
-/*
+
 extern crate gitlab_api as gitlab;
 
 use std::env;
@@ -7,7 +7,6 @@ extern crate log;
 extern crate env_logger;
 
 use gitlab::GitLab;
-use gitlab::merge_requests;
 
 
 fn main() {
@@ -35,14 +34,6 @@ fn main() {
 
     let gl = GitLab::new(&hostname, &token);
 
-    let merge_request = gl.merge_request(merge_requests::single::Listing::new(142, 418)).unwrap();
-    println!("merge_request: {:?}", merge_request);
-
-    let merge_requests = gl.merge_requests(merge_requests::Listing::new(142)).unwrap();
-    println!("merge_requests: {:?}", merge_requests);
-}
-*/
-
-fn main() {
-    println!("Merge requests disabled until API stabilizes. See projects instead.");
+    let version = gl.version();
+    println!("version: {:?}", version);
 }

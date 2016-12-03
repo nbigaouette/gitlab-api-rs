@@ -1,4 +1,4 @@
-
+/*
 extern crate gitlab_api as gitlab;
 
 use std::env;
@@ -42,4 +42,9 @@ fn main() {
 
     let owned_groups = gl.owned_groups();
     println!("owned_groups: {:?}", owned_groups);
+}
+*/
+
+fn main() {
+    println!("Groups disabled until API stabilizes. See projects instead.");
 }

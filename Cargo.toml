@@ -1,7 +1,12 @@
 [package]
 name = "gitlab-api"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Nicolas Bigaouette <nbigaouette@gmail.com>"]
+description = "Wrapper for GitLab API v3"
+license = "MIT/Apache-2.0"
+repository = "https://github.com/nbigaouette/gitlab-api-rs"
+readme = "README.md"
+keywords = ["gitlab", "git"]
 build = "build.rs"
 
 [features]
@@ -21,9 +26,14 @@ serde_derive = { version = "0.8", optional = true }
 serde_json = "0.8"
 serde_urlencoded = "0.3"
 
-
-hyper = "0.9"
-# On OSX, use the following:
-# hyper = { version = "0.9", default-features = false, features = ["security-framework"] }
+# Compilation on OSX will fail in case you don't do one of these two things:
+# 1) Use this instead to link against "security-framework":
+#        hyper = { version = "0.9.13", default-features = false, features = ["security-framework"] }
+# 2) Install OpenSSL using homebrew and export these variables:
+#        export OPENSSL_INCLUDE_DIR=`brew --prefix openssl`/include
+#        export OPENSSL_LIB_DIR=`brew --prefix openssl`/lib
+#        export DEP_OPENSSL_INCLUDE=`brew --prefix openssl`/include
+# See http://stackoverflow.com/q/39709542/178154
+hyper = "0.9.13"
 
 clippy = {version = "*", optional = true}

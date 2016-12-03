@@ -8,8 +8,7 @@ use serde;
 use serde_json;
 
 
-use BuildQuery;
-use Groups;
+// use Groups;
 
 
 pub const API_VERSION: u16 = 3;
@@ -17,19 +16,20 @@ pub const API_VERSION: u16 = 3;
 
 
 
-#[derive(Debug)]
+#[derive(Default, Clone, Copy, Debug)]
 pub struct Pagination {
     pub page: u16,
     pub per_page: u16,
 }
 
+#[derive(Default)]
 pub struct GitLab {
     scheme: String,
     domain: String,
     port: u16,
     private_token: String,
-    client: hyper::Client,
     pagination: Option<Pagination>,
+    client: hyper::Client,
 }
 
 
@@ -38,11 +38,10 @@ impl fmt::Debug for GitLab {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f,
                "GitLab {{ scheme: {}, domain: {}, port: {}, private_token: XXXXXXXXXXXXXXXXXXXX, \
-                client: {:?}, pagination: {:?} }}",
+                pagination: {:?} }}",
                self.scheme,
                self.domain,
                self.port,
-               self.client,
                self.pagination)
     }
 }
@@ -55,6 +54,7 @@ impl GitLab {
             domain: domain.to_string(),
             port: port,
             private_token: private_token.to_string(),
+            pagination: None,
             client: match env::var("HTTP_PROXY") {
                 Ok(proxy) => {
                     let proxy: Vec<&str> = proxy.trim_left_matches("http://").split(':').collect();
@@ -65,7 +65,6 @@ impl GitLab {
                 }
                 Err(_) => hyper::Client::new(),
             },
-            pagination: None,
         }
     }
 
@@ -112,11 +111,11 @@ impl GitLab {
         url
     }
 
-    pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
-        let url = self.build_url("version");
-        // Close connections after each GET.
-        self.client.get(&url).header(hyper::header::Connection::close()).send()
-    }
+    // pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
+    //     let url = self.build_url("version");
+    //     // Close connections after each GET.
+    //     self.client.get(&url).header(hyper::header::Connection::close()).send()
+    // }
 
     pub fn set_pagination(&mut self, pagination: Pagination) {
         self.pagination = Some(pagination);
@@ -125,8 +124,12 @@ impl GitLab {
     pub fn get<T>(&self, query: &str) -> Result<T, serde_json::Error>
         where T: serde::Deserialize
     {
+        // FIXME: Properly handle any errors. Use chain_error crate.
+
         let url = self.build_url(query);
         info!("url: {:?}", url);
+
+        // Close connections after each GET.
         let mut res: hyper::client::Response = self.client
             .get(&url)
             .header(hyper::header::Connection::close())
@@ -140,34 +143,34 @@ impl GitLab {
         res.read_to_string(&mut body).unwrap();
         debug!("body:\n{:?}", body);
 
-        // FIXME: Properly handle the error. Will require defining our own errors...
         assert_eq!(res.status, hyper::status::StatusCode::Ok);
 
         serde_json::from_str(body.as_str())
     }
 
-    // pub fn version(&self) -> Result<Version, serde_json::Error> {
-    //     self.get("version")
-    // }
-    //
+    pub fn version(&self) -> ::Version {
+        self.get("version").unwrap()
+    }
+
     // pub fn groups(&self) -> Result<Groups, serde_json::Error> {
     //     self.get("groups")
     // }
-    //
-    // pub fn projects(&self) -> Result<Projects, serde_json::Error> {
-    //     self.get("projects")
+
+    pub fn projects(&self) -> ::projects::ProjectsLister {
+        ::projects::ProjectsLister::new(self)
+    }
+
+    // pub fn groups(&mut self, listing: ::groups::Listing) -> Result<Groups, serde_json::Error> {
+    //     let query = listing.build_query();
+    //     // self.get(&query)
+    //     unimplemented!();
     // }
 
-    pub fn groups(&mut self, listing: ::groups::Listing) -> Result<Groups, serde_json::Error> {
-        let query = listing.build_query();
-        self.get(&query)
-    }
-
-    pub fn owned_groups(&mut self) -> Result<Groups, serde_json::Error> {
-        let query = ::groups::owned_groups::Listing::new().build_query();
-        info!("query: {:?}", query);
-        self.get(&query)
-    }
+    // pub fn owned_groups(&mut self) -> Result<Groups, serde_json::Error> {
+    //     let query = ::groups::owned_groups::Listing::new().build_query();
+    //     info!("query: {:?}", query);
+    //     self.get(&query)
+    // }
 }
 
 
