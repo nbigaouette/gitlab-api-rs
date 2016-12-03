@@ -10,6 +10,19 @@ addons:
       - binutils-dev # optional: only required for the --verify flag of coveralls
 cache: cargo
 
+rust:
+  - stable
+  - beta
+  - nightly
+matrix:
+  allow_failures:
+    - rust: nightly
+    - os: osx
+
+os:
+  - linux
+  - osx
+
 # load travis-cargo
 before_script:
   - |
@@ -35,16 +48,3 @@ after_success:
   # See https://github.com/ujh/iomrascalai/blob/master/.travis.yml
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then travis-cargo coveralls --no-sudo --verify; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./kcov/build/src/kcov --verify --coveralls-id=$TRAVIS_JOB_ID --exclude-pattern=/.cargo target/kcov target/debug/gitlab_api-*; fi
-
-# rust:
-#   - stable
-#   - beta
-#   - nightly
-# matrix:
-#   allow_failures:
-#     - rust: nightly
-#     - os: osx
-#
-# os:
-#   - linux
-#   - osx
