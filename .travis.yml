@@ -29,7 +29,11 @@ after_success:
   # measure code coverage and upload to coveralls.io (the verify
   # argument mitigates kcov crashes due to malformed debuginfo, at the
   # cost of some speed <https://github.com/huonw/travis-cargo/issues/12>)
-  - travis-cargo coveralls --no-sudo --verify
+  # - travis-cargo coveralls --no-sudo --verify
+  # https://github.com/huonw/travis-cargo/issues/58
+  # See https://github.com/ujh/iomrascalai/blob/master/.travis.yml
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then travis-cargo coveralls --no-sudo --verify; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./kcov/build/src/kcov --verify --coveralls-id=$TRAVIS_JOB_ID --exclude-pattern=/.cargo target/kcov target/debug/gitlab_api-*; fi
 
 # cache: cargo
 # rust:
