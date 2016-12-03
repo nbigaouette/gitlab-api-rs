@@ -23,15 +23,10 @@
 //!
 
 
-use std::io::Read;  // Trait providing read_to_string()
-use BuildQuery;
-
-use hyper;
 use serde_json;
 use serde_urlencoded;
 
-use gitlab::GitLab;
-use Project;
+use BuildQuery;
 use Projects;
 
 

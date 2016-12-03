@@ -30,7 +30,7 @@
 use BuildQuery;
 
 use serde_json;
-use serde_urlencoded;
+// use serde_urlencoded;
 
 use gitlab::GitLab;
 use MergeRequests;

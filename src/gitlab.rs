@@ -8,8 +8,7 @@ use serde;
 use serde_json;
 
 
-use BuildQuery;
-use Groups;
+// use Groups;
 
 
 pub const API_VERSION: u16 = 3;
@@ -161,17 +160,17 @@ impl GitLab {
         ::projects::ProjectsLister::new(&self)
     }
 
-    pub fn groups(&mut self, listing: ::groups::Listing) -> Result<Groups, serde_json::Error> {
-        let query = listing.build_query();
-        // self.get(&query)
-        unimplemented!();
-    }
+    // pub fn groups(&mut self, listing: ::groups::Listing) -> Result<Groups, serde_json::Error> {
+    //     let query = listing.build_query();
+    //     // self.get(&query)
+    //     unimplemented!();
+    // }
 
-    pub fn owned_groups(&mut self) -> Result<Groups, serde_json::Error> {
-        let query = ::groups::owned_groups::Listing::new().build_query();
-        info!("query: {:?}", query);
-        self.get(&query)
-    }
+    // pub fn owned_groups(&mut self) -> Result<Groups, serde_json::Error> {
+    //     let query = ::groups::owned_groups::Listing::new().build_query();
+    //     info!("query: {:?}", query);
+    //     self.get(&query)
+    // }
 }
 
 
