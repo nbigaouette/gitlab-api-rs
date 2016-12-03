@@ -155,8 +155,7 @@ pub enum ListingOrderBy {
 
 macro_attr! {
     #[derive(Debug, Clone, Builder!)]
-    pub struct ProjectsLister<'a> {
-        gl: &'a ::GitLab,
+    struct ProjectListerInternal {
         /// Limit by archived status
         archived: Option<bool>,
         /// Limit by visibility.
@@ -172,17 +171,27 @@ macro_attr! {
     }
 }
 
+macro_attr! {
+    #[derive(Debug, Clone, Builder!)]
+    pub struct ProjectsLister<'a> {
+        gl: &'a ::GitLab,
+        internal: ProjectListerInternal,
+    }
+}
+
 impl<'a> ProjectsLister<'a> {
 
     pub fn new(gl: &'a ::GitLab) -> ProjectsLister {
         ProjectsLister {
             gl: gl,
-            archived: None,
-            visibility: None,
-            order_by: None,
-            sort: None,
-            search: "".into(),
-            simple: None,
+            internal: ProjectListerInternal {
+                archived: None,
+                visibility: None,
+                order_by: None,
+                sort: None,
+                search: "".into(),
+                simple: None,
+            },
         }
     }
 
@@ -209,17 +218,17 @@ impl<'a> BuildQuery for ProjectsLister<'a> {
 
         // Append a "?" only if at least one of the `Option` is `Some(_)` or if
         // strings contain something.
-        query.push_str(match (&self.archived,
-                              &self.visibility,
-                              &self.order_by,
-                              &self.sort,
-                              self.search.is_empty(),
-                              &self.simple) {
+        query.push_str(match (&self.internal.archived,
+                              &self.internal.visibility,
+                              &self.internal.order_by,
+                              &self.internal.sort,
+                              self.internal.search.is_empty(),
+                              &self.internal.simple) {
             (&None, &None, &None, &None, true, &None) => "",
             _ => "?",
         });
 
-        self.archived.map(|archived| {
+        self.internal.archived.map(|archived| {
             query.push_str(split_char);
             split_char = &amp_char;
 
@@ -230,7 +239,7 @@ impl<'a> BuildQuery for ProjectsLister<'a> {
             }
         });
 
-        self.visibility.map(|visibility| {
+        self.internal.visibility.map(|visibility| {
             query.push_str(split_char);
             split_char = &amp_char;
 
@@ -242,7 +251,7 @@ impl<'a> BuildQuery for ProjectsLister<'a> {
             });
         });
 
-        self.order_by.map(|order_by| {
+        self.internal.order_by.map(|order_by| {
             query.push_str(split_char);
             split_char = &amp_char;
 
@@ -257,7 +266,7 @@ impl<'a> BuildQuery for ProjectsLister<'a> {
             });
         });
 
-        self.sort.map(|sort| {
+        self.internal.sort.map(|sort| {
             query.push_str(split_char);
             split_char = &amp_char;
 
@@ -268,15 +277,15 @@ impl<'a> BuildQuery for ProjectsLister<'a> {
             });
         });
 
-        if !self.search.is_empty() {
+        if !self.internal.search.is_empty() {
             query.push_str(split_char);
             split_char = &amp_char;
 
             query.push_str("search=");
-            query.push_str(&self.search);
+            query.push_str(&self.internal.search);
         }
 
-        self.simple.map(|simple| {
+        self.internal.simple.map(|simple| {
             query.push_str(split_char);
             split_char = &amp_char;
 
