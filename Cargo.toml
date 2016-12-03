@@ -25,10 +25,6 @@ serde = "0.8"
 serde_derive = { version = "0.8", optional = true }
 serde_json = "0.8"
 serde_urlencoded = "0.3"
-# See https://github.com/colin-kiegel/rust-derive-builder/pull/29
-# derive_builder = "0.2"
-
-clippy = {version = "*", optional = true}
 
 # Compilation on OSX will fail in case you don't do one of these two things:
 # 1) Use this instead to link against "security-framework":
@@ -39,3 +35,5 @@ clippy = {version = "*", optional = true}
 #        export DEP_OPENSSL_INCLUDE=`brew --prefix openssl`/include
 # See http://stackoverflow.com/q/39709542/178154
 hyper = "0.9.13"
+
+clippy = {version = "*", optional = true}
