@@ -1,4 +1,4 @@
-
+/*
 extern crate gitlab_api as gitlab;
 
 use std::env;
@@ -58,4 +58,9 @@ fn main() {
     let listing = issues::project::Listing::new(142).state(issues::ListingState::Closed).clone();
     let project_issues = gl.project_issues(listing).unwrap();
     println!("project_issues: {:?}", project_issues);
+}
+*/
+
+fn main() {
+    println!("Merge requests disabled until API stabilizes. See projects instead.");
 }
