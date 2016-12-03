@@ -1,11 +1,17 @@
 
 #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub enum ListingOrderBy {
+    #[serde(rename = "id")]
     Id,
+    #[serde(rename = "name")]
     Name,
+    #[serde(rename = "path")]
     Path,
+    #[serde(rename = "created_at")]
     CreatedAt,
+    #[serde(rename = "updated_at")]
     UpdatedAt,
+    #[serde(rename = "last_activity_at")]
     LastActivityAt,
 }
 
