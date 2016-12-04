@@ -16,6 +16,23 @@ pub enum ListingOrderBy {
 }
 
 
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+pub enum SearchListingOrderBy {
+    #[serde(rename = "id")]
+    Id,
+    #[serde(rename = "name")]
+    Name,
+    // #[serde(rename = "path")]
+    // Path,
+    #[serde(rename = "created_at")]
+    CreatedAt,
+    // #[serde(rename = "updated_at")]
+    // UpdatedAt,
+    #[serde(rename = "last_activity_at")]
+    LastActivityAt,
+}
+
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct ProjectListerInternal {
     /// Limit by archived status
@@ -45,4 +62,12 @@ struct OwnedProjectListerInternal {
     sort: Option<::ListingSort>,
     /// Return list of authorized projects matching the search criteria.
     search: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct SearchProjectListerInternal {
+    /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
+    order_by: Option<ListingOrderBy>,
+    /// Return requests sorted. Default is `::ListingSort::Desc`.
+    sort: Option<::ListingSort>,
 }

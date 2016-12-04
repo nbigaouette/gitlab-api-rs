@@ -78,6 +78,11 @@ impl<'a> ProjectsLister<'a> {
         owned::ProjectsLister::new(self.gl)
     }
 
+    pub fn search(self, query: String) -> search::ProjectsLister<'a> {
+        // assert_eq!(self, ProjectsLister::new(self.gl));
+        search::ProjectsLister::new(self.gl, query)
+    }
+
     pub fn archived(&'a mut self, archived: bool) -> &'a mut ProjectsLister {
         self.internal.archived = Some(archived);
         self
