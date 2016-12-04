@@ -79,3 +79,6 @@ pub enum ListingId {
     Id(i64),
     NamespaceProject(String),
 }
+
+
+type AllProjectListerInternal = OwnedProjectListerInternal;
