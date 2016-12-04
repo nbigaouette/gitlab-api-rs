@@ -72,6 +72,10 @@ impl<'a> MergeRequestsLister<'a> {
 
 
     pub fn iid(&'a mut self, iid: Vec<i64>) -> &'a mut MergeRequestsLister {
+        info!("Using 'idd' fails when there is more than one element!");
+        if iid.len() > 1 {
+            println!("Using 'idd' fails when there is more than one element!");
+        }
         self.internal.iid = Some(iid);
         self
     }
