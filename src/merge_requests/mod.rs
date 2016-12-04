@@ -65,10 +65,10 @@ impl<'a> MergeRequestsLister<'a> {
     }
 
 
-    // pub fn single(self) -> single::ProjectsLister<'a> {
-    //     // assert_eq!(self, ProjectsLister::new(self.gl));
-    //     single::ProjectsLister::new(self.gl)
-    // }
+    pub fn single(self, merge_request_id: i64) -> single::MergeRequestLister<'a> {
+        // assert_eq!(self, MergeRequestLister::new(self.gl));
+        single::MergeRequestLister::new(self.gl, self.id, merge_request_id)
+    }
 
 
     pub fn iid(&'a mut self, iid: Vec<i64>) -> &'a mut MergeRequestsLister {

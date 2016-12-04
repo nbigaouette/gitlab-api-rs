@@ -31,14 +31,20 @@ fn main() {
         }
     };
 
-    let gl = GitLab::new(&hostname, &token);
+    let gl = GitLab::new_insecure(&hostname, &token);
 
-    let merge_requests = gl.merge_requests(142).list();
+    let project_id = 142;
+    let merge_requests_ids = vec![423, 409];
+
+    let merge_requests = gl.merge_requests(project_id).list();
     println!("merge_requests: {:?}", merge_requests);
 
-    let merge_requests = gl.merge_requests(142).iid(vec![418]).list();
+    let merge_request = gl.merge_requests(project_id).single(merge_requests_ids[0]).list();
+    println!("merge_request: {:?}", merge_request);
+
+    let merge_requests = gl.merge_requests(project_id).iid(vec![merge_requests_ids[0]]).list();
     println!("merge_requests: {:?}", merge_requests);
 
-    let merge_requests = gl.merge_requests(142).iid(vec![419, 420]).list();
+    let merge_requests = gl.merge_requests(project_id).iid(merge_requests_ids).list();
     println!("merge_requests: {:?}", merge_requests);
 }

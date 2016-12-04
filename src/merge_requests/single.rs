@@ -18,41 +18,45 @@
 //!
 
 
+use serde_json;
+// use serde_urlencoded;
+
 use BuildQuery;
 
-use serde_json;
-
-use gitlab::GitLab;
-use MergeRequest;
+use merge_requests::MergeRequest;
 
 
-impl GitLab {
-    pub fn merge_request(&self, listing: Listing) -> Result<MergeRequest, serde_json::Error> {
-        let query = listing.build_query();
-        self.get(&query)
-    }
-}
-
-
-#[derive(Default, Debug, Clone)]
-pub struct Listing {
-    /// Project id
+#[derive(Debug, Clone)]
+pub struct MergeRequestLister<'a> {
+    gl: &'a ::GitLab,
     id: i64,
-    /// Merge request's ID
     mr_id: i64,
 }
 
 
-impl Listing {
-    pub fn new(id: i64, mr_id: i64) -> Listing {
-        Listing {
+#[allow(dead_code)]
+impl<'a> MergeRequestLister<'a> {
+    pub fn new(gl: &'a ::GitLab, id: i64, mr_id: i64) -> MergeRequestLister {
+        MergeRequestLister {
+            gl: gl,
             id: id,
             mr_id: mr_id,
         }
     }
+
+    /// Commit the lister: Query GitLab and return a list of projects.
+    pub fn list(&self) -> MergeRequest {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        let merge_request: Result<MergeRequest, serde_json::Error> = self.gl.get(&query);
+
+        merge_request.unwrap()
+    }
 }
 
-impl BuildQuery for Listing {
+
+impl<'a> BuildQuery for MergeRequestLister<'a> {
     fn build_query(&self) -> String {
         format!("projects/{}/merge_requests/{}", self.id, self.mr_id)
     }
@@ -61,23 +65,28 @@ impl BuildQuery for Listing {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use BuildQuery;
 
+    const TEST_PROJECT_ID: i64 = 123;
+    const TEST_MR_ID: i64 = 456;
 
     #[test]
     fn build_query_default() {
-        let expected_string = "projects/123/merge_requests/456";
-        let listing = Listing {
-            id: 123,
-            mr_id: 456,
-        };
-        let query = listing.build_query();
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = format!("projects/{}/merge_requests/{}", TEST_PROJECT_ID, TEST_MR_ID);
+
+        let lister = gl.merge_requests(TEST_PROJECT_ID);
+        let lister = lister.single(TEST_MR_ID);
+        let query = lister.build_query();
         assert_eq!(query, expected_string);
 
-        let expected_string = "projects/123/merge_requests/456";
-        let listing = Listing::new(123, 456);
-        let query = listing.build_query();
+        let lister = gl.merge_requests(TEST_PROJECT_ID).single(TEST_MR_ID);
+        let query = lister.build_query();
+        assert_eq!(query, expected_string);
+
+        let query = gl.merge_requests(TEST_PROJECT_ID).single(TEST_MR_ID).build_query();
         assert_eq!(query, expected_string);
     }
 }
