@@ -20,80 +20,111 @@
 //! | `id` | integer/string | yes | The ID or NAMESPACE/PROJECT_NAME of the project |
 
 
-use BuildQuery;
-
 use serde_json;
+use serde_urlencoded;
 
-use gitlab::GitLab;
-use Project;
-
-
-impl GitLab {
-    pub fn project_id(&self, listing: Listing) -> Result<Project, serde_json::Error> {
-        let query = listing.build_query();
-        self.get(&query)
-    }
-}
+use BuildQuery;
+use Projects;
+use projects::ListingId;
 
 
 #[derive(Debug, Clone)]
-pub enum ListingId {
-    Id(i64),
-    NamespaceProject(String),
+pub struct ProjectsLister<'a> {
+    gl: &'a ::GitLab,
+    id: ListingId,
 }
 
 
-#[derive(Default, Debug, Clone)]
-pub struct Listing {
-    /// The ID or NAMESPACE/PROJECT_NAME of the project
-    id: Option<ListingId>,
-}
-
-
-impl Listing {
-    pub fn new(id: ListingId) -> Listing {
-        Listing { id: Some(id) }
+impl<'a> ProjectsLister<'a> {
+    pub fn new(gl: &'a ::GitLab, id: ListingId) -> ProjectsLister {
+        ProjectsLister {
+            gl: gl,
+            id: id,
+        }
     }
 }
 
 
-impl BuildQuery for Listing {
-    fn build_query(&self) -> String {
-
-        let mut query = String::from("projects/");
-
-        self.id.clone().map(|id| {
-            query.push_str(&match id {
-                ListingId::Id(id) => id.to_string(),
-                ListingId::NamespaceProject(s) => s.replace("/", "%2F"),
-            });
-        });
-
-        query
-    }
-}
 
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use BuildQuery;
-
-    const TEST_PROJECT_ID: i64 = 123;
-    const TEST_PROJECT_NAME: &'static str = "group/project";
 
 
-    #[test]
-    fn build_query_id() {
-        let expected_string = format!("projects/{}", TEST_PROJECT_ID);
-        let query = Listing::new(ListingId::Id(123)).build_query();
-        assert_eq!(query, expected_string);
 
 
-        let expected_string = format!("projects/{}",
-                                      TEST_PROJECT_NAME.to_string().replace("/", "%2F"));
-        let query = Listing::new(ListingId::NamespaceProject(TEST_PROJECT_NAME.to_string()))
-            .build_query();
-        assert_eq!(query, expected_string);
-    }
-}
+// use BuildQuery;
+//
+// use serde_json;
+//
+// use gitlab::GitLab;
+// use Project;
+//
+//
+// impl GitLab {
+//     pub fn project_id(&self, listing: Listing) -> Result<Project, serde_json::Error> {
+//         let query = listing.build_query();
+//         self.get(&query)
+//     }
+// }
+//
+//
+// #[derive(Debug, Clone)]
+// pub enum ListingId {
+//     Id(i64),
+//     NamespaceProject(String),
+// }
+//
+//
+// #[derive(Default, Debug, Clone)]
+// pub struct Listing {
+//     /// The ID or NAMESPACE/PROJECT_NAME of the project
+//     id: Option<ListingId>,
+// }
+//
+//
+// impl Listing {
+//     pub fn new(id: ListingId) -> Listing {
+//         Listing { id: Some(id) }
+//     }
+// }
+//
+//
+// impl BuildQuery for Listing {
+//     fn build_query(&self) -> String {
+//
+//         let mut query = String::from("projects/");
+//
+//         self.id.clone().map(|id| {
+//             query.push_str(&match id {
+//                 ListingId::Id(id) => id.to_string(),
+//                 ListingId::NamespaceProject(s) => s.replace("/", "%2F"),
+//             });
+//         });
+//
+//         query
+//     }
+// }
+//
+//
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//     use BuildQuery;
+//
+//     const TEST_PROJECT_ID: i64 = 123;
+//     const TEST_PROJECT_NAME: &'static str = "group/project";
+//
+//
+//     #[test]
+//     fn build_query_id() {
+//         let expected_string = format!("projects/{}", TEST_PROJECT_ID);
+//         let query = Listing::new(ListingId::Id(123)).build_query();
+//         assert_eq!(query, expected_string);
+//
+//
+//         let expected_string = format!("projects/{}",
+//                                       TEST_PROJECT_NAME.to_string().replace("/", "%2F"));
+//         let query = Listing::new(ListingId::NamespaceProject(TEST_PROJECT_NAME.to_string()))
+//             .build_query();
+//         assert_eq!(query, expected_string);
+//     }
+// }

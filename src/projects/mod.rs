@@ -83,6 +83,13 @@ impl<'a> ProjectsLister<'a> {
         search::ProjectsLister::new(self.gl, query)
     }
 
+    pub fn id(self, id: ListingId) -> id::ProjectsLister<'a> {
+        // assert_eq!(self, ProjectsLister::new(self.gl));
+        id::ProjectsLister::new(self.gl, id)
+    }
+
+
+
     pub fn archived(&'a mut self, archived: bool) -> &'a mut ProjectsLister {
         self.internal.archived = Some(archived);
         self

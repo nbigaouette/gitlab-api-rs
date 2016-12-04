@@ -71,3 +71,11 @@ struct SearchProjectListerInternal {
     /// Return requests sorted. Default is `::ListingSort::Desc`.
     sort: Option<::ListingSort>,
 }
+
+
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ListingId {
+    Id(i64),
+    NamespaceProject(String),
+}
