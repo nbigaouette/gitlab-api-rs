@@ -1,4 +1,3 @@
-/*
 extern crate gitlab_api as gitlab;
 
 use std::env;
@@ -36,31 +35,24 @@ fn main() {
 
     let gl = GitLab::new(&hostname, &token);
 
-    let issues = gl.issues(issues::Listing::new()).unwrap();
+    let issues = gl.issues().list();
     println!("issues: {:?}", issues);
 
-    let listing = issues::Listing::new().state(issues::ListingState::Opened).clone();
-    let opened_issues = gl.issues(listing).unwrap();
+    let opened_issues = gl.issues().state(issues::State::Opened).list();
     println!("opened_issues: {:?}", opened_issues);
 
-    let listing = issues::Listing::new().state(issues::ListingState::Closed).clone();
-    let closed_issues = gl.issues(listing).unwrap();
+    let closed_issues = gl.issues().state(issues::State::Closed).list();
     println!("closed_issues: {:?}", closed_issues);
 
-    let listing = issues::single::Listing::new(142, 739);
-    let issue = gl.issue(listing).unwrap();
-    println!("issue: {:?}", issue);
-
-    let listing = issues::group::Listing::new(21).state(issues::ListingState::Closed).clone();
-    let group_issues = gl.group_issues(listing).unwrap();
-    println!("group_issues: {:?}", group_issues);
-
-    let listing = issues::project::Listing::new(142).state(issues::ListingState::Closed).clone();
-    let project_issues = gl.project_issues(listing).unwrap();
-    println!("project_issues: {:?}", project_issues);
-}
-*/
-
-fn main() {
-    println!("Merge requests disabled until API stabilizes. See projects instead.");
+//     let listing = issues::single::Listing::new(142, 739);
+//     let issue = gl.issue(listing).unwrap();
+//     println!("issue: {:?}", issue);
+//
+//     let listing = issues::group::Listing::new(21).state(issues::ListingState::Closed).clone();
+//     let group_issues = gl.group_issues(listing).unwrap();
+//     println!("group_issues: {:?}", group_issues);
+//
+//     let listing = issues::project::Listing::new(142).state(issues::ListingState::Closed).clone();
+//     let project_issues = gl.project_issues(listing).unwrap();
+//     println!("project_issues: {:?}", project_issues);
 }
