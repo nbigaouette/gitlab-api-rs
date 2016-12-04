@@ -44,7 +44,7 @@ impl<'a> MergeRequestLister<'a> {
         }
     }
 
-    /// Commit the lister: Query GitLab and return a list of projects.
+    /// Commit the lister: Query GitLab and return a list of merge requests.
     pub fn list(&self) -> MergeRequest {
         let query = self.build_query();
         debug!("query: {:?}", query);

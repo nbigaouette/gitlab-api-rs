@@ -67,7 +67,7 @@ mod tests {
     use BuildQuery;
 
     const TEST_PROJECT_ID: i64 = 123;
-    const TEST_MR_ID: i64 = 456;
+    const TEST_ISSUE_ID: i64 = 456;
 
 
     #[test]
@@ -75,18 +75,18 @@ mod tests {
         let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
         // let gl: ::GitLab = Default::default();
 
-        let expected_string = format!("projects/{}/issues/{}", TEST_PROJECT_ID, TEST_MR_ID);
+        let expected_string = format!("projects/{}/issues/{}", TEST_PROJECT_ID, TEST_ISSUE_ID);
 
         let lister = gl.issues();
-        let lister = lister.single(TEST_PROJECT_ID, TEST_MR_ID);
+        let lister = lister.single(TEST_PROJECT_ID, TEST_ISSUE_ID);
         let query = lister.build_query();
         assert_eq!(query, expected_string);
 
-        let lister = gl.issues().single(TEST_PROJECT_ID, TEST_MR_ID);
+        let lister = gl.issues().single(TEST_PROJECT_ID, TEST_ISSUE_ID);
         let query = lister.build_query();
         assert_eq!(query, expected_string);
 
-        let query = gl.issues().single(TEST_PROJECT_ID, TEST_MR_ID).build_query();
+        let query = gl.issues().single(TEST_PROJECT_ID, TEST_ISSUE_ID).build_query();
         assert_eq!(query, expected_string);
     }
 }
