@@ -98,7 +98,7 @@ impl<'a> ProjectsLister<'a> {
         self
     }
 
-    pub fn search(&'a mut self, search: String) -> &'a mut ProjectsLister {
+    pub fn search_pattern(&'a mut self, search: String) -> &'a mut ProjectsLister {
         self.internal.search = Some(search);
         self
     }
@@ -285,9 +285,9 @@ mod tests {
 
         let expected_string = "projects?search=SearchPattern";
         let mut projects_lister = gl.projects();
-        let query = projects_lister.search(String::from("SearchPattern")).build_query();
+        let query = projects_lister.search_pattern(String::from("SearchPattern")).build_query();
         assert_eq!(query, expected_string);
-        let query = gl.projects().search(String::from("SearchPattern")).build_query();
+        let query = gl.projects().search_pattern(String::from("SearchPattern")).build_query();
         assert_eq!(query, expected_string);
     }
 
