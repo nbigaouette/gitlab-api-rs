@@ -49,7 +49,9 @@ fn main() {
 
     let gl = GitLab::new(&hostname, &token);
 
-    // let projects = gl.projects().list();
+    let projects = gl.projects().list();
+    println!("projects: {:?}", projects);
+
     let projects = gl.projects().archived(false).list();
     println!("projects: {:?}", projects);
 
