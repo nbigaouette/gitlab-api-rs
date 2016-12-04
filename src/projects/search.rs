@@ -100,7 +100,7 @@ mod tests {
 
         let expected_string = format!("projects/search/{}", TEST_SEARCH_QUERY);
 
-        let mut lister = gl.projects().search(TEST_SEARCH_QUERY.to_string());
+        let lister = gl.projects().search(TEST_SEARCH_QUERY.to_string());
         let query = lister.build_query();
         assert_eq!(query, expected_string);
     }
