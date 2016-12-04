@@ -17,6 +17,7 @@ pub enum ListingOrderBy {
     UpdatedAt,
 }
 
+
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 struct IssuesListerInternal {
     /// State of issues to return.
