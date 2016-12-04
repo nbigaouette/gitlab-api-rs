@@ -160,6 +160,10 @@ impl GitLab {
         ::projects::ProjectsLister::new(self)
     }
 
+    pub fn issues(&self) -> ::issues::IssuesLister {
+        ::issues::IssuesLister::new(self)
+    }
+
     pub fn merge_requests(&self, project_id: i64) -> ::merge_requests::MergeRequestsLister {
         ::merge_requests::MergeRequestsLister::new(self, project_id)
     }

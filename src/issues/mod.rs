@@ -19,79 +19,99 @@
 //!
 
 
-use BuildQuery;
-
 use serde_json;
+// use serde_urlencoded;
 
-use gitlab::GitLab;
+use BuildQuery;
 use Issues;
 
-pub mod group;
-pub mod project;
-pub mod single;
+// pub mod group;
+// pub mod project;
+// pub mod single;
+
+#[cfg(feature = "serde_derive")]
+include!("serde_types.in.rs");
+
+#[cfg(feature = "serde_codegen")]
+include!(concat!(env!("OUT_DIR"), "/issues/serde_types.rs"));
 
 
-impl GitLab {
-    pub fn issues(&self, listing: Listing) -> Result<Issues, serde_json::Error> {
-        let query = listing.build_query();
-        self.get(&query)
+#[derive(Debug, Clone)]
+pub struct IssuesLister<'a> {
+    gl: &'a ::GitLab,
+    internal: IssuesListerInternal,
+}
+
+
+impl<'a> IssuesLister<'a> {
+    pub fn new(gl: &'a ::GitLab) -> IssuesLister {
+        IssuesLister {
+            gl: gl,
+            internal: IssuesListerInternal {
+                state: None,
+                labels: None,
+                order_by: None,
+                sort: None,
+            },
+        }
     }
-}
 
 
-#[derive(Debug, Copy, Clone)]
-pub enum ListingState {
-    Opened,
-    Closed,
-}
+    // pub fn group(self) -> group::IssuesLister<'a> {
+    //     // assert_eq!(self, IssuesLister::new(self.gl));
+    //     group::IssuesLister::new(self.gl)
+    // }
+
+    // pub fn project(self) -> project::IssuesLister<'a> {
+    //     // assert_eq!(self, IssuesLister::new(self.gl));
+    //     project::IssuesLister::new(self.gl)
+    // }
+
+    // pub fn single(self) -> single::IssuesLister<'a> {
+    //     // assert_eq!(self, IssuesLister::new(self.gl));
+    //     single::IssuesLister::new(self.gl)
+    // }
 
 
-#[derive(Debug, Copy, Clone)]
-pub enum ListingOrderBy {
-    CreatedAt,
-    UpdatedAt,
-}
-
-
-#[derive(Default, Debug, Clone)]
-pub struct Listing {
-    /// State of issues to return.
-    state: Option<ListingState>,
-    /// Labels of issues to return.
-    labels: Vec<String>,
-    /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
-    order_by: Option<ListingOrderBy>,
-    /// Return requests sorted. Default is `::ListingSort::Desc`.
-    sort: Option<::ListingSort>,
-}
-
-
-#[allow(dead_code)]
-impl Listing {
-    pub fn new() -> Listing {
-        Default::default()
-    }
-    pub fn state(&mut self, state: ListingState) -> &mut Listing {
-        self.state = Some(state);
+    pub fn state(&'a mut self, state: State) -> &'a mut IssuesLister {
+        self.internal.state = Some(state);
         self
     }
-    pub fn labels(&mut self, labels: Vec<String>) -> &mut Listing {
-        self.labels = labels;
+
+    pub fn labels(&'a mut self, labels: Vec<String>) -> &'a mut IssuesLister {
+        self.internal.labels = Some(labels);
         self
     }
-    pub fn order_by(&mut self, order_by: ListingOrderBy) -> &mut Listing {
-        self.order_by = Some(order_by);
+
+    pub fn order_by(&'a mut self, order_by: ListingOrderBy) -> &'a mut IssuesLister {
+        self.internal.order_by = Some(order_by);
         self
     }
-    fn sort(&mut self, sort: ::ListingSort) -> &mut Listing {
-        self.sort = Some(sort);
+
+    pub fn sort(&'a mut self, sort: ::ListingSort) -> &'a mut IssuesLister {
+        self.internal.sort = Some(sort);
         self
+    }
+
+
+    /// Commit the lister: Query GitLab and return a list of projects.
+    pub fn list(&self) -> Issues {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        let projects: Result<Issues, serde_json::Error> = self.gl.get(&query);
+
+        projects.unwrap()
     }
 }
 
 
-impl BuildQuery for Listing {
+impl<'a> BuildQuery for IssuesLister<'a> {
     fn build_query(&self) -> String {
+
+        // NOTE: Can't use `serde_urlencoded` since it cannot serialize a Vec<T>
+        //       See https://github.com/nox/serde_urlencoded/issues/6
+        // let encoded = serde_urlencoded::to_string(&self.internal).unwrap();
 
         let mut query = String::from("issues");
 
@@ -102,37 +122,37 @@ impl BuildQuery for Listing {
 
         // Append a "?" only if at least one of the `Option` is `Some(_)` or if
         // strings contain something.
-        query.push_str(match (&self.state, self.labels.is_empty(), &self.order_by, &self.sort) {
-            (&None, true, &None, &None) => "",
+        query.push_str(match (&self.internal.state, &self.internal.labels, &self.internal.order_by, &self.internal.sort) {
+            (&None, &None, &None, &None) => "",
             _ => "?",
         });
 
-        self.state.map(|state| {
+        self.internal.state.map(|state| {
             query.push_str(split_char);
             split_char = &amp_char;
 
             query.push_str("state=");
             query.push_str(match state {
-                ListingState::Opened => "opened",
-                ListingState::Closed => "closed",
+                State::Opened => "opened",
+                State::Closed => "closed",
             });
         });
 
-        if !self.labels.is_empty() {
+        self.internal.labels.as_ref().map(|labels| {
             query.push_str(split_char);
             split_char = &amp_char;
 
             query.push_str("labels=");
 
             let mut array_split_char = &none_char;
-            for label in &self.labels {
+            for label in labels {
                 query.push_str(array_split_char);
                 query.push_str(&label.to_string());
                 array_split_char = &comma_char;
             }
-        }
+        });
 
-        self.order_by.map(|order_by| {
+        self.internal.order_by.map(|order_by| {
             query.push_str(split_char);
             split_char = &amp_char;
 
@@ -143,7 +163,7 @@ impl BuildQuery for Listing {
             });
         });
 
-        self.sort.map(|sort| {
+        self.internal.sort.map(|sort| {
             query.push_str(split_char);
             split_char = &amp_char;
 
@@ -158,42 +178,50 @@ impl BuildQuery for Listing {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
-    use super::*;
     use BuildQuery;
 
 
     #[test]
     fn build_query_default() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = "issues";
-        let listing: Listing = Default::default();
-        let query = listing.build_query();
+        let lister = gl.issues();
+        let query = lister.build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "issues";
-        let listing = Listing::new();
-        let query = listing.build_query();
+        let query = gl.issues().build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn build_query_state() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = "issues?state=opened";
-        let query = Listing::new().state(ListingState::Opened).build_query();
+        let query = gl.issues().state(::issues::State::Opened).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "issues?state=closed";
-        let query = Listing::new().state(ListingState::Closed).build_query();
+        let query = gl.issues().state(::issues::State::Closed).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn build_query_skip_groups() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = "issues?labels=label1,label2,label3";
-        let query = Listing::new()
+        let query = gl.issues()
             .labels(vec![String::from("label1"), String::from("label2"), String::from("label3")])
             .build_query();
         assert_eq!(query, expected_string);
@@ -202,34 +230,43 @@ mod tests {
 
     #[test]
     fn build_query_order_by() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = "issues?order_by=created_at";
-        let query = Listing::new().order_by(ListingOrderBy::CreatedAt).build_query();
+        let query = gl.issues().order_by(::issues::ListingOrderBy::CreatedAt).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "issues?order_by=updated_at";
-        let query = Listing::new().order_by(ListingOrderBy::UpdatedAt).build_query();
+        let query = gl.issues().order_by(::issues::ListingOrderBy::UpdatedAt).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn build_query_sort() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = "issues?sort=asc";
-        let query = Listing::new().sort(::ListingSort::Asc).build_query();
+        let query = gl.issues().sort(::ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "issues?sort=desc";
-        let query = Listing::new().sort(::ListingSort::Desc).build_query();
+        let query = gl.issues().sort(::ListingSort::Desc).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn build_query_multiple() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = "issues?order_by=created_at&sort=asc";
-        let query = Listing::new()
+        let query = gl.issues()
             .sort(::ListingSort::Asc)
-            .order_by(ListingOrderBy::CreatedAt)
+            .order_by(::issues::ListingOrderBy::CreatedAt)
             .build_query();
         assert_eq!(query, expected_string);
     }
