@@ -33,7 +33,7 @@ use serde_json;
 
 use BuildQuery;
 use Issues;
-use issues::GroupIssuesListerInternal;
+use issues::GroupsIssuesListerInternal;
 
 
 #[derive(Debug, Clone)]
@@ -41,7 +41,7 @@ pub struct IssuesLister<'a> {
     gl: &'a ::GitLab,
     /// The ID of a group
     id: i64,
-    internal: GroupIssuesListerInternal,
+    internal: GroupsIssuesListerInternal,
 }
 
 
@@ -50,7 +50,7 @@ impl<'a> IssuesLister<'a> {
         IssuesLister {
             gl: gl,
             id: id,
-            internal: GroupIssuesListerInternal {
+            internal: GroupsIssuesListerInternal {
                 state: None,
                 labels: None,
                 milestone: None,

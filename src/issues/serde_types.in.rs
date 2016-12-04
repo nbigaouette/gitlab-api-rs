@@ -32,7 +32,7 @@ struct IssuesListerInternal {
 
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
-struct GroupIssuesListerInternal {
+struct GroupsIssuesListerInternal {
     /// State of issues to return.
     state: Option<State>,
     /// Labels of issues to return.
