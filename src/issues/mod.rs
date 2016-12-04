@@ -27,7 +27,7 @@ use Issues;
 
 // pub mod group;
 // pub mod project;
-// pub mod single;
+pub mod single;
 
 #[cfg(feature = "serde_derive")]
 include!("serde_types.in.rs");
@@ -67,10 +67,10 @@ impl<'a> IssuesLister<'a> {
     //     project::IssuesLister::new(self.gl)
     // }
 
-    // pub fn single(self) -> single::IssuesLister<'a> {
-    //     // assert_eq!(self, IssuesLister::new(self.gl));
-    //     single::IssuesLister::new(self.gl)
-    // }
+    pub fn single(self, id: i64, issue_id: i64) -> single::IssueLister<'a> {
+        // assert_eq!(self, IssuesLister::new(self.gl));
+        single::IssueLister::new(self.gl, id, issue_id)
+    }
 
 
     pub fn state(&'a mut self, state: State) -> &'a mut IssuesLister {
