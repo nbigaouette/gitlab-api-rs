@@ -27,62 +27,86 @@
 //!
 
 
-use BuildQuery;
-
 use serde_json;
-// use serde_urlencoded;
+use serde_urlencoded;
 
-use gitlab::GitLab;
-use MergeRequests;
-
-// Types from serde_types.in.rs
-use MergeRequestState;
+use BuildQuery;
+use Projects;
 
 pub mod single;
 
 
-// Include serializable types
 #[cfg(feature = "serde_derive")]
 include!("serde_types.in.rs");
+
 #[cfg(feature = "serde_codegen")]
 include!(concat!(env!("OUT_DIR"), "/merge_requests/serde_types.rs"));
 
+#[derive(Debug, Clone)]
+pub struct MergeRequestsLister<'a> {
+    gl: &'a ::GitLab,
+    id: i64,
+    internal: MergeRequestsListerInternal,
+}
 
-impl GitLab {
-    pub fn merge_requests(&self, listing: Listing) -> Result<MergeRequests, serde_json::Error> {
-        let query = listing.build_query();
-        self.get(&query)
+
+impl<'a> MergeRequestsLister<'a> {
+    pub fn new(gl: &'a ::GitLab, id: i64) -> MergeRequestsLister {
+        MergeRequestsLister {
+            gl: gl,
+            id: id,
+            internal: MergeRequestsListerInternal {
+                iid: None,
+                state: None,
+                order_by: None,
+                sort: None,
+            },
+        }
+    }
+
+
+    // pub fn single(self) -> single::ProjectsLister<'a> {
+    //     // assert_eq!(self, ProjectsLister::new(self.gl));
+    //     single::ProjectsLister::new(self.gl)
+    // }
+
+
+    pub fn iid(&'a mut self, iid: Vec<i64>) -> &'a mut MergeRequestsLister {
+        self.internal.iid = Some(iid);
+        self
+    }
+    pub fn state(&'a mut self, state: State) -> &'a mut MergeRequestsLister {
+        self.internal.state = Some(state);
+        self
+    }
+    pub fn order_by(&'a mut self, order_by: ListingOrderBy) -> &'a mut MergeRequestsLister {
+        self.internal.order_by = Some(order_by);
+        self
+    }
+    fn sort(&'a mut self, sort: ::ListingSort) -> &'a mut MergeRequestsLister {
+        self.internal.sort = Some(sort);
+        self
+    }
+
+
+    /// Commit the lister: Query GitLab and return a list of projects.
+    pub fn list(&self) -> MergeRequests {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        let merge_requests: Result<MergeRequests, serde_json::Error> = self.gl.get(&query);
+
+        merge_requests.unwrap()
     }
 }
 
 
-
-#[allow(dead_code)]
-impl Listing {
-    pub fn new(id: i64) -> Listing {
-        Listing { id: id, ..Default::default() }
-    }
-    pub fn iid(&mut self, iid: Vec<i64>) -> &mut Listing {
-        self.iid = iid;
-        self
-    }
-    pub fn state(&mut self, state: MergeRequestState) -> &mut Listing {
-        self.state = Some(state);
-        self
-    }
-    pub fn order_by(&mut self, order_by: ListingOrderBy) -> &mut Listing {
-        self.order_by = Some(order_by);
-        self
-    }
-    fn sort(&mut self, sort: ::ListingSort) -> &mut Listing {
-        self.sort = Some(sort);
-        self
-    }
-}
-
-
-impl BuildQuery for Listing {
+impl<'a> BuildQuery for MergeRequestsLister<'a> {
     fn build_query(&self) -> String {
+
+        // NOTE: Can't use `serde_urlencoded` since it cannot serialize a Vec<T>
+        //       See https://github.com/nox/serde_urlencoded/issues/6
+        // let encoded = serde_urlencoded::to_string(&self.internal).unwrap();
 
         let mut query = format!("projects/{}/merge_requests", self.id);
 
@@ -92,43 +116,43 @@ impl BuildQuery for Listing {
 
         // Append a "?" only if at least one of the `Option` is `Some(_)` or if
         // strings contain something.
-        query.push_str(match (self.iid.is_empty(), &self.state, &self.order_by, &self.sort) {
-            (true, &None, &None, &None) => "",
+        query.push_str(match (&self.internal.iid, &self.internal.state, &self.internal.order_by, &self.internal.sort) {
+            (&None, &None, &None, &None) => "",
             _ => "?",
         });
 
-        if !self.iid.is_empty() {
+        self.internal.iid.as_ref().map(|iid| {
             query.push_str(split_char);
             split_char = &amp_char;
 
-            if self.iid.len() == 1 {
+            if iid.len() == 1 {
                 query.push_str("iid=");
-                query.push_str(&self.iid[0].to_string());
+                query.push_str(&iid[0].to_string());
             } else {
                 let mut array_split_char = &none_char;
-                for iid in &self.iid {
+                for iid in iid {
                     query.push_str(array_split_char);
                     query.push_str("iid[]=");
                     query.push_str(&iid.to_string());
                     array_split_char = &amp_char;
                 }
             }
-        }
+        });
 
-        self.state.map(|state| {
+        self.internal.state.map(|state| {
             query.push_str(split_char);
             split_char = &amp_char;
 
             query.push_str("state=");
             query.push_str(match state {
-                MergeRequestState::Merged => "merged",
-                MergeRequestState::Opened => "opened",
-                MergeRequestState::Closed => "closed",
-                MergeRequestState::All => "all",
+                State::Merged => "merged",
+                State::Opened => "opened",
+                State::Closed => "closed",
+                State::All => "all",
             });
         });
 
-        self.order_by.map(|order_by| {
+        self.internal.order_by.map(|order_by| {
             query.push_str(split_char);
             split_char = &amp_char;
 
@@ -139,7 +163,7 @@ impl BuildQuery for Listing {
             });
         });
 
-        self.sort.map(|sort| {
+        self.internal.sort.map(|sort| {
             query.push_str(split_char);
             split_char = &amp_char;
 
@@ -154,82 +178,101 @@ impl BuildQuery for Listing {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
-    use super::*;
     use BuildQuery;
-    use MergeRequestState;
+
+
+    const TEST_PROJECT_ID: i64 = 123;
 
 
     #[test]
     fn build_query_default() {
-        let expected_string = "projects/123/merge_requests";
-        let listing = Listing { id: 123, ..Default::default() };
-        let query = listing.build_query();
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = format!("projects/{}/merge_requests", TEST_PROJECT_ID);
+        let lister = gl.merge_requests(TEST_PROJECT_ID);
+        let query = gl.merge_requests(TEST_PROJECT_ID).build_query();
         assert_eq!(query, expected_string);
 
-        let expected_string = "projects/123/merge_requests";
-        let listing = Listing::new(123);
-        let query = listing.build_query();
+        let expected_string = format!("projects/{}/merge_requests", TEST_PROJECT_ID);
+        let query = gl.merge_requests(TEST_PROJECT_ID).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn build_query_iid() {
-        let expected_string = format!("projects/123/merge_requests?iid=456");
-        let query = Listing::new(123).iid(vec![456]).build_query();
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = format!("projects/{}/merge_requests?iid=456", TEST_PROJECT_ID);
+        let query = gl.merge_requests(TEST_PROJECT_ID).iid(vec![456]).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/123/merge_requests?iid[]=456&iid[]=789");
-        let query = Listing::new(123).iid(vec![456, 789]).build_query();
+        let query = gl.merge_requests(TEST_PROJECT_ID).iid(vec![456, 789]).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn build_query_state() {
-        let expected_string = "projects/123/merge_requests?state=opened";
-        let query = Listing::new(123).state(MergeRequestState::Opened).build_query();
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = format!("projects/{}/merge_requests?state=opened", TEST_PROJECT_ID);
+        let query = gl.merge_requests(TEST_PROJECT_ID).state(::merge_requests::State::Opened).build_query();
         assert_eq!(query, expected_string);
 
-        let expected_string = "projects/123/merge_requests?state=closed";
-        let query = Listing::new(123).state(MergeRequestState::Closed).build_query();
+        let expected_string = format!("projects/{}/merge_requests?state=closed", TEST_PROJECT_ID);
+        let query = gl.merge_requests(TEST_PROJECT_ID).state(::merge_requests::State::Closed).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn build_query_order_by() {
-        let expected_string = "projects/123/merge_requests?order_by=created_at";
-        let query = Listing::new(123).order_by(ListingOrderBy::CreatedAt).build_query();
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = format!("projects/{}/merge_requests?order_by=created_at", TEST_PROJECT_ID);
+        let query = gl.merge_requests(TEST_PROJECT_ID).order_by(::merge_requests::ListingOrderBy::CreatedAt).build_query();
         assert_eq!(query, expected_string);
 
-        let expected_string = "projects/123/merge_requests?order_by=updated_at";
-        let query = Listing::new(123).order_by(ListingOrderBy::UpdatedAt).build_query();
+        let expected_string = format!("projects/{}/merge_requests?order_by=updated_at", TEST_PROJECT_ID);
+        let query = gl.merge_requests(TEST_PROJECT_ID).order_by(::merge_requests::ListingOrderBy::UpdatedAt).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn build_query_sort() {
-        let expected_string = "projects/123/merge_requests?sort=asc";
-        let query = Listing::new(123).sort(::ListingSort::Asc).build_query();
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = format!("projects/{}/merge_requests?sort=asc", TEST_PROJECT_ID);
+        let query = gl.merge_requests(TEST_PROJECT_ID).sort(::ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
 
-        let expected_string = "projects/123/merge_requests?sort=desc";
-        let query = Listing::new(123).sort(::ListingSort::Desc).build_query();
+        let expected_string = format!("projects/{}/merge_requests?sort=desc", TEST_PROJECT_ID);
+        let query = gl.merge_requests(TEST_PROJECT_ID).sort(::ListingSort::Desc).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn build_query_multiple() {
-        let expected_string = "projects/123/merge_requests?iid[]=456&iid[]=789&order_by=created_at&sort=asc";
-        let query = Listing::new(123)
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = format!("projects/{}/merge_requests?iid[]=456&iid[]=789&order_by=created_at&sort=asc", TEST_PROJECT_ID);
+        let query = gl.merge_requests(TEST_PROJECT_ID)
             .iid(vec![456, 789])
             .sort(::ListingSort::Asc)
-            .order_by(ListingOrderBy::CreatedAt)
+            .order_by(::merge_requests::ListingOrderBy::CreatedAt)
             .build_query();
         assert_eq!(query, expected_string);
     }

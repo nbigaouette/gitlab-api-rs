@@ -1,4 +1,3 @@
-/*
 extern crate gitlab_api as gitlab;
 
 use std::env;
@@ -35,14 +34,12 @@ fn main() {
 
     let gl = GitLab::new(&hostname, &token);
 
-    let merge_request = gl.merge_request(merge_requests::single::Listing::new(142, 418)).unwrap();
-    println!("merge_request: {:?}", merge_request);
-
-    let merge_requests = gl.merge_requests(merge_requests::Listing::new(142)).unwrap();
+    let merge_requests = gl.merge_requests(142).list();
     println!("merge_requests: {:?}", merge_requests);
-}
-*/
 
-fn main() {
-    println!("Merge requests disabled until API stabilizes. See projects instead.");
+    let merge_requests = gl.merge_requests(142).iid(vec![418]).list();
+    println!("merge_requests: {:?}", merge_requests);
+
+    let merge_requests = gl.merge_requests(142).iid(vec![419, 420]).list();
+    println!("merge_requests: {:?}", merge_requests);
 }

@@ -67,29 +67,6 @@ enum MilestoneState {
 }
 
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
-pub enum MergeRequestState {
-    #[serde(rename = "merged")]
-    Merged,
-    #[serde(rename = "opened")]
-    Opened,
-    #[serde(rename = "closed")]
-    Closed,
-    #[serde(rename = "all")]
-    All,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-enum MergeRequestStatus {
-    #[serde(rename = "can_be_merged")]
-    CanBeMerged,
-    #[serde(rename = "cannot_be_merged")]
-    CannotBeMerged,
-    #[serde(rename = "unchecked")]
-    Unchecked,
-}
-
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Version {
     pub version: String,
@@ -293,42 +270,3 @@ pub struct Issue {
 
 
 pub type Issues = Vec<Issue>;
-
-
-
-
-
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct MergeRequest {
-    id: i64,
-    iid: i64,
-    project_id: i64,
-    title: String,
-    description: String,
-    state: MergeRequestState,
-    created_at: String,  // FIXME: Use chrono crate
-    updated_at: String,  // FIXME: Use chrono crate
-    target_branch: String,
-    source_branch: String,
-    upvotes: i64,
-    downvotes: i64,
-    author: User,
-    assignee: Option<User>,
-    source_project_id: i64,
-    target_project_id: i64,
-    labels: Vec<String>,
-    work_in_progress: bool,
-    milestone: Option<Milestone>,
-    merge_when_build_succeeds: bool,
-    merge_status: MergeRequestStatus,
-    sha: String,
-    merge_commit_sha: Option<String>,
-    subscribed: bool,
-    user_notes_count: i64,
-    should_remove_source_branch: Option<bool>,
-    force_remove_source_branch: Option<bool>,
-    web_url: String
-}
-
-pub type MergeRequests = Vec<MergeRequest>;
