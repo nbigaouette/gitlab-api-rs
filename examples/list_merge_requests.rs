@@ -35,6 +35,7 @@ fn main() {
 
     let project_id = 142;
     let merge_requests_ids = vec![409, 410];
+    let merge_requests_iids = vec![3, 4];
 
     let merge_requests = gl.merge_requests(project_id).list();
     println!("merge_requests: {:?}", merge_requests);
@@ -42,9 +43,9 @@ fn main() {
     let merge_request = gl.merge_requests(project_id).single(merge_requests_ids[0]).list();
     println!("merge_request: {:?}", merge_request);
 
-    let merge_requests = gl.merge_requests(project_id).iid(vec![merge_requests_ids[0]]).list();
+    let merge_requests = gl.merge_requests(project_id).iid(vec![merge_requests_iids[0]]).list();
     println!("merge_requests: {:?}", merge_requests);
 
-    let merge_requests = gl.merge_requests(project_id).iid(merge_requests_ids).list();
-    println!("merge_requests: {:?}", merge_requests);
+    // let merge_requests = gl.merge_requests(project_id).iid(merge_requests_iids).list();
+    // println!("merge_requests: {:?}", merge_requests);
 }
