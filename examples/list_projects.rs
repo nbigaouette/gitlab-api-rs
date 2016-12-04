@@ -53,6 +53,11 @@ fn main() {
     let projects = gl.projects().archived(false).list();
     println!("projects: {:?}", projects);
 
+    let projects = gl.projects().owned().archived(false).list();
+    println!("projects: {:?}", projects);
+
+    let projects = gl.projects().all().order_by(gitlab::projects::ListingOrderBy::Name).list();
+    println!("projects: {:?}", projects);
 
 
 

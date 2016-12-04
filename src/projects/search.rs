@@ -19,101 +19,66 @@
 //! | `sort` | string | no | Return requests sorted in `asc` or `desc` order |
 
 
-use BuildQuery;
-
 use serde_json;
+use serde_urlencoded;
 
-use gitlab::GitLab;
+use BuildQuery;
 use Projects;
+use projects::{SearchProjectListerInternal, ListingOrderBy};
 
 
-impl GitLab {
-    pub fn projects_search(&self, listing: Listing) -> Result<Projects, serde_json::Error> {
-        let query = listing.build_query();
-        self.get(&query)
-    }
-}
-
-
-#[derive(Debug, Copy, Clone)]
-pub enum ListingOrderBy {
-    Id,
-    Name,
-    // Path,
-    CreatedAt,
-    // UpdatedAt,
-    LastActivityAt,
-}
-
-
-#[derive(Default, Debug, Clone)]
-pub struct Listing {
+#[derive(Debug, Clone)]
+pub struct ProjectsLister<'a> {
+    gl: &'a ::GitLab,
     /// A string contained in the project name.
     query: String,
-    /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
-    order_by: Option<ListingOrderBy>,
-    /// Return requests sorted. Default is `::ListingSort::Desc`.
-    sort: Option<::ListingSort>,
+    internal: SearchProjectListerInternal,
 }
 
+impl<'a> ProjectsLister<'a> {
+    pub fn new(gl: &'a ::GitLab, query: String) -> ProjectsLister {
+        ProjectsLister {
+            gl: gl,
+            query: query,
+            internal: SearchProjectListerInternal {
+                order_by: None,
+                sort: None,
+            },
+        }
+    }
 
-#[allow(dead_code)]
-impl Listing {
-    pub fn new(query: String) -> Listing {
-        Listing { query: query, ..Default::default() }
-    }
-    pub fn order_by(&mut self, order_by: ListingOrderBy) -> &mut Listing {
-        self.order_by = Some(order_by);
+    pub fn order_by(&'a mut self, order_by: ListingOrderBy) -> &'a mut ProjectsLister {
+        self.internal.order_by = Some(order_by);
         self
     }
-    fn sort(&mut self, sort: ::ListingSort) -> &mut Listing {
-        self.sort = Some(sort);
+
+    pub fn sort(&'a mut self, sort: ::ListingSort) -> &'a mut ProjectsLister {
+        self.internal.sort = Some(sort);
         self
+    }
+
+    /// Commit the lister: Query GitLab and return a list of projects.
+    pub fn list(&self) -> Projects {
+        // let query = serde_urlencoded::to_string(&self);
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        let projects: Result<Projects, serde_json::Error> = self.gl.get(&query);
+
+        projects.unwrap()
     }
 }
 
-
-impl BuildQuery for Listing {
+impl<'a> BuildQuery for ProjectsLister<'a> {
     fn build_query(&self) -> String {
 
+        let encoded = serde_urlencoded::to_string(&self.internal).unwrap();
         let mut query = format!("projects/search/{}", self.query);
-
-        let amp_char = "&";
-        let none_char = "";
-        let mut split_char = &none_char;
-
-        // Append a "?" only if at least one of the `Option` is `Some(_)` or if
-        // strings contain something.
-        query.push_str(match (&self.order_by, &self.sort) {
-            (&None, &None) => "",
-            _ => "?",
-        });
-
-        self.order_by.map(|order_by| {
-            query.push_str(split_char);
-            split_char = &amp_char;
-
-            query.push_str("order_by=");
-            query.push_str(match order_by {
-                ListingOrderBy::Id => "id",
-                ListingOrderBy::Name => "name",
-                // ListingOrderBy::Path => "path",
-                ListingOrderBy::CreatedAt => "created_at",
-                // ListingOrderBy::UpdatedAt => "updated_at",
-                ListingOrderBy::LastActivityAt => "last_activity_at",
-            });
-        });
-
-        self.sort.map(|sort| {
-            query.push_str(split_char);
-            // split_char = &amp_char;
-
-            query.push_str("sort=");
-            query.push_str(match sort {
-                ::ListingSort::Asc => "asc",
-                ::ListingSort::Desc => "desc",
-            });
-        });
+        if !encoded.is_empty() {
+            query.push_str("?");
+            query.push_str(&encoded);
+        }
+        debug!("query: {}", query);
 
         query
     }
@@ -122,71 +87,94 @@ impl BuildQuery for Listing {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use BuildQuery;
+    use projects::ListingOrderBy;
 
     const TEST_SEARCH_QUERY: &'static str = "SearchPattern";
 
 
     #[test]
     fn build_query_default() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = format!("projects/search/{}", TEST_SEARCH_QUERY);
-        let listing = Listing::new(TEST_SEARCH_QUERY.to_string());
-        let query = listing.build_query();
+
+        let lister = gl.projects().search(TEST_SEARCH_QUERY.to_string());
+        let query = lister.build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn build_query_order_by() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = format!("projects/search/{}?order_by=id", TEST_SEARCH_QUERY);
-        let query =
-            Listing::new(TEST_SEARCH_QUERY.to_string()).order_by(ListingOrderBy::Id).build_query();
+        let query = gl.projects()
+                      .search(TEST_SEARCH_QUERY.to_string())
+                      .order_by(ListingOrderBy::Id)
+                      .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/search/{}?order_by=name", TEST_SEARCH_QUERY);
-        let query = Listing::new(TEST_SEARCH_QUERY.to_string())
-            .order_by(ListingOrderBy::Name)
-            .build_query();
+        let query = gl.projects()
+                      .search(TEST_SEARCH_QUERY.to_string())
+                      .order_by(ListingOrderBy::Name)
+                      .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/search/{}?order_by=created_at", TEST_SEARCH_QUERY);
-        let query = Listing::new(TEST_SEARCH_QUERY.to_string())
-            .order_by(ListingOrderBy::CreatedAt)
-            .build_query();
+        let query = gl.projects()
+                      .search(TEST_SEARCH_QUERY.to_string())
+                      .order_by(ListingOrderBy::CreatedAt)
+                      .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/search/{}?order_by=last_activity_at",
                                       TEST_SEARCH_QUERY);
-        let query = Listing::new(TEST_SEARCH_QUERY.to_string())
-            .order_by(ListingOrderBy::LastActivityAt)
-            .build_query();
+        let query = gl.projects()
+                      .search(TEST_SEARCH_QUERY.to_string())
+                      .order_by(ListingOrderBy::LastActivityAt)
+                      .build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn build_query_sort() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = format!("projects/search/{}?sort=asc", TEST_SEARCH_QUERY);
-        let query =
-            Listing::new(TEST_SEARCH_QUERY.to_string()).sort(::ListingSort::Asc).build_query();
+        let query = gl.projects()
+                      .search(TEST_SEARCH_QUERY.to_string())
+                      .sort(::ListingSort::Asc)
+                      .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/search/{}?sort=desc", TEST_SEARCH_QUERY);
-        let query =
-            Listing::new(TEST_SEARCH_QUERY.to_string()).sort(::ListingSort::Desc).build_query();
+        let query = gl.projects()
+                      .search(TEST_SEARCH_QUERY.to_string())
+                      .sort(::ListingSort::Desc)
+                      .build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn groups_build_query_multiple() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = format!("projects/search/{}?order_by=created_at&sort=desc",
                                       TEST_SEARCH_QUERY);
-        let query = Listing::new(TEST_SEARCH_QUERY.to_string())
-            .order_by(ListingOrderBy::CreatedAt)
-            .sort(::ListingSort::Desc)
-            .build_query();
+        let query = gl.projects()
+                      .search(TEST_SEARCH_QUERY.to_string())
+                      .order_by(ListingOrderBy::CreatedAt)
+                      .sort(::ListingSort::Desc)
+                      .build_query();
         assert_eq!(query, expected_string);
     }
 }

@@ -20,53 +20,47 @@
 //! | `id` | integer/string | yes | The ID or NAMESPACE/PROJECT_NAME of the project |
 
 
-use BuildQuery;
-
 use serde_json;
 
-use gitlab::GitLab;
+use BuildQuery;
 use Project;
-
-
-impl GitLab {
-    pub fn project_id(&self, listing: Listing) -> Result<Project, serde_json::Error> {
-        let query = listing.build_query();
-        self.get(&query)
-    }
-}
+use projects::ListingId;
 
 
 #[derive(Debug, Clone)]
-pub enum ListingId {
-    Id(i64),
-    NamespaceProject(String),
+pub struct ProjectsLister<'a> {
+    gl: &'a ::GitLab,
+    id: ListingId,
 }
 
 
-#[derive(Default, Debug, Clone)]
-pub struct Listing {
-    /// The ID or NAMESPACE/PROJECT_NAME of the project
-    id: Option<ListingId>,
-}
+impl<'a> ProjectsLister<'a> {
+    pub fn new(gl: &'a ::GitLab, id: ListingId) -> ProjectsLister {
+        ProjectsLister {
+            gl: gl,
+            id: id,
+        }
+    }
 
+    /// Commit the lister: Query GitLab and return a list of projects.
+    pub fn list(&self) -> Project {
+        // let query = serde_urlencoded::to_string(&self);
+        let query = self.build_query();
+        debug!("query: {:?}", query);
 
-impl Listing {
-    pub fn new(id: ListingId) -> Listing {
-        Listing { id: Some(id) }
+        let project: Result<Project, serde_json::Error> = self.gl.get(&query);
+
+        project.unwrap()
     }
 }
 
-
-impl BuildQuery for Listing {
+impl<'a> BuildQuery for ProjectsLister<'a> {
     fn build_query(&self) -> String {
-
         let mut query = String::from("projects/");
 
-        self.id.clone().map(|id| {
-            query.push_str(&match id {
-                ListingId::Id(id) => id.to_string(),
-                ListingId::NamespaceProject(s) => s.replace("/", "%2F"),
-            });
+        query.push_str(&match self.id {
+            ListingId::Id(id) => id.to_string(),
+            ListingId::NamespaceProject(ref s) => s.replace("/", "%2F"),
         });
 
         query
@@ -76,7 +70,7 @@ impl BuildQuery for Listing {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use projects::ListingId;
     use BuildQuery;
 
     const TEST_PROJECT_ID: i64 = 123;
@@ -85,15 +79,20 @@ mod tests {
 
     #[test]
     fn build_query_id() {
-        let expected_string = format!("projects/{}", TEST_PROJECT_ID);
-        let query = Listing::new(ListingId::Id(123)).build_query();
-        assert_eq!(query, expected_string);
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
 
+        let expected_string = format!("projects/{}", TEST_PROJECT_ID);
+        let query = gl.projects()
+                      .id(ListingId::Id(TEST_PROJECT_ID))
+                      .build_query();
+        assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/{}",
                                       TEST_PROJECT_NAME.to_string().replace("/", "%2F"));
-        let query = Listing::new(ListingId::NamespaceProject(TEST_PROJECT_NAME.to_string()))
-            .build_query();
+        let query = gl.projects()
+                      .id(ListingId::NamespaceProject(TEST_PROJECT_NAME.to_string()))
+                      .build_query();
         assert_eq!(query, expected_string);
     }
 }

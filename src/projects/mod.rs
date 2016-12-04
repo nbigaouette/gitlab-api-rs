@@ -73,6 +73,28 @@ impl<'a> ProjectsLister<'a> {
         }
     }
 
+    pub fn all(self) -> all::ProjectsLister<'a> {
+        // assert_eq!(self, ProjectsLister::new(self.gl));
+        all::ProjectsLister::new(self.gl)
+    }
+
+    pub fn owned(self) -> owned::ProjectsLister<'a> {
+        // assert_eq!(self, ProjectsLister::new(self.gl));
+        owned::ProjectsLister::new(self.gl)
+    }
+
+    pub fn search(self, query: String) -> search::ProjectsLister<'a> {
+        // assert_eq!(self, ProjectsLister::new(self.gl));
+        search::ProjectsLister::new(self.gl, query)
+    }
+
+    pub fn id(self, id: ListingId) -> id::ProjectsLister<'a> {
+        // assert_eq!(self, ProjectsLister::new(self.gl));
+        id::ProjectsLister::new(self.gl, id)
+    }
+
+
+
     pub fn archived(&'a mut self, archived: bool) -> &'a mut ProjectsLister {
         self.internal.archived = Some(archived);
         self
@@ -93,7 +115,7 @@ impl<'a> ProjectsLister<'a> {
         self
     }
 
-    pub fn search(&'a mut self, search: String) -> &'a mut ProjectsLister {
+    pub fn search_pattern(&'a mut self, search: String) -> &'a mut ProjectsLister {
         self.internal.search = Some(search);
         self
     }
@@ -280,9 +302,9 @@ mod tests {
 
         let expected_string = "projects?search=SearchPattern";
         let mut projects_lister = gl.projects();
-        let query = projects_lister.search(String::from("SearchPattern")).build_query();
+        let query = projects_lister.search_pattern(String::from("SearchPattern")).build_query();
         assert_eq!(query, expected_string);
-        let query = gl.projects().search(String::from("SearchPattern")).build_query();
+        let query = gl.projects().search_pattern(String::from("SearchPattern")).build_query();
         assert_eq!(query, expected_string);
     }
 
