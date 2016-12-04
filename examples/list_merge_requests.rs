@@ -34,7 +34,7 @@ fn main() {
     let gl = GitLab::new_insecure(&hostname, &token);
 
     let project_id = 142;
-    let merge_requests_ids = vec![423, 409];
+    let merge_requests_ids = vec![409, 410];
 
     let merge_requests = gl.merge_requests(project_id).list();
     println!("merge_requests: {:?}", merge_requests);
