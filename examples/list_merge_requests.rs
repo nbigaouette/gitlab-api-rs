@@ -31,7 +31,7 @@ fn main() {
         }
     };
 
-    let gl = GitLab::new_insecure(&hostname, &token);
+    let gl = GitLab::new(&hostname, &token);
 
     let project_id = 142;
     let merge_requests_ids = vec![409, 410];
