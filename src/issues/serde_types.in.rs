@@ -29,3 +29,18 @@ struct IssuesListerInternal {
     /// Return requests sorted. Default is `::ListingSort::Desc`.
     sort: Option<::ListingSort>,
 }
+
+
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+struct GroupIssuesListerInternal {
+    /// State of issues to return.
+    state: Option<State>,
+    /// Labels of issues to return.
+    labels: Option<Vec<String>>,
+    /// The milestone title
+    milestone: Option<String>,
+    /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
+    order_by: Option<ListingOrderBy>,
+    /// Return requests sorted. Default is `::ListingSort::Desc`.
+    sort: Option<::ListingSort>,
+}
