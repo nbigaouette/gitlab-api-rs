@@ -160,8 +160,8 @@ impl GitLab {
         ::projects::ProjectsLister::new(self)
     }
 
-    pub fn merge_requests(&self, id: i64) -> ::merge_requests::MergeRequestsLister {
-        ::merge_requests::MergeRequestsLister::new(self, id)
+    pub fn merge_requests(&self, project_id: i64) -> ::merge_requests::MergeRequestsLister {
+        ::merge_requests::MergeRequestsLister::new(self, project_id)
     }
 
     // pub fn groups(&mut self, listing: ::groups::Listing) -> Result<Groups, serde_json::Error> {
