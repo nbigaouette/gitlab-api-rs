@@ -127,7 +127,6 @@ impl<'a> ProjectsLister<'a> {
 
     /// Commit the lister: Query GitLab and return a list of projects.
     pub fn list(&self) -> Projects {
-        // let query = serde_urlencoded::to_string(&self);
         let query = self.build_query();
         debug!("query: {:?}", query);
 
