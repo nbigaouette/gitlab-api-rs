@@ -25,7 +25,7 @@ use serde_json;
 use BuildQuery;
 use Issues;
 
-pub mod group;
+pub mod groups;
 // pub mod project;
 pub mod single;
 
@@ -57,9 +57,9 @@ impl<'a> IssuesLister<'a> {
     }
 
 
-    pub fn groups(self, id: i64) -> group::IssuesLister<'a> {
+    pub fn groups(self, id: i64) -> groups::IssuesLister<'a> {
         // assert_eq!(self, IssuesLister::new(self.gl));
-        group::IssuesLister::new(self.gl, id)
+        groups::IssuesLister::new(self.gl, id)
     }
 
     // pub fn project(self) -> project::IssuesLister<'a> {
