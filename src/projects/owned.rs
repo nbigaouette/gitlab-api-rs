@@ -25,7 +25,6 @@ use serde_json;
 use serde_urlencoded;
 
 use BuildQuery;
-use gitlab::GitLab;
 use Projects;
 use projects::{OwnedProjectListerInternal, ListingOrderBy};
 
@@ -105,7 +104,6 @@ impl<'a> BuildQuery for ProjectsLister<'a> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use BuildQuery;
     use projects::ListingOrderBy;
 
