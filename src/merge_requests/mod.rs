@@ -31,7 +31,6 @@ use serde_json;
 // use serde_urlencoded;
 
 use BuildQuery;
-use Projects;
 
 pub mod single;
 
@@ -50,6 +49,7 @@ pub struct MergeRequestsLister<'a> {
 }
 
 
+#[allow(dead_code)]
 impl<'a> MergeRequestsLister<'a> {
     pub fn new(gl: &'a ::GitLab, id: i64) -> MergeRequestsLister {
         MergeRequestsLister {
@@ -194,7 +194,7 @@ mod tests {
 
         let expected_string = format!("projects/{}/merge_requests", TEST_PROJECT_ID);
         let lister = gl.merge_requests(TEST_PROJECT_ID);
-        let query = gl.merge_requests(TEST_PROJECT_ID).build_query();
+        let query = lister.build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/{}/merge_requests", TEST_PROJECT_ID);
