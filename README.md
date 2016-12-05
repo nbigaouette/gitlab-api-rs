@@ -29,6 +29,7 @@ The (v3) API is quite long, so the parts I need will be implemented first.
 ## What Doesn't Work
 
 * Any _write_ commands (`POST`, `PUT`, etc.)
+* Any _Enterprise Edition_-specific features.
 * Some projects listing:
     * branch;
     * branches;
