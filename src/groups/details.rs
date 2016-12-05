@@ -40,14 +40,14 @@ impl<'a> GroupLister<'a> {
         }
     }
 
-    /// Commit the lister: Query GitLab and return a list of projects.
+    /// Commit the lister: Query GitLab and return a group.
     pub fn list(&self) -> Group {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
-        let issue: Result<Group, serde_json::Error> = self.gl.get(&query);
+        let group: Result<Group, serde_json::Error> = self.gl.get(&query);
 
-        issue.unwrap()
+        group.unwrap()
     }
 }
 
