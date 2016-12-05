@@ -1,6 +1,6 @@
 [package]
 name = "gitlab-api"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Nicolas Bigaouette <nbigaouette@gmail.com>"]
 description = "Wrapper for GitLab API v3"
 license = "MIT/Apache-2.0"
