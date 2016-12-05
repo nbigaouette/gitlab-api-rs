@@ -77,6 +77,16 @@ impl GitLab {
         GitLab::_new("https", domain, 443, private_token)
     }
 
+    pub fn port(mut self, port: u16) -> Self {
+        self.port = port;
+        self
+    }
+
+    pub fn scheme(mut self, scheme: &str) -> Self {
+        self.scheme = scheme.to_string();
+        self
+    }
+
     /// Build a URL used to access GitLab instance, including some parameters.
     ///
     /// # Examples
