@@ -152,9 +152,9 @@ impl GitLab {
         self.get("version").unwrap()
     }
 
-    // pub fn groups(&self) -> Result<Groups, serde_json::Error> {
-    //     self.get("groups")
-    // }
+    pub fn groups(&self) -> ::groups::GroupsLister {
+        ::groups::GroupsLister::new(self)
+    }
 
     pub fn projects(&self) -> ::projects::ProjectsLister {
         ::projects::ProjectsLister::new(self)

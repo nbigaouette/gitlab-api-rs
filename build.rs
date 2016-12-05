@@ -27,6 +27,7 @@ fn main() {
     let dst = Path::new(&out_dir).join("serde_types.rs");
     serde_codegen::expand(&src, &dst).unwrap();
 
+    module_codegen(&out_dir, "groups");
     module_codegen(&out_dir, "issues");
     module_codegen(&out_dir, "merge_requests");
     module_codegen(&out_dir, "projects");

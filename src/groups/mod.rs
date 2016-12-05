@@ -28,88 +28,105 @@
 //!
 
 
+use serde_json;
+// use serde_urlencoded;
+
 use BuildQuery;
+use Groups;
 
-pub mod owned_groups;
-pub mod projects;
-pub mod details;
+// pub mod owned;
+// pub mod projects;
+// pub mod details;
 
-// TODO:
-// New group:                   POST /groups
-// Transfer project to group:   POST  /groups/:id/projects/:project_id
-// Update group:                PUT /groups/:id
-// Remove group:                DELETE /groups/:id
+#[cfg(feature = "serde_derive")]
+include!("serde_types.in.rs");
+
+#[cfg(feature = "serde_codegen")]
+include!(concat!(env!("OUT_DIR"), "/groups/serde_types.rs"));
 
 
-#[derive(Debug, Copy, Clone)]
-pub enum ListingOrderBy {
-    Name,
-    Path,
+#[derive(Debug, Clone)]
+pub struct GroupsLister<'a> {
+    gl: &'a ::GitLab,
+    internal: GroupsListerInternal,
 }
 
 
-fn append_group_lister_options_order_by(order_by: ListingOrderBy, s: &mut String) {
-    s.push_str(match order_by {
-        ListingOrderBy::Name => "name",
-        ListingOrderBy::Path => "path",
-    });
+impl<'a> GroupsLister<'a> {
+    pub fn new(gl: &'a ::GitLab) -> GroupsLister {
+        GroupsLister {
+            gl: gl,
+            internal: GroupsListerInternal {
+                skip_groups: None,
+                all_available: None,
+                search: None,
+                order_by: None,
+                sort: None,
+            },
+        }
+    }
+
+
+    // pub fn details(self, id: i64) -> details::GroupsLister<'a> {
+    //     // assert_eq!(self, GroupsLister::new(self.gl));
+    //     details::GroupsLister::new(self.gl, id)
+    // }
+    //
+    // pub fn onwed(self, id: i64) -> onwed::GroupsLister<'a> {
+    //     // assert_eq!(self, GroupsLister::new(self.gl));
+    //     onwed::GroupsLister::new(self.gl, id)
+    // }
+    //
+    // pub fn projects(self, id: i64) -> projects::GroupsLister<'a> {
+    //     // assert_eq!(self, GroupsLister::new(self.gl));
+    //     projects::GroupsLister::new(self.gl, id)
+    // }
+
+
+    pub fn skip_groups(&'a mut self, skip_groups: Vec<i64>) -> &'a mut GroupsLister {
+        self.internal.skip_groups = Some(skip_groups);
+        self
+    }
+
+    pub fn all_available(&'a mut self, all_available: bool) -> &'a mut GroupsLister {
+        self.internal.all_available = Some(all_available);
+        self
+    }
+
+    pub fn search(&'a mut self, search: String) -> &'a mut GroupsLister {
+        self.internal.search = Some(search);
+        self
+    }
+
+    pub fn order_by(&'a mut self, order_by: ListingOrderBy) -> &'a mut GroupsLister {
+        self.internal.order_by = Some(order_by);
+        self
+    }
+
+    pub fn sort(&'a mut self, sort: ::ListingSort) -> &'a mut GroupsLister {
+        self.internal.sort = Some(sort);
+        self
+    }
+
+
+    /// Commit the lister: Query GitLab and return a list of groups.
+    pub fn list(&self) -> Groups {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        let groups: Result<Groups, serde_json::Error> = self.gl.get(&query);
+
+        groups.unwrap()
+    }
 }
 
 
-fn append_group_lister_options_sort(order_by: ::ListingSort, s: &mut String) {
-    s.push_str(match order_by {
-        ::ListingSort::Asc => "asc",
-        ::ListingSort::Desc => "desc",
-    });
-}
-
-
-/// https://docs.gitlab.com/ce/api/groups.html#list-groups
-#[derive(Default, Debug, Clone)]
-pub struct Listing {
-    /// Skip the group IDs passes
-    skip_groups: Vec<i64>,
-    /// Show all the groups you have access to
-    all_available: Option<bool>,
-    /// Return list of authorized groups matching the search criteria
-    search: String,
-    /// Order groups by `name` or `path`. Default is `name`
-    order_by: Option<ListingOrderBy>,
-    /// Order groups in `asc` or `desc` order. Default is `asc`
-    sort: Option<::ListingSort>,
-}
-
-
-#[allow(dead_code)]
-impl Listing {
-    pub fn new() -> Listing {
-        Default::default()
-    }
-    pub fn skip_groups(&mut self, skip_groups: Vec<i64>) -> &mut Listing {
-        self.skip_groups = skip_groups;
-        self
-    }
-    pub fn all_available(&mut self, all_available: bool) -> &mut Listing {
-        self.all_available = Some(all_available);
-        self
-    }
-    pub fn search(&mut self, search: String) -> &mut Listing {
-        self.search = search;
-        self
-    }
-    pub fn order_by(&mut self, order_by: ListingOrderBy) -> &mut Listing {
-        self.order_by = Some(order_by);
-        self
-    }
-    fn sort(&mut self, sort: ::ListingSort) -> &mut Listing {
-        self.sort = Some(sort);
-        self
-    }
-}
-
-
-impl BuildQuery for Listing {
+impl<'a> BuildQuery for GroupsLister<'a> {
     fn build_query(&self) -> String {
+
+        // NOTE: Can't use `serde_urlencoded` since it cannot serialize a Vec<T>
+        //       See https://github.com/nox/serde_urlencoded/issues/6
+        // let encoded = serde_urlencoded::to_string(&self.internal).unwrap();
 
         let mut query = String::from("groups");
 
@@ -118,29 +135,29 @@ impl BuildQuery for Listing {
         let mut split_char = &none_char;
 
         // Append a "?", only if one of the `Option` is `Some(_)`
-        query.push_str(match (self.skip_groups.is_empty(),
-                              &self.all_available,
-                              self.search.is_empty(),
-                              &self.order_by,
-                              &self.sort) {
-            (true, &None, true, &None, &None) => "",
+        query.push_str(match (&self.internal.skip_groups,
+                              &self.internal.all_available,
+                              &self.internal.search,
+                              &self.internal.order_by,
+                              &self.internal.sort) {
+            (&None, &None, &None, &None, &None) => "",
             _ => "?",
         });
 
-        if !self.skip_groups.is_empty() {
+        self.internal.skip_groups.as_ref().map(|skip_groups| {
             query.push_str(split_char);
             split_char = &amp_char;
 
             let mut array_split_char = &none_char;
-            for skip_group in &self.skip_groups {
+            for skip_group in skip_groups {
                 query.push_str(array_split_char);
                 query.push_str("skip_groups[]=");
                 query.push_str(&skip_group.to_string());
                 array_split_char = &amp_char;
             }
-        }
+        });
 
-        self.all_available.map(|all_available| {
+        self.internal.all_available.map(|all_available| {
             query.push_str(split_char);
             split_char = &amp_char;
 
@@ -151,28 +168,34 @@ impl BuildQuery for Listing {
             }
         });
 
-        if !self.search.is_empty() {
+        self.internal.search.as_ref().map(|search| {
             query.push_str(split_char);
             split_char = &amp_char;
 
             query.push_str("search=");
-            query.push_str(&self.search);
-        }
+            query.push_str(search);
+        });
 
-        self.order_by.map(|order_by| {
+        self.internal.order_by.map(|order_by| {
             query.push_str(split_char);
             split_char = &amp_char;
 
             query.push_str("order_by=");
-            append_group_lister_options_order_by(order_by, &mut query);
+            query.push_str(match order_by {
+                ListingOrderBy::Name => "name",
+                ListingOrderBy::Path => "path",
+            });
         });
 
-        self.sort.map(|sort| {
+        self.internal.sort.map(|sort| {
             query.push_str(split_char);
             split_char = &amp_char;
 
             query.push_str("sort=");
-            append_group_lister_options_sort(sort, &mut query);
+            query.push_str(match sort {
+                ::ListingSort::Asc => "asc",
+                ::ListingSort::Desc => "desc",
+            });
         });
 
         query
@@ -182,91 +205,113 @@ impl BuildQuery for Listing {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use BuildQuery;
 
 
     #[test]
     fn groups_build_query_default() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = "groups";
-        let listing: Listing = Default::default();
-        let query = listing.build_query();
+        let lister = gl.groups();
+        let query = lister.build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "groups";
-        let listing = Listing::new();
-        let query = listing.build_query();
+        let query = gl.groups().build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn groups_build_query_skip_groups() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = "groups?skip_groups[]=1&skip_groups[]=2&skip_groups[]=3";
-        let query = Listing::new().skip_groups(vec![1, 2, 3]).build_query();
+        let query = gl.groups().skip_groups(vec![1, 2, 3]).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn groups_build_query_all_available() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = "groups?all_available=true";
-        let query = Listing::new().all_available(true).build_query();
+        let query = gl.groups().all_available(true).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "groups?all_available=false";
-        let query = Listing::new().all_available(false).build_query();
+        let query = gl.groups().all_available(false).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn groups_build_query_search() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = "groups?search=SearchPattern";
-        let query = Listing::new().search(String::from("SearchPattern")).build_query();
+        let query = gl.groups().search(String::from("SearchPattern")).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn groups_build_query_order_by_name() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = "groups?order_by=name";
-        let query = Listing::new().order_by(ListingOrderBy::Name).build_query();
+        let query = gl.groups().order_by(::groups::ListingOrderBy::Name).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn groups_build_query_order_by_path() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = "groups?order_by=path";
-        let query = Listing::new().order_by(ListingOrderBy::Path).build_query();
+        let query = gl.groups().order_by(::groups::ListingOrderBy::Path).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn groups_build_query_sort() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = "groups?sort=asc";
-        let query = Listing::new().sort(::ListingSort::Asc).build_query();
+        let query = gl.groups().sort(::ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "groups?sort=desc";
-        let query = Listing::new().sort(::ListingSort::Desc).build_query();
+        let query = gl.groups().sort(::ListingSort::Desc).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
     fn groups_build_query_search_order_by_path() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = "groups?search=SearchPattern&order_by=path";
-        let query = Listing::new()
-            .order_by(ListingOrderBy::Path)
+        let query = gl.groups()
+            .order_by(::groups::ListingOrderBy::Path)
             .search(String::from("SearchPattern"))
             .build_query();
         assert_eq!(query, expected_string);
-        let query = Listing::new()
+        let query = gl.groups()
             .search(String::from("SearchPattern"))
-            .order_by(ListingOrderBy::Path)
+            .order_by(::groups::ListingOrderBy::Path)
             .build_query();
         assert_eq!(query, expected_string);
     }
