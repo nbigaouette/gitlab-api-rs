@@ -72,8 +72,12 @@ fn main() {
     let closed_issues = gl.issues().state(gitlab::issues::State::Closed).list();
     println!("closed_issues: {:?}", closed_issues);
 }
-
 ```
+
+**NOTES**:
+* Crate uses `https` by default. Use `GitLab::new_insecure()` to use `http`.
+* Sending your token in clear over `http` is dangerous!
+* See [examples/list_projects.rs] for an example of how to load the token (and the hostname) from an environment variable.
 
 
 ## Dependencies
