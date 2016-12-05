@@ -39,7 +39,7 @@ fn main() {
     let groups = gl.groups().list();
     println!("groups: {:?}", groups);
 
-    let groups = gl.groups().details(gitlab::groups::ListingId::Id(2)).list();
+    let groups = gl.groups().details(gitlab::groups::ListingId::Id(21)).list();
     println!("groups: {:?}", groups);
 
     // let groups = gl.groups(gitlab::groups::Listing::new().skip_groups(vec![1, 2, 3]).clone());
