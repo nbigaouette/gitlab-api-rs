@@ -34,10 +34,7 @@ pub struct GroupLister<'a> {
 
 impl<'a> GroupLister<'a> {
     pub fn new(gl: &'a ::GitLab, id: ::groups::ListingId) -> GroupLister {
-        GroupLister {
-            gl: gl,
-            id: id,
-        }
+        GroupLister { gl: gl, id: id }
     }
 
     /// Commit the lister: Query GitLab and return a group.
@@ -103,15 +100,19 @@ mod tests {
         let expected_string = format!("groups/{}", TEST_GROUP_ID_STRING.replace("/", "%2F"));
 
         let lister = gl.groups();
-        let lister = lister.details(::groups::ListingId::NamespaceProject(TEST_GROUP_ID_STRING.to_string()));
+        let lister =
+            lister.details(::groups::ListingId::NamespaceProject(TEST_GROUP_ID_STRING.to_string()));
         let query = lister.build_query();
         assert_eq!(query, expected_string);
 
-        let lister = gl.groups().details(::groups::ListingId::NamespaceProject(TEST_GROUP_ID_STRING.to_string()));
+        let lister = gl.groups()
+            .details(::groups::ListingId::NamespaceProject(TEST_GROUP_ID_STRING.to_string()));
         let query = lister.build_query();
         assert_eq!(query, expected_string);
 
-        let query = gl.groups().details(::groups::ListingId::NamespaceProject(TEST_GROUP_ID_STRING.to_string())).build_query();
+        let query = gl.groups()
+            .details(::groups::ListingId::NamespaceProject(TEST_GROUP_ID_STRING.to_string()))
+            .build_query();
         assert_eq!(query, expected_string);
     }
 }

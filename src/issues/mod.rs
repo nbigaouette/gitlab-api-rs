@@ -122,7 +122,10 @@ impl<'a> BuildQuery for IssuesLister<'a> {
 
         // Append a "?" only if at least one of the `Option` is `Some(_)` or if
         // strings contain something.
-        query.push_str(match (&self.internal.state, &self.internal.labels, &self.internal.order_by, &self.internal.sort) {
+        query.push_str(match (&self.internal.state,
+                              &self.internal.labels,
+                              &self.internal.order_by,
+                              &self.internal.sort) {
             (&None, &None, &None, &None) => "",
             _ => "?",
         });

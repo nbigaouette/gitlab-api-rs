@@ -113,31 +113,31 @@ mod tests {
 
         let expected_string = format!("projects/search/{}?order_by=id", TEST_SEARCH_QUERY);
         let query = gl.projects()
-                      .search(TEST_SEARCH_QUERY.to_string())
-                      .order_by(ListingOrderBy::Id)
-                      .build_query();
+            .search(TEST_SEARCH_QUERY.to_string())
+            .order_by(ListingOrderBy::Id)
+            .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/search/{}?order_by=name", TEST_SEARCH_QUERY);
         let query = gl.projects()
-                      .search(TEST_SEARCH_QUERY.to_string())
-                      .order_by(ListingOrderBy::Name)
-                      .build_query();
+            .search(TEST_SEARCH_QUERY.to_string())
+            .order_by(ListingOrderBy::Name)
+            .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/search/{}?order_by=created_at", TEST_SEARCH_QUERY);
         let query = gl.projects()
-                      .search(TEST_SEARCH_QUERY.to_string())
-                      .order_by(ListingOrderBy::CreatedAt)
-                      .build_query();
+            .search(TEST_SEARCH_QUERY.to_string())
+            .order_by(ListingOrderBy::CreatedAt)
+            .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/search/{}?order_by=last_activity_at",
                                       TEST_SEARCH_QUERY);
         let query = gl.projects()
-                      .search(TEST_SEARCH_QUERY.to_string())
-                      .order_by(ListingOrderBy::LastActivityAt)
-                      .build_query();
+            .search(TEST_SEARCH_QUERY.to_string())
+            .order_by(ListingOrderBy::LastActivityAt)
+            .build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -149,16 +149,16 @@ mod tests {
 
         let expected_string = format!("projects/search/{}?sort=asc", TEST_SEARCH_QUERY);
         let query = gl.projects()
-                      .search(TEST_SEARCH_QUERY.to_string())
-                      .sort(::ListingSort::Asc)
-                      .build_query();
+            .search(TEST_SEARCH_QUERY.to_string())
+            .sort(::ListingSort::Asc)
+            .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/search/{}?sort=desc", TEST_SEARCH_QUERY);
         let query = gl.projects()
-                      .search(TEST_SEARCH_QUERY.to_string())
-                      .sort(::ListingSort::Desc)
-                      .build_query();
+            .search(TEST_SEARCH_QUERY.to_string())
+            .sort(::ListingSort::Desc)
+            .build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -171,10 +171,10 @@ mod tests {
         let expected_string = format!("projects/search/{}?order_by=created_at&sort=desc",
                                       TEST_SEARCH_QUERY);
         let query = gl.projects()
-                      .search(TEST_SEARCH_QUERY.to_string())
-                      .order_by(ListingOrderBy::CreatedAt)
-                      .sort(::ListingSort::Desc)
-                      .build_query();
+            .search(TEST_SEARCH_QUERY.to_string())
+            .order_by(ListingOrderBy::CreatedAt)
+            .sort(::ListingSort::Desc)
+            .build_query();
         assert_eq!(query, expected_string);
     }
 }

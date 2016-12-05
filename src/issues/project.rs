@@ -122,7 +122,11 @@ impl<'a> BuildQuery for IssuesLister<'a> {
 
         // Append a "?" only if at least one of the `Option` is `Some(_)` or if
         // strings contain something.
-        query.push_str(match (&self.internal.state, &self.internal.labels, &self.internal.milestone, &self.internal.order_by, &self.internal.sort) {
+        query.push_str(match (&self.internal.state,
+                              &self.internal.labels,
+                              &self.internal.milestone,
+                              &self.internal.order_by,
+                              &self.internal.sort) {
             (&None, &None, &None, &None, &None) => "",
             _ => "?",
         });
@@ -228,11 +232,13 @@ mod tests {
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("projects/{}/issues?state=opened", TEST_PROJECT_ID);
-        let query = gl.issues().project(TEST_PROJECT_ID).state(::issues::State::Opened).build_query();
+        let query =
+            gl.issues().project(TEST_PROJECT_ID).state(::issues::State::Opened).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/{}/issues?state=closed", TEST_PROJECT_ID);
-        let query = gl.issues().project(TEST_PROJECT_ID).state(::issues::State::Closed).build_query();
+        let query =
+            gl.issues().project(TEST_PROJECT_ID).state(::issues::State::Closed).build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -242,8 +248,10 @@ mod tests {
         let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
         // let gl: ::GitLab = Default::default();
 
-        let expected_string = format!("projects/{}/issues?labels=label1,label2,label3", TEST_PROJECT_ID);
-        let query = gl.issues().project(TEST_PROJECT_ID)
+        let expected_string = format!("projects/{}/issues?labels=label1,label2,label3",
+                                      TEST_PROJECT_ID);
+        let query = gl.issues()
+            .project(TEST_PROJECT_ID)
             .labels(vec![String::from("label1"), String::from("label2"), String::from("label3")])
             .build_query();
         assert_eq!(query, expected_string);
@@ -256,11 +264,17 @@ mod tests {
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("projects/{}/issues?order_by=created_at", TEST_PROJECT_ID);
-        let query = gl.issues().project(TEST_PROJECT_ID).order_by(::issues::ListingOrderBy::CreatedAt).build_query();
+        let query = gl.issues()
+            .project(TEST_PROJECT_ID)
+            .order_by(::issues::ListingOrderBy::CreatedAt)
+            .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/{}/issues?order_by=updated_at", TEST_PROJECT_ID);
-        let query = gl.issues().project(TEST_PROJECT_ID).order_by(::issues::ListingOrderBy::UpdatedAt).build_query();
+        let query = gl.issues()
+            .project(TEST_PROJECT_ID)
+            .order_by(::issues::ListingOrderBy::UpdatedAt)
+            .build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -285,8 +299,10 @@ mod tests {
         let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
         // let gl: ::GitLab = Default::default();
 
-        let expected_string = format!("projects/{}/issues?order_by=created_at&sort=asc", TEST_PROJECT_ID);
-        let query = gl.issues().project(TEST_PROJECT_ID)
+        let expected_string = format!("projects/{}/issues?order_by=created_at&sort=asc",
+                                      TEST_PROJECT_ID);
+        let query = gl.issues()
+            .project(TEST_PROJECT_ID)
             .sort(::ListingSort::Asc)
             .order_by(::issues::ListingOrderBy::CreatedAt)
             .build_query();

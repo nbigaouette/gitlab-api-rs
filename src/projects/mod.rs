@@ -265,9 +265,11 @@ mod tests {
 
         let expected_string = "projects?order_by=last_activity_at";
         let mut projects_lister = gl.projects();
-        let query = projects_lister.order_by(::projects::ListingOrderBy::LastActivityAt).build_query();
+        let query = projects_lister.order_by(::projects::ListingOrderBy::LastActivityAt)
+            .build_query();
         assert_eq!(query, expected_string);
-        let query = gl.projects().order_by(::projects::ListingOrderBy::LastActivityAt).build_query();
+        let query =
+            gl.projects().order_by(::projects::ListingOrderBy::LastActivityAt).build_query();
         assert_eq!(query, expected_string);
     }
 

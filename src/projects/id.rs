@@ -36,10 +36,7 @@ pub struct ProjectsLister<'a> {
 
 impl<'a> ProjectsLister<'a> {
     pub fn new(gl: &'a ::GitLab, id: ListingId) -> ProjectsLister {
-        ProjectsLister {
-            gl: gl,
-            id: id,
-        }
+        ProjectsLister { gl: gl, id: id }
     }
 
     /// Commit the lister: Query GitLab and return a list of projects.
@@ -84,15 +81,15 @@ mod tests {
 
         let expected_string = format!("projects/{}", TEST_PROJECT_ID);
         let query = gl.projects()
-                      .id(ListingId::Id(TEST_PROJECT_ID))
-                      .build_query();
+            .id(ListingId::Id(TEST_PROJECT_ID))
+            .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/{}",
                                       TEST_PROJECT_NAME.to_string().replace("/", "%2F"));
         let query = gl.projects()
-                      .id(ListingId::NamespaceProject(TEST_PROJECT_NAME.to_string()))
-                      .build_query();
+            .id(ListingId::NamespaceProject(TEST_PROJECT_NAME.to_string()))
+            .build_query();
         assert_eq!(query, expected_string);
     }
 }

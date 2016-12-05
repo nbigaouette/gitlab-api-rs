@@ -25,9 +25,7 @@ pub struct GroupsLister<'a> {
 
 impl<'a> GroupsLister<'a> {
     pub fn new(gl: &'a ::GitLab) -> GroupsLister {
-        GroupsLister {
-            gl: gl,
-        }
+        GroupsLister { gl: gl }
     }
 
     /// Commit the lister: Query GitLab and return a list of groups.

@@ -53,7 +53,7 @@ impl<'a> ProjectsLister<'a> {
                 sort: None,
                 search: None,
                 ci_enabled_first: None,
-            }
+            },
         }
     }
 
@@ -181,19 +181,22 @@ mod tests {
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("groups/{}/projects?visibility=public", TEST_PROJECT_ID);
-        let query = gl.groups().projects(TEST_PROJECT_ID)
+        let query = gl.groups()
+            .projects(TEST_PROJECT_ID)
             .visibility(::ListingVisibility::Public)
             .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?visibility=internal", TEST_PROJECT_ID);
-        let query = gl.groups().projects(TEST_PROJECT_ID)
+        let query = gl.groups()
+            .projects(TEST_PROJECT_ID)
             .visibility(::ListingVisibility::Internal)
             .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?visibility=private", TEST_PROJECT_ID);
-        let query = gl.groups().projects(TEST_PROJECT_ID)
+        let query = gl.groups()
+            .projects(TEST_PROJECT_ID)
             .visibility(::ListingVisibility::Private)
             .build_query();
         assert_eq!(query, expected_string);
@@ -206,33 +209,44 @@ mod tests {
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("groups/{}/projects?order_by=id", TEST_PROJECT_ID);
-        let query =
-            gl.groups().projects(TEST_PROJECT_ID).order_by(::projects::ListingOrderBy::Id).build_query();
+        let query = gl.groups()
+            .projects(TEST_PROJECT_ID)
+            .order_by(::projects::ListingOrderBy::Id)
+            .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?order_by=name", TEST_PROJECT_ID);
-        let query =
-            gl.groups().projects(TEST_PROJECT_ID).order_by(::projects::ListingOrderBy::Name).build_query();
+        let query = gl.groups()
+            .projects(TEST_PROJECT_ID)
+            .order_by(::projects::ListingOrderBy::Name)
+            .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?order_by=path", TEST_PROJECT_ID);
-        let query =
-            gl.groups().projects(TEST_PROJECT_ID).order_by(::projects::ListingOrderBy::Path).build_query();
+        let query = gl.groups()
+            .projects(TEST_PROJECT_ID)
+            .order_by(::projects::ListingOrderBy::Path)
+            .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?order_by=created_at", TEST_PROJECT_ID);
-        let query =
-            gl.groups().projects(TEST_PROJECT_ID).order_by(::projects::ListingOrderBy::CreatedAt).build_query();
+        let query = gl.groups()
+            .projects(TEST_PROJECT_ID)
+            .order_by(::projects::ListingOrderBy::CreatedAt)
+            .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?order_by=updated_at", TEST_PROJECT_ID);
-        let query =
-            gl.groups().projects(TEST_PROJECT_ID).order_by(::projects::ListingOrderBy::UpdatedAt).build_query();
+        let query = gl.groups()
+            .projects(TEST_PROJECT_ID)
+            .order_by(::projects::ListingOrderBy::UpdatedAt)
+            .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?order_by=last_activity_at",
                                       TEST_PROJECT_ID);
-        let query = gl.groups().projects(TEST_PROJECT_ID)
+        let query = gl.groups()
+            .projects(TEST_PROJECT_ID)
             .order_by(::projects::ListingOrderBy::LastActivityAt)
             .build_query();
         assert_eq!(query, expected_string);
@@ -260,7 +274,8 @@ mod tests {
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("groups/{}/projects?search=SearchPattern", TEST_PROJECT_ID);
-        let query = gl.groups().projects(TEST_PROJECT_ID)
+        let query = gl.groups()
+            .projects(TEST_PROJECT_ID)
             .search(String::from("SearchPattern"))
             .build_query();
         assert_eq!(query, expected_string);
@@ -289,7 +304,8 @@ mod tests {
 
         let expected_string = format!("groups/{}/projects?archived=true&ci_enabled_first=true",
                                       TEST_PROJECT_ID);
-        let query = gl.groups().projects(TEST_PROJECT_ID)
+        let query = gl.groups()
+            .projects(TEST_PROJECT_ID)
             .archived(true)
             .ci_enabled_first(true)
             .build_query();
