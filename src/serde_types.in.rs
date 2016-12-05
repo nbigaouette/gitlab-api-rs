@@ -213,7 +213,7 @@ pub struct Project {
     request_access_enabled: bool,
     only_allow_merge_if_all_discussions_are_resolved: Option<bool>,  // FIXME: Is bool the proper type?
     approvals_before_merge: Option<i64>,
-    permissions: ProjectPermissions,
+    permissions: Option<ProjectPermissions>,
 }
 
 pub type Projects = Vec<Project>;
