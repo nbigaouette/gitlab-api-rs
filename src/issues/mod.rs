@@ -26,7 +26,7 @@ use BuildQuery;
 use Issues;
 
 pub mod group;
-// pub mod project;
+pub mod project;
 pub mod single;
 
 #[cfg(feature = "serde_derive")]
@@ -62,10 +62,10 @@ impl<'a> IssuesLister<'a> {
         group::IssuesLister::new(self.gl, id)
     }
 
-    // pub fn project(self) -> project::IssuesLister<'a> {
-    //     // assert_eq!(self, IssuesLister::new(self.gl));
-    //     project::IssuesLister::new(self.gl)
-    // }
+    pub fn project(self, id: i64) -> project::IssuesLister<'a> {
+        // assert_eq!(self, IssuesLister::new(self.gl));
+        project::IssuesLister::new(self.gl, id)
+    }
 
     pub fn single(self, id: i64, issue_id: i64) -> single::IssueLister<'a> {
         // assert_eq!(self, IssuesLister::new(self.gl));

@@ -50,7 +50,6 @@ fn main() {
     let group_issues = gl.issues().group(21).state(issues::State::Closed).list();
     println!("group_issues: {:?}", group_issues);
 
-//     let listing = issues::project::Listing::new(142).state(issues::ListingState::Closed).clone();
-//     let project_issues = gl.project_issues(listing).unwrap();
-//     println!("project_issues: {:?}", project_issues);
+    let project_issues = gl.issues().project(142).state(issues::State::Opened).list();
+    println!("project_issues: {:?}", project_issues);
 }
