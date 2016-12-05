@@ -35,7 +35,7 @@ use BuildQuery;
 use Groups;
 
 pub mod owned;
-// pub mod projects;
+pub mod projects;
 pub mod details;
 
 #[cfg(feature = "serde_derive")]
@@ -77,10 +77,10 @@ impl<'a> GroupsLister<'a> {
         owned::GroupsLister::new(self.gl)
     }
 
-    // pub fn projects(self, id: i64) -> projects::GroupsLister<'a> {
-    //     // assert_eq!(self, GroupsLister::new(self.gl));
-    //     projects::GroupsLister::new(self.gl, id)
-    // }
+    pub fn projects(self, id: i64) -> projects::ProjectsLister<'a> {
+        // assert_eq!(self, ProjectsLister::new(self.gl));
+        projects::ProjectsLister::new(self.gl, id)
+    }
 
 
     pub fn skip_groups(&'a mut self, skip_groups: Vec<i64>) -> &'a mut GroupsLister {

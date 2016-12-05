@@ -47,4 +47,7 @@ fn main() {
     //
     let owned_groups = gl.groups().owned().list();
     println!("owned_groups: {:?}", owned_groups);
+
+    let projects_groups = gl.groups().projects(21).list();
+    println!("projects_groups: {:?}", projects_groups);
 }

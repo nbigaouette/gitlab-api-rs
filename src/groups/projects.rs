@@ -24,212 +24,176 @@
 //!
 
 
+use serde_json;
+use serde_urlencoded;
+
 use BuildQuery;
+use Projects;
+
+use groups::ProjectsListerInternal;
 
 
-// FIXME: Use a type for the project id.
-
-
-#[derive(Debug, Copy, Clone)]
-pub enum ListingOrderBy {
-    Id,
-    Name,
-    Path,
-    CreatedAt,
-    UpdatedAt,
-    LastActivityAt,
-}
-
-
-#[derive(Default, Debug, Clone)]
-pub struct Listing {
-    /// Group Id.
+#[derive(Debug, Clone)]
+pub struct ProjectsLister<'a> {
+    gl: &'a ::GitLab,
     id: i64,
-    /// Limit by archived status.
-    archived: Option<bool>,
-    /// Limit by visibility
-    visibility: Option<::ListingVisibility>,
-    /// Return requests ordered by. Default is `ListingOrderBy::CreatedAt`.
-    order_by: Option<ListingOrderBy>,
-    /// Return requests sorted. Default is `::ListingSort::Desc`.
-    sort: Option<::ListingSort>,
-    /// Return list of authorized projects according to a search criteria.
-    search: String,
-    /// Return projects ordered by `ci_enabled` flag. Projects with enabled GitLab CI go first.
-    ci_enabled_first: Option<bool>,
+    internal: ProjectsListerInternal,
 }
 
 
-impl Listing {
-    pub fn new(id: i64) -> Listing {
-        Listing { id: id, ..Default::default() }
-    }
-    pub fn archived(&mut self, archived: bool) -> &mut Listing {
-        self.archived = Some(archived);
-        self
-    }
-    pub fn visibility(&mut self, visibility: ::ListingVisibility) -> &mut Listing {
-        self.visibility = Some(visibility);
-        self
-    }
-    pub fn order_by(&mut self, order_by: ListingOrderBy) -> &mut Listing {
-        self.order_by = Some(order_by);
-        self
-    }
-    pub fn sort(&mut self, sort: ::ListingSort) -> &mut Listing {
-        self.sort = Some(sort);
-        self
-    }
-    pub fn search(&mut self, search: String) -> &mut Listing {
-        self.search = search;
-        self
-    }
-    pub fn ci_enabled_first(&mut self, ci_enabled_first: bool) -> &mut Listing {
-        self.ci_enabled_first = Some(ci_enabled_first);
-        self
-    }
-}
-
-
-impl BuildQuery for Listing {
-    fn build_query(&self) -> String {
-        let mut query = format!("groups/{}/projects", self.id);
-
-        let amp_char = "&";
-        let none_char = "";
-        let mut split_char = &none_char;
-
-        // Append a "?", only if one of the `Option` is `Some(_)`
-        query.push_str(match (&self.archived,
-                              &self.visibility,
-                              &self.order_by,
-                              &self.sort,
-                              self.search.is_empty(),
-                              &self.ci_enabled_first) {
-            (&None, &None, &None, &None, true, &None) => "",
-            _ => "?",
-        });
-
-        self.archived.map(|archived| {
-            query.push_str(split_char);
-            split_char = &amp_char;
-
-            if archived {
-                query.push_str("archived=true")
-            } else {
-                query.push_str("archived=false")
+impl<'a> ProjectsLister<'a> {
+    pub fn new(gl: &'a ::GitLab, id: i64) -> ProjectsLister {
+        ProjectsLister {
+            gl: gl,
+            id: id,
+            internal: ProjectsListerInternal {
+                archived: None,
+                visibility: None,
+                order_by: None,
+                sort: None,
+                search: None,
+                ci_enabled_first: None,
             }
-        });
-
-        self.visibility.map(|visibility| {
-            query.push_str(split_char);
-            split_char = &amp_char;
-
-            query.push_str("visibility=");
-            query.push_str(match visibility {
-                ::ListingVisibility::Public => "public",
-                ::ListingVisibility::Internal => "internal",
-                ::ListingVisibility::Private => "private",
-            });
-        });
-
-        self.order_by.map(|order_by| {
-            query.push_str(split_char);
-            split_char = &amp_char;
-
-            query.push_str("order_by=");
-            query.push_str(match order_by {
-                ListingOrderBy::Id => "id",
-                ListingOrderBy::Name => "name",
-                ListingOrderBy::Path => "path",
-                ListingOrderBy::CreatedAt => "created_at",
-                ListingOrderBy::UpdatedAt => "updated_at",
-                ListingOrderBy::LastActivityAt => "last_activity_at",
-            });
-        });
-
-        self.sort.map(|sort| {
-            query.push_str(split_char);
-            split_char = &amp_char;
-
-            query.push_str("sort=");
-            query.push_str(match sort {
-                ::ListingSort::Asc => "asc",
-                ::ListingSort::Desc => "desc",
-            });
-        });
-
-        if !self.search.is_empty() {
-            query.push_str(split_char);
-            split_char = &amp_char;
-
-            query.push_str("search=");
-            query.push_str(&self.search);
         }
+    }
 
-        self.ci_enabled_first.map(|ci_enabled_first| {
-            query.push_str(split_char);
-            split_char = &amp_char;
 
-            if ci_enabled_first {
-                query.push_str("ci_enabled_first=true")
-            } else {
-                query.push_str("ci_enabled_first=false")
-            }
-        });
+    pub fn archived(&'a mut self, archived: bool) -> &'a mut ProjectsLister {
+        self.internal.archived = Some(archived);
+        self
+    }
+
+    pub fn visibility(&'a mut self, visibility: ::ListingVisibility) -> &'a mut ProjectsLister {
+        self.internal.visibility = Some(visibility);
+        self
+    }
+
+    pub fn order_by(&'a mut self, order_by: ::projects::ListingOrderBy) -> &'a mut ProjectsLister {
+        self.internal.order_by = Some(order_by);
+        self
+    }
+
+    pub fn sort(&'a mut self, sort: ::ListingSort) -> &'a mut ProjectsLister {
+        self.internal.sort = Some(sort);
+        self
+    }
+
+    pub fn search(&'a mut self, search: String) -> &'a mut ProjectsLister {
+        self.internal.search = Some(search);
+        self
+    }
+
+    pub fn ci_enabled_first(&'a mut self, ci_enabled_first: bool) -> &'a mut ProjectsLister {
+        self.internal.ci_enabled_first = Some(ci_enabled_first);
+        self
+    }
+
+
+    /// Commit the lister: Query GitLab and return a list of projects.
+    pub fn list(&self) -> Projects {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        let projects: Result<Projects, serde_json::Error> = self.gl.get(&query);
+
+        projects.unwrap()
+    }
+}
+
+
+impl<'a> BuildQuery for ProjectsLister<'a> {
+    fn build_query(&self) -> String {
+        let encoded = serde_urlencoded::to_string(&self.internal).unwrap();
+
+        let mut query = format!("groups/{}/projects", self.id);
+        if !encoded.is_empty() {
+            query.push_str("?");
+            query.push_str(&encoded);
+        }
 
         query
     }
 }
 
-// GET /groups/:id/projects
-
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use BuildQuery;
 
     const TEST_PROJECT_ID: i64 = 123;
 
 
     #[test]
-    fn groups_build_query_default() {
+    fn build_query_default_split0() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = format!("groups/{}/projects", TEST_PROJECT_ID);
-        let listing = Listing::new(TEST_PROJECT_ID);
-        let query = listing.build_query();
+
+        let lister = gl.groups();
+        let lister = lister.projects(TEST_PROJECT_ID);
+        let query = lister.build_query();
+        assert_eq!(query, expected_string);
+    }
+
+    #[test]
+    fn build_query_default_split1() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = format!("groups/{}/projects", TEST_PROJECT_ID);
+
+        let lister = gl.groups().projects(TEST_PROJECT_ID);
+        let query = lister.build_query();
+        assert_eq!(query, expected_string);
+    }
+
+    #[test]
+    fn build_query_default() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = format!("groups/{}/projects", TEST_PROJECT_ID);
+
+        let query = gl.groups().projects(TEST_PROJECT_ID).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
-    fn groups_build_query_archived() {
+    fn build_query_archived() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = format!("groups/{}/projects?archived=true", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).archived(true).build_query();
+        let query = gl.groups().projects(TEST_PROJECT_ID).archived(true).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?archived=false", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).archived(false).build_query();
+        let query = gl.groups().projects(TEST_PROJECT_ID).archived(false).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
-    fn groups_build_query_visibility() {
+    fn build_query_visibility() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = format!("groups/{}/projects?visibility=public", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone())
+        let query = gl.groups().projects(TEST_PROJECT_ID)
             .visibility(::ListingVisibility::Public)
             .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?visibility=internal", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone())
+        let query = gl.groups().projects(TEST_PROJECT_ID)
             .visibility(::ListingVisibility::Internal)
             .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?visibility=private", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone())
+        let query = gl.groups().projects(TEST_PROJECT_ID)
             .visibility(::ListingVisibility::Private)
             .build_query();
         assert_eq!(query, expected_string);
@@ -237,57 +201,66 @@ mod tests {
 
 
     #[test]
-    fn groups_build_query_order_by() {
+    fn build_query_order_by() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = format!("groups/{}/projects?order_by=id", TEST_PROJECT_ID);
         let query =
-            Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::Id).build_query();
+            gl.groups().projects(TEST_PROJECT_ID).order_by(::projects::ListingOrderBy::Id).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?order_by=name", TEST_PROJECT_ID);
         let query =
-            Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::Name).build_query();
+            gl.groups().projects(TEST_PROJECT_ID).order_by(::projects::ListingOrderBy::Name).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?order_by=path", TEST_PROJECT_ID);
         let query =
-            Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::Path).build_query();
+            gl.groups().projects(TEST_PROJECT_ID).order_by(::projects::ListingOrderBy::Path).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?order_by=created_at", TEST_PROJECT_ID);
         let query =
-            Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::CreatedAt).build_query();
+            gl.groups().projects(TEST_PROJECT_ID).order_by(::projects::ListingOrderBy::CreatedAt).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?order_by=updated_at", TEST_PROJECT_ID);
         let query =
-            Listing::new(TEST_PROJECT_ID.clone()).order_by(ListingOrderBy::UpdatedAt).build_query();
+            gl.groups().projects(TEST_PROJECT_ID).order_by(::projects::ListingOrderBy::UpdatedAt).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?order_by=last_activity_at",
                                       TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone())
-            .order_by(ListingOrderBy::LastActivityAt)
+        let query = gl.groups().projects(TEST_PROJECT_ID)
+            .order_by(::projects::ListingOrderBy::LastActivityAt)
             .build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
-    fn groups_build_query_sort() {
+    fn build_query_sort() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = format!("groups/{}/projects?sort=asc", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).sort(::ListingSort::Asc).build_query();
+        let query = gl.groups().projects(TEST_PROJECT_ID).sort(::ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?sort=desc", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).sort(::ListingSort::Desc).build_query();
+        let query = gl.groups().projects(TEST_PROJECT_ID).sort(::ListingSort::Desc).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
-    fn groups_build_query_search() {
+    fn build_query_search() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = format!("groups/{}/projects?search=SearchPattern", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone())
+        let query = gl.groups().projects(TEST_PROJECT_ID)
             .search(String::from("SearchPattern"))
             .build_query();
         assert_eq!(query, expected_string);
@@ -295,22 +268,28 @@ mod tests {
 
 
     #[test]
-    fn groups_build_query_ci_enabled_first() {
+    fn build_query_ci_enabled_first() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = format!("groups/{}/projects?ci_enabled_first=true", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).ci_enabled_first(true).build_query();
+        let query = gl.groups().projects(TEST_PROJECT_ID).ci_enabled_first(true).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("groups/{}/projects?ci_enabled_first=false", TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone()).ci_enabled_first(false).build_query();
+        let query = gl.groups().projects(TEST_PROJECT_ID).ci_enabled_first(false).build_query();
         assert_eq!(query, expected_string);
     }
 
 
     #[test]
-    fn groups_build_query_multiple() {
+    fn build_query_multiple() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
         let expected_string = format!("groups/{}/projects?archived=true&ci_enabled_first=true",
                                       TEST_PROJECT_ID);
-        let query = Listing::new(TEST_PROJECT_ID.clone())
+        let query = gl.groups().projects(TEST_PROJECT_ID)
             .archived(true)
             .ci_enabled_first(true)
             .build_query();
