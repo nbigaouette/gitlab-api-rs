@@ -1,4 +1,3 @@
-/*
 extern crate gitlab_api as gitlab;
 
 use std::env;
@@ -29,6 +28,7 @@ fn main() {
                    hostname);
         }
     };
+
     let mut gl = gitlab::GitLab::new(&hostname, &token);
     gl.set_pagination(gitlab::Pagination {
         page: 1,
@@ -36,15 +36,12 @@ fn main() {
     });
     println!("gl: {:?}", gl);
 
-    // let groups = gl.groups(Default::default());
-    let groups = gl.groups(gitlab::groups::Listing::new().skip_groups(vec![1, 2, 3]).clone());
+    let groups = gl.groups().list();
     println!("groups: {:?}", groups);
 
-    let owned_groups = gl.owned_groups();
-    println!("owned_groups: {:?}", owned_groups);
-}
-*/
-
-fn main() {
-    println!("Groups disabled until API stabilizes. See projects instead.");
+    // let groups = gl.groups(gitlab::groups::Listing::new().skip_groups(vec![1, 2, 3]).clone());
+    // println!("groups: {:?}", groups);
+    //
+    // let owned_groups = gl.owned_groups();
+    // println!("owned_groups: {:?}", owned_groups);
 }
