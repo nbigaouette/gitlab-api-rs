@@ -18,44 +18,100 @@
 //!
 
 
+use serde_json;
+
 use BuildQuery;
+use Group;
 
-// FIXME: Use a type for the project id.
 
-#[derive(Default, Debug, Clone)]
-pub struct Listing {
-    /// Group Id.
-    id: i64,
+#[derive(Debug, Clone)]
+pub struct GroupLister<'a> {
+    gl: &'a ::GitLab,
+    /// The ID of a project
+    id: ::groups::ListingId,
 }
 
 
-impl Listing {
-    pub fn new(id: i64) -> Listing {
-        Listing { id: id }
+impl<'a> GroupLister<'a> {
+    pub fn new(gl: &'a ::GitLab, id: ::groups::ListingId) -> GroupLister {
+        GroupLister {
+            gl: gl,
+            id: id,
+        }
+    }
+
+    /// Commit the lister: Query GitLab and return a list of projects.
+    pub fn list(&self) -> Group {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        let issue: Result<Group, serde_json::Error> = self.gl.get(&query);
+
+        issue.unwrap()
     }
 }
 
 
-impl BuildQuery for Listing {
+impl<'a> BuildQuery for GroupLister<'a> {
     fn build_query(&self) -> String {
-        format!("groups/{}", self.id)
+        let mut query = String::from("groups/");
+
+        query.push_str(&match self.id {
+            ::groups::ListingId::Id(id) => id.to_string(),
+            ::groups::ListingId::NamespaceProject(ref s) => s.replace("/", "%2F"),
+        });
+
+        query
     }
 }
 
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use BuildQuery;
 
-    const TEST_PROJECT_ID: i64 = 123;
+    const TEST_GROUP_ID_I64: i64 = 123;
+    const TEST_GROUP_ID_STRING: &'static str = "group/project";
 
 
     #[test]
-    fn groups_build_query_default() {
-        let expected_string = format!("groups/{}", TEST_PROJECT_ID);
-        let listing = Listing::new(TEST_PROJECT_ID);
-        let query = listing.build_query();
+    fn build_query_default_i64() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = format!("groups/{}", TEST_GROUP_ID_I64);
+
+        let lister = gl.groups();
+        let lister = lister.details(::groups::ListingId::Id(TEST_GROUP_ID_I64));
+        let query = lister.build_query();
+        assert_eq!(query, expected_string);
+
+        let lister = gl.groups().details(::groups::ListingId::Id(TEST_GROUP_ID_I64));
+        let query = lister.build_query();
+        assert_eq!(query, expected_string);
+
+        let query = gl.groups().details(::groups::ListingId::Id(TEST_GROUP_ID_I64)).build_query();
+        assert_eq!(query, expected_string);
+    }
+
+
+    #[test]
+    fn build_query_default_str() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = format!("groups/{}", TEST_GROUP_ID_STRING.replace("/", "%2F"));
+
+        let lister = gl.groups();
+        let lister = lister.details(::groups::ListingId::NamespaceProject(TEST_GROUP_ID_STRING.to_string()));
+        let query = lister.build_query();
+        assert_eq!(query, expected_string);
+
+        let lister = gl.groups().details(::groups::ListingId::NamespaceProject(TEST_GROUP_ID_STRING.to_string()));
+        let query = lister.build_query();
+        assert_eq!(query, expected_string);
+
+        let query = gl.groups().details(::groups::ListingId::NamespaceProject(TEST_GROUP_ID_STRING.to_string())).build_query();
         assert_eq!(query, expected_string);
     }
 }

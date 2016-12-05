@@ -36,7 +36,7 @@ use Groups;
 
 // pub mod owned;
 // pub mod projects;
-// pub mod details;
+pub mod details;
 
 #[cfg(feature = "serde_derive")]
 include!("serde_types.in.rs");
@@ -67,11 +67,11 @@ impl<'a> GroupsLister<'a> {
     }
 
 
-    // pub fn details(self, id: i64) -> details::GroupsLister<'a> {
-    //     // assert_eq!(self, GroupsLister::new(self.gl));
-    //     details::GroupsLister::new(self.gl, id)
-    // }
-    //
+    pub fn details(self, id: ListingId) -> details::GroupLister<'a> {
+        // assert_eq!(self, GroupLister::new(self.gl));
+        details::GroupLister::new(self.gl, id)
+    }
+
     // pub fn onwed(self, id: i64) -> onwed::GroupsLister<'a> {
     //     // assert_eq!(self, GroupsLister::new(self.gl));
     //     onwed::GroupsLister::new(self.gl, id)

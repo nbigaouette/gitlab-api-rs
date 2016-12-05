@@ -6,6 +6,13 @@ pub enum ListingOrderBy {
     Path,
 }
 
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ListingId {
+    Id(i64),
+    NamespaceProject(String),
+}
+
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 struct GroupsListerInternal {
     /// Skip the group IDs passes
