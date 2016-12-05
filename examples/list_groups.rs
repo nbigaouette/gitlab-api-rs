@@ -30,6 +30,9 @@ fn main() {
     };
 
     let mut gl = gitlab::GitLab::new(&hostname, &token);
+    // let mut gl = gitlab::GitLab::new(&hostname, &token).scheme("http").port(80);
+    // gl = gl.scheme("http").port(80);
+
     gl.set_pagination(gitlab::Pagination {
         page: 1,
         per_page: 100,
