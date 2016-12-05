@@ -47,21 +47,27 @@ The (v3) API is quite long, so the parts I need will be implemented first.
 gitlab-api = "0.3.0"
 ```
 
+This crate uses a builder pattern to add filters to a query. Once the query is built, `list()` will commit it by contacting the GitLab server and performing the request.
+
 ```
 extern crate gitlab_api as gitlab;
 
 fn main() {
     let gl = gitlab::GitLab::new(&"gitlab.com", &"GITLAB_TOKEN_XXXXXXX");
 
+    // Get GitLab's version.
     let gitlab_version = gl.version();
     println!("gitlab_version: {:?}", gitlab_version);
 
-    let projects = gl.projects().owned().archived(false).list();
+    // Get projects, owned by authenticated user and which are archived.
+    let projects = gl.projects().owned().archived(true).list();
     println!("projects: {:?}", projects);
 
+    // Get groups owned by authenticated user.
     let owned_groups = gl.groups().owned().list();
     println!("owned_groups: {:?}", owned_groups);
 
+    // Get closed issues.
     let closed_issues = gl.issues().state(gitlab::issues::State::Closed).list();
     println!("closed_issues: {:?}", closed_issues);
 }
