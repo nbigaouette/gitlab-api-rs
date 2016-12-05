@@ -26,7 +26,7 @@ The (v3) API is quite long, so the parts I need will be implemented first.
 
 ## Dependencies
 
-Depends (directly) only on `serde`, `serde_json` and `hyper`.
+Thanks `cargo-graph` for the graph!
 
 ![Dependencies](gitlab-api-rs.png)
 
