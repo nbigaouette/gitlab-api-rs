@@ -2,3 +2,5 @@ target
 target.*
 Cargo.lock
 *.rs.bk
+.tags
+.tags1
