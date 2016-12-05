@@ -11,36 +11,81 @@
 //! ```
 
 
+use serde_json;
+
 use BuildQuery;
+use Groups;
 
 
-#[derive(Default, Debug, Clone)]
-pub struct Listing {
+#[derive(Debug, Clone)]
+pub struct GroupsLister<'a> {
+    gl: &'a ::GitLab,
 }
 
-impl Listing {
-    pub fn new() -> Listing {
-        Default::default()
+
+impl<'a> GroupsLister<'a> {
+    pub fn new(gl: &'a ::GitLab) -> GroupsLister {
+        GroupsLister {
+            gl: gl,
+        }
+    }
+
+    /// Commit the lister: Query GitLab and return a list of groups.
+    pub fn list(&self) -> Groups {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        let groups: Result<Groups, serde_json::Error> = self.gl.get(&query);
+
+        groups.unwrap()
     }
 }
 
 
-impl BuildQuery for Listing {
+impl<'a> BuildQuery for GroupsLister<'a> {
     fn build_query(&self) -> String {
         String::from("groups/owned")
     }
 }
 
 
-#[test]
-fn owned_groups_build_query_default() {
-    let expected_string = "groups/owned";
-    let listing: Listing = Default::default();
-    let query = listing.build_query();
-    assert_eq!(query, expected_string);
+#[cfg(test)]
+mod tests {
+    use BuildQuery;
 
-    let expected_string = "groups/owned";
-    let listing = Listing::new();
-    let query = listing.build_query();
-    assert_eq!(query, expected_string);
+    #[test]
+    fn build_query_default_split0() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = "groups/owned";
+
+        let lister = gl.groups();
+        let lister = lister.owned();
+        let query = lister.build_query();
+        assert_eq!(query, expected_string);
+    }
+
+    #[test]
+    fn build_query_default_split1() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = "groups/owned";
+
+        let lister = gl.groups().owned();
+        let query = lister.build_query();
+        assert_eq!(query, expected_string);
+    }
+
+    #[test]
+    fn build_query_default() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = "groups/owned";
+
+        let query = gl.groups().owned().build_query();
+        assert_eq!(query, expected_string);
+    }
 }

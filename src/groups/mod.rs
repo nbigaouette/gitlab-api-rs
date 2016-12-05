@@ -34,7 +34,7 @@ use serde_json;
 use BuildQuery;
 use Groups;
 
-// pub mod owned;
+pub mod owned;
 // pub mod projects;
 pub mod details;
 
@@ -72,11 +72,11 @@ impl<'a> GroupsLister<'a> {
         details::GroupLister::new(self.gl, id)
     }
 
-    // pub fn onwed(self, id: i64) -> onwed::GroupsLister<'a> {
-    //     // assert_eq!(self, GroupsLister::new(self.gl));
-    //     onwed::GroupsLister::new(self.gl, id)
-    // }
-    //
+    pub fn owned(self) -> owned::GroupsLister<'a> {
+        // assert_eq!(self, GroupsLister::new(self.gl));
+        owned::GroupsLister::new(self.gl)
+    }
+
     // pub fn projects(self, id: i64) -> projects::GroupsLister<'a> {
     //     // assert_eq!(self, GroupsLister::new(self.gl));
     //     projects::GroupsLister::new(self.gl, id)
