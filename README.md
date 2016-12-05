@@ -10,18 +10,63 @@ Rust wrapper to the GitLab API.
 
 ## Synopsis
 
-[GitLab](https://about.gitlab.com/) is an amazing tool of which I am a big fan. For most of the tasks, the web UI is more than enough but for some tasks nothing beats scripting them. The [GitLab API](https://docs.gitlab.com/ce/api/) is there to allow scripting actions on the GitLab server.
+[GitLab](https://about.gitlab.com/) is an amazing tool. For most of the tasks, the web UI is more than enough but for some tasks nothing beats scripting them. The [GitLab API](https://docs.gitlab.com/ce/api/) is there to allow scripting actions on the GitLab server.
 
 The excellent [python-gitlab](https://github.com/gpocentek/python-gitlab) allows to use the API from Python, but when playing with it I find myself missing [Rust](https://www.rust-lang.org/)'s static typing. Hence this implementation in Rust.
 
 The (v3) API is quite long, so the parts I need will be implemented first.
 
 
-## Possible Goals
+## What Works
 
-* 100% coverage of the API;
-* Library for full API manipulation;
-* Command line tool for basic tasks and queries;
+* Read-only listing:
+    * Groups;
+    * Issues;
+    * Merge Requests;
+    * Projects (admin all, user's, specific id, owned, search);
+
+
+## What Doesn't Work
+
+* Any _write_ commands (`POST`, `PUT`, etc.)
+* Some projects listing:
+    * branch;
+    * branches;
+    * events;
+    * hook;
+    * hooks;
+    * starred;
+    * visible;
+
+
+## Usage
+
+
+```
+[dependencies]
+gitlab-api = "0.3.0"
+```
+
+```
+extern crate gitlab_api as gitlab;
+
+fn main() {
+    let gl = gitlab::GitLab::new(&"gitlab.com", &"GITLAB_TOKEN_XXXXXXX");
+
+    let gitlab_version = gl.version();
+    println!("gitlab_version: {:?}", gitlab_version);
+
+    let projects = gl.projects().owned().archived(false).list();
+    println!("projects: {:?}", projects);
+
+    let owned_groups = gl.groups().owned().list();
+    println!("owned_groups: {:?}", owned_groups);
+
+    let closed_issues = gl.issues().state(gitlab::issues::State::Closed).list();
+    println!("closed_issues: {:?}", closed_issues);
+}
+
+```
 
 
 ## Dependencies
