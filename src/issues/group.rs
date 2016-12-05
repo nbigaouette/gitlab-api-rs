@@ -33,7 +33,7 @@ use serde_json;
 
 use BuildQuery;
 use Issues;
-use issues::GroupsIssuesListerInternal;
+use issues::GroupIssuesListerInternal;
 
 
 #[derive(Debug, Clone)]
@@ -41,7 +41,7 @@ pub struct IssuesLister<'a> {
     gl: &'a ::GitLab,
     /// The ID of a group
     id: i64,
-    internal: GroupsIssuesListerInternal,
+    internal: GroupIssuesListerInternal,
 }
 
 
@@ -50,7 +50,7 @@ impl<'a> IssuesLister<'a> {
         IssuesLister {
             gl: gl,
             id: id,
-            internal: GroupsIssuesListerInternal {
+            internal: GroupIssuesListerInternal {
                 state: None,
                 labels: None,
                 milestone: None,
@@ -194,15 +194,15 @@ mod tests {
         let expected_string = format!("groups/{}/issues", TEST_PROJECT_ID);
 
         let lister = gl.issues();
-        let lister = lister.groups(TEST_PROJECT_ID);
+        let lister = lister.group(TEST_PROJECT_ID);
         let query = lister.build_query();
         assert_eq!(query, expected_string);
 
-        let lister = gl.issues().groups(TEST_PROJECT_ID);
+        let lister = gl.issues().group(TEST_PROJECT_ID);
         let query = lister.build_query();
         assert_eq!(query, expected_string);
 
-        let query = gl.issues().groups(TEST_PROJECT_ID).build_query();
+        let query = gl.issues().group(TEST_PROJECT_ID).build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -213,11 +213,11 @@ mod tests {
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups/123/issues?state=opened";
-        let query = gl.issues().groups(TEST_PROJECT_ID).state(::issues::State::Opened).build_query();
+        let query = gl.issues().group(TEST_PROJECT_ID).state(::issues::State::Opened).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "groups/123/issues?state=closed";
-        let query = gl.issues().groups(TEST_PROJECT_ID).state(::issues::State::Closed).build_query();
+        let query = gl.issues().group(TEST_PROJECT_ID).state(::issues::State::Closed).build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -228,7 +228,7 @@ mod tests {
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups/123/issues?labels=label1,label2,label3";
-        let query = gl.issues().groups(TEST_PROJECT_ID)
+        let query = gl.issues().group(TEST_PROJECT_ID)
             .labels(vec![String::from("label1"), String::from("label2"), String::from("label3")])
             .build_query();
         assert_eq!(query, expected_string);
@@ -241,11 +241,11 @@ mod tests {
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups/123/issues?order_by=created_at";
-        let query = gl.issues().groups(TEST_PROJECT_ID).order_by(::issues::ListingOrderBy::CreatedAt).build_query();
+        let query = gl.issues().group(TEST_PROJECT_ID).order_by(::issues::ListingOrderBy::CreatedAt).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "groups/123/issues?order_by=updated_at";
-        let query = gl.issues().groups(TEST_PROJECT_ID).order_by(::issues::ListingOrderBy::UpdatedAt).build_query();
+        let query = gl.issues().group(TEST_PROJECT_ID).order_by(::issues::ListingOrderBy::UpdatedAt).build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -256,11 +256,11 @@ mod tests {
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups/123/issues?sort=asc";
-        let query = gl.issues().groups(TEST_PROJECT_ID).sort(::ListingSort::Asc).build_query();
+        let query = gl.issues().group(TEST_PROJECT_ID).sort(::ListingSort::Asc).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "groups/123/issues?sort=desc";
-        let query = gl.issues().groups(TEST_PROJECT_ID).sort(::ListingSort::Desc).build_query();
+        let query = gl.issues().group(TEST_PROJECT_ID).sort(::ListingSort::Desc).build_query();
         assert_eq!(query, expected_string);
     }
 
@@ -271,7 +271,7 @@ mod tests {
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups/123/issues?order_by=created_at&sort=asc";
-        let query = gl.issues().groups(TEST_PROJECT_ID)
+        let query = gl.issues().group(TEST_PROJECT_ID)
             .sort(::ListingSort::Asc)
             .order_by(::issues::ListingOrderBy::CreatedAt)
             .build_query();
