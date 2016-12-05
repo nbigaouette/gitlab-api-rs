@@ -1,6 +1,6 @@
 //! Get single MR
 //!
-//! https://docs.gitlab.com/ce/api/merge_requests.html#get-single-mr
+//! [https://docs.gitlab.com/ce/api/merge\_requests.html#get-single-mr](https://docs.gitlab.com/ce/api/merge_requests.html#get-single-mr)
 //!
 //! # Get single MR
 //!

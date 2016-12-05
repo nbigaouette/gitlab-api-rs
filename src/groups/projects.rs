@@ -18,8 +18,8 @@
 //!     `updated_at` or `last_activity_at` fields. Default is `created_at`
 //! - `sort` (optional) - Return requests sorted in `asc` or `desc` order. Default is `desc`
 //! - `search` (optional) - Return list of authorized projects according to a search criteria
-//! - `ci_enabled_first` - Return projects ordered by ci_enabled flag. Projects with enabled
-//!     GitLab CI go first
+//! - `ci_enabled_first` - Return projects ordered by `ci_enabled` flag. Projects with enabled
+//!     CI go first
 //!
 //!
 

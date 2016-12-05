@@ -4,7 +4,7 @@
 //!
 //! # List ALL projects
 //!
-//! Get a list of all GitLab projects (admin only).
+//! Get a list of all projects (admin only).
 //!
 //! ```text
 //! GET /projects/all

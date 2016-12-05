@@ -15,6 +15,6 @@
 //!
 //! | Attribute | Type | Required | Description |
 //! | --------- | ---- | -------- | ----------- |
-//! | `id` | integer/string | yes | The ID or NAMESPACE/PROJECT_NAME of the project |
+//! | `id` | integer/string | yes | The ID or `NAMESPACE/PROJECT_NAME` of the project |
 //!
 //!

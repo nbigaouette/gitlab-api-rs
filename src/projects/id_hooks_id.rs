@@ -14,7 +14,7 @@
 //!
 //! | Attribute | Type | Required | Description |
 //! | --------- | ---- | -------- | ----------- |
-//! | `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+//! | `id` | integer/string | yes | The ID of the project or `NAMESPACE/PROJECT_NAME` |
 //! | `hook_id` | integer | yes | The ID of a project hook |
 //!
 //!

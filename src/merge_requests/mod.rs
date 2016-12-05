@@ -1,6 +1,6 @@
 //! List merge requests
 //!
-//! https://docs.gitlab.com/ce/api/merge_requests.html#list-merge-requests
+//! [https://docs.gitlab.com/ce/api/merge\_requests.html#list-merge-requests](https://docs.gitlab.com/ce/api/merge_requests.html#list-merge-requests)
 //!
 //! # List merge requests
 //!

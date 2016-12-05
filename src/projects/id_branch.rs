@@ -14,7 +14,7 @@
 //!
 //! | Attribute | Type | Required | Description |
 //! | --------- | ---- | -------- | ----------- |
-//! | `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+//! | `id` | integer/string | yes | The ID of the project or `NAMESPACE/PROJECT_NAME` |
 //! | `branch` | string | yes | The name of the branch |
 //! | `developers_can_push` | boolean | no | Flag if developers can push to the branch |
 //! | `developers_can_merge` | boolean | no | Flag if developers can merge to the branch |
