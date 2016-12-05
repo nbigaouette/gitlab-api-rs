@@ -30,6 +30,13 @@ The (v3) API is quite long, so the parts I need will be implemented first.
 
 * Any _write_ commands (`POST`, `PUT`, etc.)
 * Any _Enterprise Edition_-specific features.
+* API elements using arrays.
+
+    For example [listing merge requests, filtering  with multiple `iid`s](https://docs.gitlab.com/ce/api/merge_requests.html#list-merge-requests):
+
+    ```
+    GET /projects/:id/merge_requests?iid[]=42&iid[]=43
+    ```
 * Some projects listing:
     * branch;
     * branches;
