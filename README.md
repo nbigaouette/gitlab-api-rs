@@ -37,6 +37,7 @@ The (v3) API is quite long, so the parts I need will be implemented first.
     * hooks;
     * starred;
     * visible;
+* Error handling. This crate `unwraps()` results instead of handling them. This was done until the API stabilized.
 
 
 ## Usage
