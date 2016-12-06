@@ -31,7 +31,7 @@ before_script:
   # Install OpenSSL through homebrew
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then brew update && brew install openssl; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then export LDFLAGS='-L/usr/local/opt/openssl/lib'; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then export CPPFLAGS='-I/usr/local/opt/openssl/include';; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then export CPPFLAGS='-I/usr/local/opt/openssl/include'; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then export PKG_CONFIG_PATH='/usr/local/opt/openssl/lib/pkgconfig'; fi
 
 
