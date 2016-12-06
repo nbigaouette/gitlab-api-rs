@@ -60,19 +60,29 @@ fn run() -> Result<()> {
     let issues = gl.issues().list().chain_err(|| "cannot get issues")?;
     println!("issues: {:?}", issues);
 
-    let opened_issues = gl.issues().state(issues::State::Opened).list().chain_err(|| "cannot get issues")?;
+    let opened_issues =
+        gl.issues().state(issues::State::Opened).list().chain_err(|| "cannot get issues")?;
     println!("opened_issues: {:?}", opened_issues);
 
-    let closed_issues = gl.issues().state(issues::State::Closed).list().chain_err(|| "cannot get issues")?;
+    let closed_issues =
+        gl.issues().state(issues::State::Closed).list().chain_err(|| "cannot get issues")?;
     println!("closed_issues: {:?}", closed_issues);
 
     let issue = gl.issues().single(142, 739).list().chain_err(|| "cannot get issues")?;
     println!("issue: {:?}", issue);
 
-    let group_issues = gl.issues().group(21).state(issues::State::Closed).list().chain_err(|| "cannot get issues")?;
+    let group_issues = gl.issues()
+        .group(21)
+        .state(issues::State::Closed)
+        .list()
+        .chain_err(|| "cannot get issues")?;
     println!("group_issues: {:?}", group_issues);
 
-    let project_issues = gl.issues().project(142).state(issues::State::Opened).list().chain_err(|| "cannot get issues")?;
+    let project_issues = gl.issues()
+        .project(142)
+        .state(issues::State::Opened)
+        .list()
+        .chain_err(|| "cannot get issues")?;
     println!("project_issues: {:?}", project_issues);
 
     Ok(())

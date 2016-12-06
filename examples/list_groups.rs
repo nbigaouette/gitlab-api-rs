@@ -62,7 +62,10 @@ fn run() -> Result<()> {
     let groups = gl.groups().list().chain_err(|| "cannot get groups")?;
     println!("groups: {:?}", groups);
 
-    let groups = gl.groups().details(gitlab::groups::ListingId::Id(21)).list().chain_err(|| "cannot get groups")?;
+    let groups = gl.groups()
+        .details(gitlab::groups::ListingId::Id(21))
+        .list()
+        .chain_err(|| "cannot get groups")?;
     println!("groups: {:?}", groups);
 
     // let groups = gl.groups(gitlab::groups::Listing::new().skip_groups(vec![1, 2, 3]).clone());

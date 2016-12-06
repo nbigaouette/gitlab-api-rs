@@ -54,7 +54,7 @@ impl fmt::Debug for GitLab {
 impl GitLab {
     pub fn _new(scheme: &str, domain: &str, port: u16, private_token: &str) -> GitLab {
         let mut url = url::Url::parse(&format!("{}://{}/api/v{}/", scheme, domain, API_VERSION))
-                                .unwrap();
+            .unwrap();
         url.set_port(Some(port)).unwrap();
         GitLab {
             scheme: scheme.to_string(),
@@ -164,7 +164,8 @@ impl GitLab {
             bail!(format!("status code ({}) not Ok()", res.status));
         }
 
-        serde_json::from_str(body.as_str()).chain_err(|| format!("cannot build Rust struct from JSON data: {}", body))
+        serde_json::from_str(body.as_str())
+            .chain_err(|| format!("cannot build Rust struct from JSON data: {}", body))
     }
 
     pub fn version(&self) -> Result<::Version> {

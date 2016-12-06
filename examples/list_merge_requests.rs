@@ -59,13 +59,20 @@ fn run() -> Result<()> {
     let merge_requests_ids = vec![409, 410];
     let merge_requests_iids = vec![3, 4];
 
-    let merge_requests = gl.merge_requests(project_id).list().chain_err(|| "cannot get merge request")?;
+    let merge_requests =
+        gl.merge_requests(project_id).list().chain_err(|| "cannot get merge request")?;
     println!("merge_requests: {:?}", merge_requests);
 
-    let merge_request = gl.merge_requests(project_id).single(merge_requests_ids[0]).list().chain_err(|| "cannot get merge request")?;
+    let merge_request = gl.merge_requests(project_id)
+        .single(merge_requests_ids[0])
+        .list()
+        .chain_err(|| "cannot get merge request")?;
     println!("merge_request: {:?}", merge_request);
 
-    let merge_requests = gl.merge_requests(project_id).iid(vec![merge_requests_iids[0]]).list().chain_err(|| "cannot get merge request")?;
+    let merge_requests = gl.merge_requests(project_id)
+        .iid(vec![merge_requests_iids[0]])
+        .list()
+        .chain_err(|| "cannot get merge request")?;
     println!("merge_requests: {:?}", merge_requests);
 
     // let merge_requests = gl.merge_requests(project_id).iid(merge_requests_iids).list().chain_err(|| "cannot get merge request")?;

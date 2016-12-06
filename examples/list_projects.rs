@@ -63,10 +63,15 @@ fn run() -> Result<()> {
     let projects = gl.projects().archived(false).list().chain_err(|| "cannot get projects")?;
     println!("projects: {:?}", projects);
 
-    let projects = gl.projects().owned().archived(false).list().chain_err(|| "cannot get projects")?;
+    let projects =
+        gl.projects().owned().archived(false).list().chain_err(|| "cannot get projects")?;
     println!("projects: {:?}", projects);
 
-    let projects = gl.projects().all().order_by(gitlab::projects::ListingOrderBy::Name).list().chain_err(|| "cannot get projects")?;
+    let projects = gl.projects()
+        .all()
+        .order_by(gitlab::projects::ListingOrderBy::Name)
+        .list()
+        .chain_err(|| "cannot get projects")?;
     println!("projects: {:?}", projects);
 
     Ok(())
