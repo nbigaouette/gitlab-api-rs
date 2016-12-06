@@ -1,5 +1,3 @@
-// Inspired by http://python-gitlab.readthedocs.io/en/stable/
-
 #![cfg_attr(feature="clippy", feature(plugin))]
 #![cfg_attr(feature="clippy", plugin(clippy))]
 
