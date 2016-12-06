@@ -71,7 +71,7 @@ mod tests {
 
     #[test]
     fn build_query_default_i64() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("groups/{}", TEST_GROUP_ID_I64);
@@ -92,7 +92,7 @@ mod tests {
 
     #[test]
     fn build_query_default_str() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("groups/{}", TEST_GROUP_ID_STRING.replace("/", "%2F"));

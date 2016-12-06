@@ -40,19 +40,20 @@ impl fmt::Debug for GitLab {
                "GitLab {{ scheme: {}, domain: {}, port: {}, private_token: XXXXXXXXXXXXXXXXXXXX, \
                 pagination: {:?} }}",
                self.url.scheme(),
-               self.url.domain().unwrap(),
-               self.url.port().unwrap(),
+               self.url.domain().expect("bad hostname provided"),
+               self.url.port().expect("bad port provided"),
                self.pagination)
     }
 }
 
 
 impl GitLab {
-    pub fn _new(scheme: &str, domain: &str, port: u16, private_token: &str) -> GitLab {
-        let mut url = url::Url::parse(&format!("{}://{}/api/v{}/", scheme, domain, API_VERSION))
-            .unwrap();
-        url.set_port(Some(port)).unwrap();
-        GitLab {
+    pub fn _new(scheme: &str, domain: &str, port: u16, private_token: &str) -> Result<GitLab> {
+        let url_string = format!("{}://{}/api/v{}/", scheme, domain, API_VERSION);
+        let mut url = url::Url::parse(&url_string)
+            .chain_err(|| format!("failure to parse URL '{}'", url_string))?;
+        url.set_port(Some(port)).expect("bad port provided");
+        Ok(GitLab {
             url: url,
             private_token: private_token.to_string(),
             pagination: None,
@@ -60,21 +61,22 @@ impl GitLab {
                 Ok(proxy) => {
                     let proxy: Vec<&str> = proxy.trim_left_matches("http://").split(':').collect();
                     let hostname = proxy[0].to_string();
-                    let port = proxy[1];
+                    // let port = proxy[1].parse().chain_err(|| format!("failure to set port to {}", port))?;
+                    let port = proxy[1].parse().unwrap();
 
-                    hyper::Client::with_http_proxy(hostname, port.parse().unwrap())
+                    hyper::Client::with_http_proxy(hostname, port)
                 }
                 Err(_) => hyper::Client::new(),
             },
-        }
+        })
     }
 
-    pub fn new_insecure(domain: &str, private_token: &str) -> GitLab {
+    pub fn new_insecure(domain: &str, private_token: &str) -> Result<GitLab> {
         warn!("Using insecure http:// protocol: Token will be sent in clear!");
         GitLab::_new("http", domain, 80, private_token)
     }
 
-    pub fn new(domain: &str, private_token: &str) -> GitLab {
+    pub fn new(domain: &str, private_token: &str) -> Result<GitLab> {
         GitLab::_new("https", domain, 443, private_token)
     }
 
@@ -100,7 +102,7 @@ impl GitLab {
     /// let expected_url = "https://gitlab.example.com\
     ///                     /api/v3/groups?order_by=path&private_token=XXXXXXXXXXXXX";
     ///
-    /// let gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXX");
+    /// let gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXX").unwrap();
     ///
     /// assert_eq!(gl.build_url("groups?order_by=path").unwrap(), expected_url);
     /// ```

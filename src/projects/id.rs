@@ -74,7 +74,7 @@ mod tests {
 
     #[test]
     fn build_query_id() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("projects/{}", TEST_PROJECT_ID);

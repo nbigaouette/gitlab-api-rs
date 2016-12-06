@@ -210,7 +210,7 @@ mod tests {
 
     #[test]
     fn groups_build_query_default() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups";
@@ -226,7 +226,7 @@ mod tests {
 
     #[test]
     fn groups_build_query_skip_groups() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups?skip_groups[]=1&skip_groups[]=2&skip_groups[]=3";
@@ -237,7 +237,7 @@ mod tests {
 
     #[test]
     fn groups_build_query_all_available() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups?all_available=true";
@@ -252,7 +252,7 @@ mod tests {
 
     #[test]
     fn groups_build_query_search() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups?search=SearchPattern";
@@ -263,7 +263,7 @@ mod tests {
 
     #[test]
     fn groups_build_query_order_by_name() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups?order_by=name";
@@ -274,7 +274,7 @@ mod tests {
 
     #[test]
     fn groups_build_query_order_by_path() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups?order_by=path";
@@ -285,7 +285,7 @@ mod tests {
 
     #[test]
     fn groups_build_query_sort() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups?sort=asc";
@@ -300,7 +300,7 @@ mod tests {
 
     #[test]
     fn groups_build_query_search_order_by_path() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups?search=SearchPattern&order_by=path";
