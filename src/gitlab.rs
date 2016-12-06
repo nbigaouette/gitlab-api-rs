@@ -145,7 +145,7 @@ impl GitLab {
             .get(&url)
             .header(hyper::header::Connection::close())
             .send()
-            .chain_err(|| format!("cannot send request {} to {:?}", query, self))?;
+            .chain_err(|| format!("cannot send request '{}' to {:?}", query, self))?;
         info!("res.status: {:?}", res.status);
         debug!("res.headers: {:?}", res.headers);
         debug!("res.url: {:?}", res.url);
