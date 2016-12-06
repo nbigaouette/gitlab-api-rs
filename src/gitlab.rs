@@ -3,6 +3,7 @@ use std::fmt;
 use std::io::Read;  // Trait providing read_to_string()
 use std::env;
 
+use url;
 use hyper;
 use serde;
 use serde_json;
@@ -29,6 +30,7 @@ pub struct GitLab {
     scheme: String,
     domain: String,
     port: u16,
+    url: Option<url::Url>,
     private_token: String,
     pagination: Option<Pagination>,
     client: hyper::Client,
@@ -51,10 +53,14 @@ impl fmt::Debug for GitLab {
 
 impl GitLab {
     pub fn _new(scheme: &str, domain: &str, port: u16, private_token: &str) -> GitLab {
+        let mut url = url::Url::parse(&format!("{}://{}/api/v{}/", scheme, domain, API_VERSION))
+                                .unwrap();
+        url.set_port(Some(port)).unwrap();
         GitLab {
             scheme: scheme.to_string(),
             domain: domain.to_string(),
             port: port,
+            url: Some(url),
             private_token: private_token.to_string(),
             pagination: None,
             client: match env::var("HTTP_PROXY") {
@@ -81,11 +87,13 @@ impl GitLab {
 
     pub fn port(mut self, port: u16) -> Self {
         self.port = port;
+        self.url.as_mut().map(|url| url.set_port(Some(port)));
         self
     }
 
     pub fn scheme(mut self, scheme: &str) -> Self {
         self.scheme = scheme.to_string();
+        self.url.as_mut().map(|url| url.set_scheme(scheme));
         self
     }
 
@@ -98,29 +106,22 @@ impl GitLab {
     /// ```
     /// use gitlab_api::GitLab;
     ///
-    /// let expected_url = "https://gitlab.example.com:\
-    ///                     443/api/v3/groups?order_by=path&private_token=XXXXXXXXXXXXX";
+    /// let expected_url = "https://gitlab.example.com\
+    ///                     /api/v3/groups?order_by=path&private_token=XXXXXXXXXXXXX";
     ///
     /// let gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXX");
     ///
     /// assert_eq!(gl.build_url("groups?order_by=path"), expected_url);
     /// ```
     pub fn build_url(&self, query: &str) -> String {
-        let params_splitter = if query.find('?').is_some() { "&" } else { "?" };
-        let mut url = format!("{}://{}:{}/api/v{}/{}{}private_token={}",
-                              self.scheme,
-                              self.domain,
-                              self.port,
-                              API_VERSION,
-                              query,
-                              params_splitter,
-                              self.private_token);
-
+        let mut new_url = self.url.clone().unwrap().join(query).unwrap();
+        new_url.query_pairs_mut().append_pair("private_token", &self.private_token);
         self.pagination.as_ref().map(|pagination| {
-            url.push_str(&format!("&page={}&per_page={}", pagination.page, pagination.per_page));
+            new_url.query_pairs_mut().append_pair("page", &pagination.page.to_string());
+            new_url.query_pairs_mut().append_pair("per_page", &pagination.per_page.to_string());
         });
 
-        url
+        new_url.into_string()
     }
 
     // pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {

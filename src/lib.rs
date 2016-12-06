@@ -34,6 +34,8 @@ include!(concat!(env!("OUT_DIR"), "/serde_types.rs"));
 extern crate log;
 extern crate hyper;
 
+extern crate url;
+
 
 pub mod gitlab;
 pub mod groups;
