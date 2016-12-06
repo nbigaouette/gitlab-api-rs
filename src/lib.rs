@@ -16,6 +16,18 @@ extern crate serde_urlencoded;
 #[macro_use]
 extern crate error_chain;
 
+// We'll put our errors in an `errors` module, and other modules in
+// this crate will `use errors::*;` to get access to everything
+// `error_chain!` creates.
+pub mod errors {
+    // Create the Error, ErrorKind, ResultExt, and Result types
+    error_chain! { }
+}
+
+use errors::*;
+
+
+
 #[cfg(feature = "serde_derive")]
 include!("serde_types.in.rs");
 
