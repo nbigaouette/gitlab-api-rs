@@ -25,9 +25,8 @@ pub struct Pagination {
     pub per_page: u16,
 }
 
-#[derive(Default)]
 pub struct GitLab {
-    url: Option<url::Url>,
+    url: url::Url,
     private_token: String,
     pagination: Option<Pagination>,
     client: hyper::Client,
@@ -41,8 +40,8 @@ impl fmt::Debug for GitLab {
                "GitLab {{ scheme: {}, domain: {}, port: {}, private_token: XXXXXXXXXXXXXXXXXXXX, \
                 pagination: {:?} }}",
                self.url.scheme(),
-               self.url.domain(),
-               self.url.port(),
+               self.url.domain().unwrap(),
+               self.url.port().unwrap(),
                self.pagination)
     }
 }
@@ -54,7 +53,7 @@ impl GitLab {
             .unwrap();
         url.set_port(Some(port)).unwrap();
         GitLab {
-            url: Some(url),
+            url: url,
             private_token: private_token.to_string(),
             pagination: None,
             client: match env::var("HTTP_PROXY") {
@@ -80,12 +79,12 @@ impl GitLab {
     }
 
     pub fn port(mut self, port: u16) -> Self {
-        self.url.as_mut().map(|url| url.set_port(Some(port)));
+        self.url.set_port(Some(port)).unwrap();
         self
     }
 
     pub fn scheme(mut self, scheme: &str) -> Self {
-        self.url.as_mut().map(|url| url.set_scheme(scheme));
+        self.url.set_scheme(scheme).unwrap();
         self
     }
 
@@ -103,15 +102,15 @@ impl GitLab {
     ///
     /// let gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXX");
     ///
-    /// assert_eq!(gl.build_url("groups?order_by=path"), expected_url);
+    /// assert_eq!(gl.build_url("groups?order_by=path").unwrap(), expected_url);
     /// ```
     pub fn build_url(&self, query: &str) -> Result<String> {
         let mut new_url =
-            self.url.clone().chain_err(|| "failure to clone URL").join(query).chain_err(|| {
+            self.url.clone().join(query).chain_err(|| {
                 format!("Failure to join query '{}' to url {}",
                         query,
                         self.url.as_str())
-            });
+            })?;
         new_url.query_pairs_mut().append_pair("private_token", &self.private_token);
         self.pagination.as_ref().map(|pagination| {
             new_url.query_pairs_mut().append_pair("page", &pagination.page.to_string());
@@ -134,7 +133,7 @@ impl GitLab {
     pub fn get<T>(&self, query: &str) -> Result<T>
         where T: serde::Deserialize
     {
-        let url = self.build_url(query);
+        let url = self.build_url(query).chain_err(|| format!("failure to build url for query '{}'", query))?;
         info!("url: {:?}", url);
 
         // Close connections after each GET.
