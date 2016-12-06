@@ -21,6 +21,7 @@ env_logger = "0.3"
 
 [dependencies]
 log = "0.3"
+error-chain = "0.7.1"
 serde = "0.8"
 serde_derive = { version = "0.8", optional = true }
 serde_json = "0.8"
