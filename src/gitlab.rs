@@ -158,8 +158,8 @@ impl GitLab {
         serde_json::from_str(body.as_str())
     }
 
-    pub fn version(&self) -> ::Version {
-        self.get("version").unwrap()
+    pub fn version(&self) -> Result<::Version, serde_json::Error> {
+        self.get::<::Version>("version")
     }
 
     pub fn groups(&self) -> ::groups::GroupsLister {

@@ -55,8 +55,8 @@ fn run() -> Result<()> {
     let gl = GitLab::new(&hostname, &token);
     // let gl = GitLab::new(&hostname, &token).scheme("http").port(80);
     // let gl = gl.scheme("http").port(80);
+    let version = gl.version().chain_err(|| "cannot get version")?;
 
-    let version = gl.version();
     println!("version: {:?}", version);
 
     Ok(())
