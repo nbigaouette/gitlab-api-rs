@@ -27,9 +27,6 @@ pub struct Pagination {
 
 #[derive(Default)]
 pub struct GitLab {
-    scheme: String,
-    domain: String,
-    port: u16,
     url: Option<url::Url>,
     private_token: String,
     pagination: Option<Pagination>,
@@ -43,9 +40,9 @@ impl fmt::Debug for GitLab {
         write!(f,
                "GitLab {{ scheme: {}, domain: {}, port: {}, private_token: XXXXXXXXXXXXXXXXXXXX, \
                 pagination: {:?} }}",
-               self.scheme,
-               self.domain,
-               self.port,
+               self.url.scheme(),
+               self.url.domain(),
+               self.url.port(),
                self.pagination)
     }
 }
@@ -57,9 +54,6 @@ impl GitLab {
             .unwrap();
         url.set_port(Some(port)).unwrap();
         GitLab {
-            scheme: scheme.to_string(),
-            domain: domain.to_string(),
-            port: port,
             url: Some(url),
             private_token: private_token.to_string(),
             pagination: None,
@@ -86,13 +80,11 @@ impl GitLab {
     }
 
     pub fn port(mut self, port: u16) -> Self {
-        self.port = port;
         self.url.as_mut().map(|url| url.set_port(Some(port)));
         self
     }
 
     pub fn scheme(mut self, scheme: &str) -> Self {
-        self.scheme = scheme.to_string();
         self.url.as_mut().map(|url| url.set_scheme(scheme));
         self
     }
