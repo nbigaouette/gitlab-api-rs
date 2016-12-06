@@ -113,15 +113,20 @@ impl GitLab {
     ///
     /// assert_eq!(gl.build_url("groups?order_by=path"), expected_url);
     /// ```
-    pub fn build_url(&self, query: &str) -> String {
-        let mut new_url = self.url.clone().unwrap().join(query).unwrap();
+    pub fn build_url(&self, query: &str) -> Result<String> {
+        let mut new_url =
+            self.url.clone().chain_err(|| "failure to clone URL").join(query).chain_err(|| {
+                format!("Failure to join query '{}' to url {}",
+                        query,
+                        self.url.as_str())
+            });
         new_url.query_pairs_mut().append_pair("private_token", &self.private_token);
         self.pagination.as_ref().map(|pagination| {
             new_url.query_pairs_mut().append_pair("page", &pagination.page.to_string());
             new_url.query_pairs_mut().append_pair("per_page", &pagination.per_page.to_string());
         });
 
-        new_url.into_string()
+        Ok(new_url.into_string())
     }
 
     // pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
