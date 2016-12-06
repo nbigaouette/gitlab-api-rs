@@ -24,13 +24,14 @@
 //!
 
 
-use serde_json;
 use serde_urlencoded;
 
 use BuildQuery;
 use Projects;
 
 use groups::ProjectsListerInternal;
+
+use ::errors::*;
 
 
 #[derive(Debug, Clone)]
@@ -90,13 +91,11 @@ impl<'a> ProjectsLister<'a> {
 
 
     /// Commit the lister: Query GitLab and return a list of projects.
-    pub fn list(&self) -> Projects {
+    pub fn list(&self) -> Result<Projects> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
-        let projects: Result<Projects, serde_json::Error> = self.gl.get(&query);
-
-        projects.unwrap()
+        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
     }
 }
 

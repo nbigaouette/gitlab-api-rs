@@ -30,12 +30,13 @@
 //!
 
 
-use serde_json;
 // use serde_urlencoded;
 
 use BuildQuery;
 use Issues;
 use issues::ProjectsIssuesListerInternal;
+
+use ::errors::*;
 
 
 #[derive(Debug, Clone)]
@@ -96,13 +97,11 @@ impl<'a> IssuesLister<'a> {
 
 
     /// Commit the lister: Query GitLab and return a list of issues.
-    pub fn list(&self) -> Issues {
+    pub fn list(&self) -> Result<Issues> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
-        let issues: Result<Issues, serde_json::Error> = self.gl.get(&query);
-
-        issues.unwrap()
+        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
     }
 }
 

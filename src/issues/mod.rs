@@ -19,7 +19,6 @@
 //!
 
 
-use serde_json;
 // use serde_urlencoded;
 
 use BuildQuery;
@@ -28,6 +27,9 @@ use Issues;
 pub mod group;
 pub mod project;
 pub mod single;
+
+use ::errors::*;
+
 
 #[cfg(feature = "serde_derive")]
 include!("serde_types.in.rs");
@@ -95,13 +97,11 @@ impl<'a> IssuesLister<'a> {
 
 
     /// Commit the lister: Query GitLab and return a list of projects.
-    pub fn list(&self) -> Issues {
+    pub fn list(&self) -> Result<Issues> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
-        let projects: Result<Issues, serde_json::Error> = self.gl.get(&query);
-
-        projects.unwrap()
+        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
     }
 }
 

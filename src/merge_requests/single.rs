@@ -18,12 +18,13 @@
 //!
 
 
-use serde_json;
 // use serde_urlencoded;
 
 use BuildQuery;
 
 use merge_requests::MergeRequest;
+
+use ::errors::*;
 
 
 #[derive(Debug, Clone)]
@@ -45,13 +46,11 @@ impl<'a> MergeRequestLister<'a> {
     }
 
     /// Commit the lister: Query GitLab and return a list of merge requests.
-    pub fn list(&self) -> MergeRequest {
+    pub fn list(&self) -> Result<MergeRequest> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
-        let merge_request: Result<MergeRequest, serde_json::Error> = self.gl.get(&query);
-
-        merge_request.unwrap()
+        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
     }
 }
 

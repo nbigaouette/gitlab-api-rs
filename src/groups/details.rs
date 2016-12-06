@@ -18,10 +18,10 @@
 //!
 
 
-use serde_json;
-
 use BuildQuery;
 use Group;
+
+use ::errors::*;
 
 
 #[derive(Debug, Clone)]
@@ -38,13 +38,11 @@ impl<'a> GroupLister<'a> {
     }
 
     /// Commit the lister: Query GitLab and return a group.
-    pub fn list(&self) -> Group {
+    pub fn list(&self) -> Result<Group> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
-        let group: Result<Group, serde_json::Error> = self.gl.get(&query);
-
-        group.unwrap()
+        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
     }
 }
 

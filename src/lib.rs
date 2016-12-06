@@ -22,9 +22,6 @@ pub mod errors {
     error_chain! { }
 }
 
-use errors::*;
-
-
 
 #[cfg(feature = "serde_derive")]
 include!("serde_types.in.rs");

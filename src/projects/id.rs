@@ -20,11 +20,11 @@
 //! | `id` | integer/string | yes | The ID or `NAMESPACE/PROJECT_NAME` of the project |
 
 
-use serde_json;
-
 use BuildQuery;
 use Project;
 use projects::ListingId;
+
+use ::errors::*;
 
 
 #[derive(Debug, Clone)]
@@ -40,14 +40,12 @@ impl<'a> ProjectsLister<'a> {
     }
 
     /// Commit the lister: Query GitLab and return a list of projects.
-    pub fn list(&self) -> Project {
+    pub fn list(&self) -> Result<Project> {
         // let query = serde_urlencoded::to_string(&self);
         let query = self.build_query();
         debug!("query: {:?}", query);
 
-        let project: Result<Project, serde_json::Error> = self.gl.get(&query);
-
-        project.unwrap()
+        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
     }
 }
 
