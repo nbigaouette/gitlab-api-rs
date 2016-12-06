@@ -10,6 +10,9 @@ use serde_json;
 
 // use Groups;
 
+// Import the ResultExt trait, giving the chain_err() method on Result
+use errors::ResultExt;
+
 
 pub const API_VERSION: u16 = 3;
 
@@ -158,8 +161,36 @@ impl GitLab {
         serde_json::from_str(body.as_str())
     }
 
-    pub fn version(&self) -> Result<::Version, serde_json::Error> {
-        self.get::<::Version>("version")
+    pub fn new_get<T>(&self, query: &str) -> ::errors::Result<T>
+        where T: serde::Deserialize
+    {
+        let url = self.build_url(query);
+        info!("url: {:?}", url);
+
+        // Close connections after each GET.
+        let mut res: hyper::client::Response = self.client
+            .get(&url)
+            .header(hyper::header::Connection::close())
+            .send()
+            .chain_err(|| format!("cannot send request {} to {:?}", query, self))?;
+        info!("res.status: {:?}", res.status);
+        debug!("res.headers: {:?}", res.headers);
+        debug!("res.url: {:?}", res.url);
+
+        let mut body = String::new();
+        res.read_to_string(&mut body).chain_err(|| "cannot read response body")?;
+        debug!("body:\n{:?}", body);
+
+        // assert_eq!(res.status, hyper::status::StatusCode::Ok);
+        if res.status != hyper::status::StatusCode::Ok {
+            bail!(format!("status code ({}) not Ok()", res.status));
+        }
+
+        serde_json::from_str(body.as_str()).chain_err(|| format!("cannot build Rust struct from JSON data: {}", body))
+    }
+
+    pub fn version(&self) -> ::errors::Result<::Version> {
+        self.new_get("version").chain_err(|| "cannot query 'version'")
     }
 
     pub fn groups(&self) -> ::groups::GroupsLister {
