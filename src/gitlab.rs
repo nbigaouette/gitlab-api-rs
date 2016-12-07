@@ -41,7 +41,10 @@ impl fmt::Debug for GitLab {
                 pagination: {:?} }}",
                self.url.scheme(),
                self.url.domain().unwrap_or("bad hostname provided"),
-               self.url.port().map(|port_u16| port_u16.to_string()).unwrap_or("no port provided".to_string()),
+               self.url
+                   .port()
+                   .map(|port_u16| port_u16.to_string())
+                   .unwrap_or("no port provided".to_string()),
                self.pagination)
     }
 }
@@ -49,12 +52,14 @@ impl fmt::Debug for GitLab {
 fn validate_url(scheme: &str, domain: &str, port: u16) -> Result<url::Url> {
 
     match domain.find(".") {
-        None => { /* pass */ },
+        None => {
+            // pass
+        }
         Some(index) => {
             if index == 0 {
                 bail!(format!("invalid domain: '{}' cannot start with a dot", domain));
             }
-        },
+        }
     };
 
     if domain.ends_with(".") {
@@ -82,7 +87,8 @@ fn validate_url(scheme: &str, domain: &str, port: u16) -> Result<url::Url> {
 impl GitLab {
     pub fn _new(scheme: &str, domain: &str, port: u16, private_token: &str) -> Result<GitLab> {
         if private_token.len() != 20 {
-            bail!(format!("private token should be a 20 characters string (not {})", private_token.len()));
+            bail!(format!("private token should be a 20 characters string (not {})",
+                          private_token.len()));
         }
 
         let url: url::Url = validate_url(scheme, domain, port).chain_err(|| "invalid URL")?;
@@ -95,7 +101,8 @@ impl GitLab {
                 Ok(proxy) => {
                     let proxy: Vec<&str> = proxy.trim_left_matches("http://").split(':').collect();
                     let hostname = proxy[0].to_string();
-                    let port = proxy[1].parse().chain_err(|| format!("failure to set port to {}", port))?;
+                    let port = proxy[1].parse()
+                        .chain_err(|| format!("failure to set port to {}", port))?;
 
                     hyper::Client::with_http_proxy(hostname, port)
                 }
@@ -140,8 +147,10 @@ impl GitLab {
     /// assert_eq!(gl.build_url("groups?order_by=path").unwrap(), expected_url);
     /// ```
     pub fn build_url(&self, query: &str) -> Result<String> {
-        let mut new_url =
-            self.url.clone().join(query).chain_err(|| {
+        let mut new_url = self.url
+            .clone()
+            .join(query)
+            .chain_err(|| {
                 format!("Failure to join query '{}' to url {}",
                         query,
                         self.url.as_str())
@@ -184,7 +193,8 @@ impl GitLab {
     pub fn get<T>(&self, query: &str) -> Result<T>
         where T: serde::Deserialize
     {
-        let url = self.build_url(query).chain_err(|| format!("failure to build url for query '{}'", query))?;
+        let url = self.build_url(query)
+            .chain_err(|| format!("failure to build url for query '{}'", query))?;
         info!("url: {:?}", url);
 
         // Close connections after each GET.
@@ -271,7 +281,9 @@ mod tests {
         where T: fmt::Debug
     {
         match result {
-            &Err(_) => { /* pass */ },
+            &Err(_) => {
+                // pass
+            }
             &Ok(ref t) => {
                 panic!(format!("Expected an Err(), got an Ok(t), with t: {:?}", t));
             }
