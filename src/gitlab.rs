@@ -51,7 +51,7 @@ impl fmt::Debug for GitLab {
 
 fn validate_url(scheme: &str, domain: &str, port: u16) -> Result<url::Url> {
 
-    match domain.find(".") {
+    match domain.find('.') {
         None => {
             // pass
         }
@@ -62,7 +62,7 @@ fn validate_url(scheme: &str, domain: &str, port: u16) -> Result<url::Url> {
         }
     };
 
-    if domain.ends_with(".") {
+    if domain.ends_with('.') {
         bail!(format!("invalid domain: '{}' cannot end with a dot", domain));
     }
 
