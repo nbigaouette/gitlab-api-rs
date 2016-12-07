@@ -48,13 +48,15 @@ impl fmt::Debug for GitLab {
 
 fn validate_url(scheme: &str, domain: &str, port: u16) -> Result<url::Url> {
 
-    let index = match domain.find(".") {
-        None => bail!(format!("invalid domain: '{}' should contain at least one dot", domain)),
-        Some(index) => index
+    match domain.find(".") {
+        None => { /* pass */ },
+        Some(index) => {
+            if index == 0 {
+                bail!(format!("invalid domain: '{}' cannot start with a dot", domain));
+            }
+        },
     };
-    if index == 0 {
-        bail!(format!("invalid domain: '{}' cannot start with a dot", domain));
-    }
+
     if domain.ends_with(".") {
         bail!(format!("invalid domain: '{}' cannot end with a dot", domain));
     }
@@ -284,23 +286,20 @@ mod tests {
 
         let gl = GitLab::new_insecure("gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
         verify_ok(&gl);
-    }
 
-    #[test]
-    fn new_invalid_url_0() {
-        let gl = GitLab::new("", "XXXXXXXXXXXXXXXXXXXX");
-        verify_err(&gl);
+        let gl = GitLab::new("localhost", "XXXXXXXXXXXXXXXXXXXX");
+        verify_ok(&gl);
 
-        let gl = GitLab::new_insecure("", "XXXXXXXXXXXXXXXXXXXX");
-        verify_err(&gl);
+        let gl = GitLab::new_insecure("localhost", "XXXXXXXXXXXXXXXXXXXX");
+        verify_ok(&gl);
     }
 
     #[test]
     fn new_invalid_url_1() {
-        let gl = GitLab::new("gitlab", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = GitLab::new("", "XXXXXXXXXXXXXXXXXXXX");
         verify_err(&gl);
 
-        let gl = GitLab::new_insecure("gitlab", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = GitLab::new_insecure("", "XXXXXXXXXXXXXXXXXXXX");
         verify_err(&gl);
     }
 
