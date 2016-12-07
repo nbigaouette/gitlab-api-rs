@@ -18,10 +18,10 @@
 //!
 
 
-use serde_json;
-
 use BuildQuery;
 use Group;
+
+use ::errors::*;
 
 
 #[derive(Debug, Clone)]
@@ -38,13 +38,11 @@ impl<'a> GroupLister<'a> {
     }
 
     /// Commit the lister: Query GitLab and return a group.
-    pub fn list(&self) -> Group {
+    pub fn list(&self) -> Result<Group> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
-        let group: Result<Group, serde_json::Error> = self.gl.get(&query);
-
-        group.unwrap()
+        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
     }
 }
 
@@ -73,7 +71,7 @@ mod tests {
 
     #[test]
     fn build_query_default_i64() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("groups/{}", TEST_GROUP_ID_I64);
@@ -94,7 +92,7 @@ mod tests {
 
     #[test]
     fn build_query_default_str() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("groups/{}", TEST_GROUP_ID_STRING.replace("/", "%2F"));

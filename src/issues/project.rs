@@ -30,12 +30,13 @@
 //!
 
 
-use serde_json;
 // use serde_urlencoded;
 
 use BuildQuery;
 use Issues;
 use issues::ProjectsIssuesListerInternal;
+
+use ::errors::*;
 
 
 #[derive(Debug, Clone)]
@@ -96,13 +97,11 @@ impl<'a> IssuesLister<'a> {
 
 
     /// Commit the lister: Query GitLab and return a list of issues.
-    pub fn list(&self) -> Issues {
+    pub fn list(&self) -> Result<Issues> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
-        let issues: Result<Issues, serde_json::Error> = self.gl.get(&query);
-
-        issues.unwrap()
+        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
     }
 }
 
@@ -207,7 +206,7 @@ mod tests {
 
     #[test]
     fn build_query_default() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("projects/{}/issues", TEST_PROJECT_ID);
@@ -228,7 +227,7 @@ mod tests {
 
     #[test]
     fn build_query_state() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("projects/{}/issues?state=opened", TEST_PROJECT_ID);
@@ -245,7 +244,7 @@ mod tests {
 
     #[test]
     fn build_query_skip_groups() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("projects/{}/issues?labels=label1,label2,label3",
@@ -260,7 +259,7 @@ mod tests {
 
     #[test]
     fn build_query_order_by() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("projects/{}/issues?order_by=created_at", TEST_PROJECT_ID);
@@ -281,7 +280,7 @@ mod tests {
 
     #[test]
     fn build_query_sort() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("projects/{}/issues?sort=asc", TEST_PROJECT_ID);
@@ -296,7 +295,7 @@ mod tests {
 
     #[test]
     fn build_query_multiple() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("projects/{}/issues?order_by=created_at&sort=asc",

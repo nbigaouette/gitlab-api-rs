@@ -18,10 +18,10 @@
 //!
 
 
-use serde_json;
-
 use BuildQuery;
 use Issue;
+
+use ::errors::*;
 
 
 #[derive(Debug, Clone)]
@@ -44,13 +44,11 @@ impl<'a> IssueLister<'a> {
     }
 
     /// Commit the lister: Query GitLab and return a list of projects.
-    pub fn list(&self) -> Issue {
+    pub fn list(&self) -> Result<Issue> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
-        let issue: Result<Issue, serde_json::Error> = self.gl.get(&query);
-
-        issue.unwrap()
+        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
     }
 }
 
@@ -72,7 +70,7 @@ mod tests {
 
     #[test]
     fn build_query_default() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("projects/{}/issues/{}", TEST_PROJECT_ID, TEST_ISSUE_ID);

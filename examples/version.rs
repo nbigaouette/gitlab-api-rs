@@ -8,8 +8,28 @@ extern crate env_logger;
 
 use gitlab::GitLab;
 
+use gitlab::errors::*;
+
 
 fn main() {
+    if let Err(ref e) = run() {
+        println!("error: {}", e);
+
+        for e in e.iter().skip(1) {
+            println!("caused by: {}", e);
+        }
+
+        // The backtrace is not always generated. Try to run this example
+        // with `RUST_BACKTRACE=1`.
+        if let Some(backtrace) = e.backtrace() {
+            println!("backtrace: {:?}", backtrace);
+        }
+
+        ::std::process::exit(1);
+    }
+}
+
+fn run() -> Result<()> {
     env_logger::init().unwrap();
     info!("starting up");
 
@@ -32,10 +52,12 @@ fn main() {
         }
     };
 
-    let gl = GitLab::new(&hostname, &token);
+    let gl = GitLab::new(&hostname, &token).chain_err(|| "failure to create GitLab instance")?;
     // let gl = GitLab::new(&hostname, &token).scheme("http").port(80);
     // let gl = gl.scheme("http").port(80);
+    let version = gl.version().chain_err(|| "cannot get version")?;
 
-    let version = gl.version();
     println!("version: {:?}", version);
+
+    Ok(())
 }

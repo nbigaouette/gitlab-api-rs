@@ -19,12 +19,13 @@
 //! | `sort` | string | no | Return requests sorted in `asc` or `desc` order |
 
 
-use serde_json;
 use serde_urlencoded;
 
 use BuildQuery;
 use Projects;
 use projects::{SearchProjectListerInternal, ListingOrderBy};
+
+use ::errors::*;
 
 
 #[derive(Debug, Clone)]
@@ -58,14 +59,12 @@ impl<'a> ProjectsLister<'a> {
     }
 
     /// Commit the lister: Query GitLab and return a list of projects.
-    pub fn list(&self) -> Projects {
+    pub fn list(&self) -> Result<Projects> {
         // let query = serde_urlencoded::to_string(&self);
         let query = self.build_query();
         debug!("query: {:?}", query);
 
-        let projects: Result<Projects, serde_json::Error> = self.gl.get(&query);
-
-        projects.unwrap()
+        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
     }
 }
 
@@ -95,7 +94,7 @@ mod tests {
 
     #[test]
     fn build_query_default() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("projects/search/{}", TEST_SEARCH_QUERY);
@@ -108,7 +107,7 @@ mod tests {
 
     #[test]
     fn build_query_order_by() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("projects/search/{}?order_by=id", TEST_SEARCH_QUERY);
@@ -144,7 +143,7 @@ mod tests {
 
     #[test]
     fn build_query_sort() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("projects/search/{}?sort=asc", TEST_SEARCH_QUERY);
@@ -165,7 +164,7 @@ mod tests {
 
     #[test]
     fn groups_build_query_multiple() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = format!("projects/search/{}?order_by=created_at&sort=desc",

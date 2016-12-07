@@ -25,9 +25,15 @@ os:
 
 # load travis-cargo
 before_script:
-  - |
-      pip install 'travis-cargo<0.2' --user &&
-      export PATH=$HOME/.local/bin:$PATH
+  - pip install 'travis-cargo<0.2' --user
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PATH=$HOME/.local/bin:$PATH; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then export PATH=$HOME/Library/Python/2.7/bin:$PATH; fi
+  # Install OpenSSL through homebrew
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then brew update && brew install openssl; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then export OPENSSL_INCLUDE_DIR=`brew --prefix openssl`/include; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then export OPENSSL_LIB_DIR=`brew --prefix openssl`/lib; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then export DEP_OPENSSL_INCLUDE=`brew --prefix openssl`/include; fi
+
 
 # the main build
 script:
@@ -44,8 +50,7 @@ after_success:
   # measure code coverage and upload to coveralls.io (the verify
   # argument mitigates kcov crashes due to malformed debuginfo, at the
   # cost of some speed <https://github.com/huonw/travis-cargo/issues/12>)
-  # - travis-cargo coveralls --no-sudo --verify
   # https://github.com/huonw/travis-cargo/issues/58
   # See https://github.com/ujh/iomrascalai/blob/master/.travis.yml
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then travis-cargo coveralls --no-sudo --verify; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./kcov/build/src/kcov --verify --coveralls-id=$TRAVIS_JOB_ID --exclude-pattern=/.cargo target/kcov target/debug/gitlab_api-*; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$TRAVIS_RUST_VERSION" == "stable" ]]; then travis-cargo coveralls --no-sudo --verify; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$TRAVIS_RUST_VERSION" == "stable" ]]; then ./kcov/build/src/kcov --verify --coveralls-id=$TRAVIS_JOB_ID --exclude-pattern=/.cargo target/kcov target/debug/gitlab_api-*; fi

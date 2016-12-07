@@ -1,5 +1,3 @@
-// Inspired by http://python-gitlab.readthedocs.io/en/stable/
-
 #![cfg_attr(feature="clippy", feature(plugin))]
 #![cfg_attr(feature="clippy", plugin(clippy))]
 
@@ -13,6 +11,18 @@ extern crate serde;
 extern crate serde_json;
 extern crate serde_urlencoded;
 
+#[macro_use]
+extern crate error_chain;
+
+// We'll put our errors in an `errors` module, and other modules in
+// this crate will `use errors::*;` to get access to everything
+// `error_chain!` creates.
+pub mod errors {
+    // Create the Error, ErrorKind, ResultExt, and Result types
+    error_chain!{}
+}
+
+
 #[cfg(feature = "serde_derive")]
 include!("serde_types.in.rs");
 
@@ -23,6 +33,8 @@ include!(concat!(env!("OUT_DIR"), "/serde_types.rs"));
 #[macro_use]
 extern crate log;
 extern crate hyper;
+
+extern crate url;
 
 
 pub mod gitlab;
@@ -50,7 +62,7 @@ mod tests {
 
     // #[test]
     // fn unauthorized() {
-    //     let gl = GitLab::new("http", "gitlab.com", 80, "XXXXXXXXXXXXX");
+    //     let gl = GitLab::new("http", "gitlab.com", 80, "XXXXXXXXXXXXX").unwrap();
     //     println!("gl: {:?}", gl);
     //     assert_eq!(gl.attempt_connection().unwrap().status,
     //                hyper::status::StatusCode::Unauthorized);

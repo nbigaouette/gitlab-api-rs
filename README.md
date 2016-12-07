@@ -45,7 +45,6 @@ The (v3) API is quite long, so the parts I need will be implemented first.
     * hooks;
     * starred;
     * visible;
-* Error handling. This crate `unwraps()` results instead of handling them. This was done until the API stabilized.
 
 
 ## Usage
@@ -53,7 +52,7 @@ The (v3) API is quite long, so the parts I need will be implemented first.
 
 ```
 [dependencies]
-gitlab-api = "0.3.0"
+gitlab-api = "0.4.0"
 ```
 
 This crate uses a builder pattern to add filters to a query. Once the query is built, `list()` will commit it by contacting the GitLab server and performing the request.

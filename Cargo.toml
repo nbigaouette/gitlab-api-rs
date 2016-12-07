@@ -1,6 +1,6 @@
 [package]
 name = "gitlab-api"
-version = "0.3.1"
+version = "0.4.0"
 authors = ["Nicolas Bigaouette <nbigaouette@gmail.com>"]
 description = "Wrapper for GitLab API v3"
 license = "MIT/Apache-2.0"
@@ -21,6 +21,8 @@ env_logger = "0.3"
 
 [dependencies]
 log = "0.3"
+error-chain = "0.7.1"
+url = "1.2.3"
 serde = "0.8"
 serde_derive = { version = "0.8", optional = true }
 serde_json = "0.8"

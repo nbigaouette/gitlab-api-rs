@@ -11,10 +11,10 @@
 //! ```
 
 
-use serde_json;
-
 use BuildQuery;
 use Groups;
+
+use ::errors::*;
 
 
 #[derive(Debug, Clone)]
@@ -29,13 +29,11 @@ impl<'a> GroupsLister<'a> {
     }
 
     /// Commit the lister: Query GitLab and return a list of groups.
-    pub fn list(&self) -> Groups {
+    pub fn list(&self) -> Result<Groups> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
-        let groups: Result<Groups, serde_json::Error> = self.gl.get(&query);
-
-        groups.unwrap()
+        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
     }
 }
 
@@ -53,7 +51,7 @@ mod tests {
 
     #[test]
     fn build_query_default_split0() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups/owned";
@@ -66,7 +64,7 @@ mod tests {
 
     #[test]
     fn build_query_default_split1() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups/owned";
@@ -78,7 +76,7 @@ mod tests {
 
     #[test]
     fn build_query_default() {
-        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX");
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
         let expected_string = "groups/owned";

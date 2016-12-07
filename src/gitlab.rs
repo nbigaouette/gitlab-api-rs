@@ -3,12 +3,15 @@ use std::fmt;
 use std::io::Read;  // Trait providing read_to_string()
 use std::env;
 
+use url;
 use hyper;
 use serde;
 use serde_json;
 
 
 // use Groups;
+
+use ::errors::*;
 
 
 pub const API_VERSION: u16 = 3;
@@ -22,11 +25,8 @@ pub struct Pagination {
     pub per_page: u16,
 }
 
-#[derive(Default)]
 pub struct GitLab {
-    scheme: String,
-    domain: String,
-    port: u16,
+    url: url::Url,
     private_token: String,
     pagination: Option<Pagination>,
     client: hyper::Client,
@@ -39,51 +39,87 @@ impl fmt::Debug for GitLab {
         write!(f,
                "GitLab {{ scheme: {}, domain: {}, port: {}, private_token: XXXXXXXXXXXXXXXXXXXX, \
                 pagination: {:?} }}",
-               self.scheme,
-               self.domain,
-               self.port,
+               self.url.scheme(),
+               self.url.domain().unwrap_or("bad hostname provided"),
+               self.url.port().map(|port_u16| port_u16.to_string()).unwrap_or("no port provided".to_string()),
                self.pagination)
     }
 }
 
+fn validate_url(scheme: &str, domain: &str, port: u16) -> Result<url::Url> {
+
+    match domain.find(".") {
+        None => { /* pass */ },
+        Some(index) => {
+            if index == 0 {
+                bail!(format!("invalid domain: '{}' cannot start with a dot", domain));
+            }
+        },
+    };
+
+    if domain.ends_with(".") {
+        bail!(format!("invalid domain: '{}' cannot end with a dot", domain));
+    }
+
+    let url_string = format!("{}://{}/api/v{}/", scheme, domain, API_VERSION);
+    let mut url = url::Url::parse(&url_string)
+        .chain_err(|| format!("failure to parse URL '{}'", url_string))?;
+    url.set_port(Some(port)).expect("bad port provided");
+
+    {
+        let url_host = url.host_str();
+        if url_host.is_none() {
+            bail!("failure to get URL's hostname");
+        }
+        if url_host.unwrap() != domain {
+            bail!(format!("invalid hostname '{}'", domain));
+        }
+    }
+
+    Ok(url)
+}
 
 impl GitLab {
-    pub fn _new(scheme: &str, domain: &str, port: u16, private_token: &str) -> GitLab {
-        GitLab {
-            scheme: scheme.to_string(),
-            domain: domain.to_string(),
-            port: port,
+    pub fn _new(scheme: &str, domain: &str, port: u16, private_token: &str) -> Result<GitLab> {
+        if private_token.len() != 20 {
+            bail!(format!("private token should be a 20 characters string (not {})", private_token.len()));
+        }
+
+        let url: url::Url = validate_url(scheme, domain, port).chain_err(|| "invalid URL")?;
+
+        Ok(GitLab {
+            url: url,
             private_token: private_token.to_string(),
             pagination: None,
             client: match env::var("HTTP_PROXY") {
                 Ok(proxy) => {
                     let proxy: Vec<&str> = proxy.trim_left_matches("http://").split(':').collect();
                     let hostname = proxy[0].to_string();
-                    let port = proxy[1];
+                    let port = proxy[1].parse().chain_err(|| format!("failure to set port to {}", port))?;
 
-                    hyper::Client::with_http_proxy(hostname, port.parse().unwrap())
+                    hyper::Client::with_http_proxy(hostname, port)
                 }
                 Err(_) => hyper::Client::new(),
             },
-        }
+        })
     }
 
-    pub fn new_insecure(domain: &str, private_token: &str) -> GitLab {
+    pub fn new_insecure(domain: &str, private_token: &str) -> Result<GitLab> {
         warn!("Using insecure http:// protocol: Token will be sent in clear!");
         GitLab::_new("http", domain, 80, private_token)
     }
 
-    pub fn new(domain: &str, private_token: &str) -> GitLab {
+    pub fn new(domain: &str, private_token: &str) -> Result<GitLab> {
         GitLab::_new("https", domain, 443, private_token)
     }
 
     pub fn port(mut self, port: u16) -> Self {
-        self.port = port;
+        self.url.set_port(Some(port)).unwrap();
         self
     }
 
     pub fn scheme(mut self, scheme: &str) -> Self {
-        self.scheme = scheme.to_string();
+        self.url.set_scheme(scheme).unwrap();
         self
     }
 
@@ -96,29 +132,27 @@ impl GitLab {
     /// ```
     /// use gitlab_api::GitLab;
     ///
-    /// let expected_url = "https://gitlab.example.com:\
-    ///                     443/api/v3/groups?order_by=path&private_token=XXXXXXXXXXXXX";
+    /// let expected_url = "https://gitlab.example.com\
+    ///                     /api/v3/groups?order_by=path&private_token=XXXXXXXXXXXXXXXXXXXX";
     ///
-    /// let gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXX");
+    /// let gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
     ///
-    /// assert_eq!(gl.build_url("groups?order_by=path"), expected_url);
+    /// assert_eq!(gl.build_url("groups?order_by=path").unwrap(), expected_url);
     /// ```
-    pub fn build_url(&self, query: &str) -> String {
-        let params_splitter = if query.find('?').is_some() { "&" } else { "?" };
-        let mut url = format!("{}://{}:{}/api/v{}/{}{}private_token={}",
-                              self.scheme,
-                              self.domain,
-                              self.port,
-                              API_VERSION,
-                              query,
-                              params_splitter,
-                              self.private_token);
-
+    pub fn build_url(&self, query: &str) -> Result<String> {
+        let mut new_url =
+            self.url.clone().join(query).chain_err(|| {
+                format!("Failure to join query '{}' to url {}",
+                        query,
+                        self.url.as_str())
+            })?;
+        new_url.query_pairs_mut().append_pair("private_token", &self.private_token);
         self.pagination.as_ref().map(|pagination| {
-            url.push_str(&format!("&page={}&per_page={}", pagination.page, pagination.per_page));
+            new_url.query_pairs_mut().append_pair("page", &pagination.page.to_string());
+            new_url.query_pairs_mut().append_pair("per_page", &pagination.per_page.to_string());
         });
 
-        url
+        Ok(new_url.into_string())
     }
 
     // pub fn attempt_connection(&self) -> Result<hyper::client::Response, hyper::Error> {
@@ -127,16 +161,30 @@ impl GitLab {
     //     self.client.get(&url).header(hyper::header::Connection::close()).send()
     // }
 
+
+    /// Set pagination information
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use gitlab_api::{GitLab, Pagination};
+    ///
+    /// let expected_url = "https://gitlab.example.com\
+    ///                     /api/v3/groups?order_by=path&\
+    ///                     private_token=XXXXXXXXXXXXXXXXXXXX&page=2&per_page=5";
+    ///
+    /// let mut gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+    /// gl.set_pagination(Pagination {page: 2, per_page: 5});
+    /// assert_eq!(gl.build_url("groups?order_by=path").unwrap(), expected_url);
+    /// ```
     pub fn set_pagination(&mut self, pagination: Pagination) {
         self.pagination = Some(pagination);
     }
 
-    pub fn get<T>(&self, query: &str) -> Result<T, serde_json::Error>
+    pub fn get<T>(&self, query: &str) -> Result<T>
         where T: serde::Deserialize
     {
-        // FIXME: Properly handle any errors. Use chain_error crate.
-
-        let url = self.build_url(query);
+        let url = self.build_url(query).chain_err(|| format!("failure to build url for query '{}'", query))?;
         info!("url: {:?}", url);
 
         // Close connections after each GET.
@@ -144,22 +192,26 @@ impl GitLab {
             .get(&url)
             .header(hyper::header::Connection::close())
             .send()
-            .unwrap();
+            .chain_err(|| format!("cannot send request '{}' to {:?}", query, self))?;
         info!("res.status: {:?}", res.status);
         debug!("res.headers: {:?}", res.headers);
         debug!("res.url: {:?}", res.url);
 
         let mut body = String::new();
-        res.read_to_string(&mut body).unwrap();
+        res.read_to_string(&mut body).chain_err(|| "cannot read response body")?;
         debug!("body:\n{:?}", body);
 
-        assert_eq!(res.status, hyper::status::StatusCode::Ok);
+        // assert_eq!(res.status, hyper::status::StatusCode::Ok);
+        if res.status != hyper::status::StatusCode::Ok {
+            bail!(format!("status code ({}) not Ok()", res.status));
+        }
 
         serde_json::from_str(body.as_str())
+            .chain_err(|| format!("cannot build Rust struct from JSON data: {}", body))
     }
 
-    pub fn version(&self) -> ::Version {
-        self.get("version").unwrap()
+    pub fn version(&self) -> Result<::Version> {
+        self.get("version").chain_err(|| "cannot query 'version'")
     }
 
     pub fn groups(&self) -> ::groups::GroupsLister {
@@ -192,11 +244,149 @@ impl GitLab {
 }
 
 
-// #[cfg(test)]
-// mod tests {
-//
-// #[test]
-// fn it_works() {
-// }
-// }
-//
+#[cfg(test)]
+mod tests {
+    use std::fmt;
+    use gitlab::*;
+    use errors::*;
+
+    fn verify_ok<T>(result: &Result<T>) {
+        if let &Err(ref e) = result {
+            println!("error: {}", e);
+
+            for e in e.iter().skip(1) {
+                println!("caused by: {}", e);
+            }
+
+            // The backtrace is not always generated. Try to run this example
+            // with `RUST_BACKTRACE=1`.
+            if let Some(backtrace) = e.backtrace() {
+                println!("backtrace: {:?}", backtrace);
+            }
+        }
+        assert!(result.is_ok());
+    }
+
+    fn verify_err<T>(result: &Result<T>)
+        where T: fmt::Debug
+    {
+        match result {
+            &Err(_) => { /* pass */ },
+            &Ok(ref t) => {
+                panic!(format!("Expected an Err(), got an Ok(t), with t: {:?}", t));
+            }
+        }
+    }
+
+
+    #[test]
+    fn new_valid() {
+        let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_ok(&gl);
+
+        let gl = GitLab::new_insecure("gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_ok(&gl);
+
+        let gl = GitLab::new("localhost", "XXXXXXXXXXXXXXXXXXXX");
+        verify_ok(&gl);
+
+        let gl = GitLab::new_insecure("localhost", "XXXXXXXXXXXXXXXXXXXX");
+        verify_ok(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_1() {
+        let gl = GitLab::new("", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure("", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_2() {
+        let gl = GitLab::new("gitla/b.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure("gitla/b.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_3() {
+        let gl = GitLab::new("/gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure("/gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_4() {
+        let gl = GitLab::new("http:/gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure("http:/gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_5() {
+        let gl = GitLab::new("http:///gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure("http:///gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_6() {
+        let gl = GitLab::new(".gitlab", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure(".gitlab", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_7() {
+        let gl = GitLab::new(".gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure(".gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_8() {
+        let gl = GitLab::new("gitlab.", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure("gitlab.", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_10() {
+        let gl = GitLab::new("gitlab.com.", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure("gitlab.com.", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_token() {
+        let gl = GitLab::new("gitlab.com", "");
+        assert!(gl.is_err());
+
+        let gl = GitLab::new("gitlab.com", "X");
+        assert!(gl.is_err());
+
+        let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXX");
+        assert!(gl.is_err());
+
+        let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXXX");
+        assert!(gl.is_err());
+    }
+}
