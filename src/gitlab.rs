@@ -213,7 +213,7 @@ impl GitLab {
 
         // assert_eq!(res.status, hyper::status::StatusCode::Ok);
         if res.status != hyper::status::StatusCode::Ok {
-            bail!(format!("status code ({}) not Ok()", res.status));
+            bail!(format!("status code '{}', not '200 OK'", res.status));
         }
 
         serde_json::from_str(body.as_str())
