@@ -46,13 +46,45 @@ impl fmt::Debug for GitLab {
     }
 }
 
+fn validate_url(scheme: &str, domain: &str, port: u16) -> Result<url::Url> {
+
+    let index = match domain.find(".") {
+        None => bail!(format!("invalid domain: '{}' should contain at least one dot", domain)),
+        Some(index) => index
+    };
+    if index == 0 {
+        bail!(format!("invalid domain: '{}' cannot start with a dot", domain));
+    }
+    if domain.ends_with(".") {
+        bail!(format!("invalid domain: '{}' cannot end with a dot", domain));
+    }
+
+    let url_string = format!("{}://{}/api/v{}/", scheme, domain, API_VERSION);
+    let mut url = url::Url::parse(&url_string)
+        .chain_err(|| format!("failure to parse URL '{}'", url_string))?;
+    url.set_port(Some(port)).expect("bad port provided");
+
+    {
+        let url_host = url.host_str();
+        if url_host.is_none() {
+            bail!("failure to get URL's hostname");
+        }
+        if url_host.unwrap() != domain {
+            bail!(format!("invalid hostname '{}'", domain));
+        }
+    }
+
+    Ok(url)
+}
 
 impl GitLab {
     pub fn _new(scheme: &str, domain: &str, port: u16, private_token: &str) -> Result<GitLab> {
-        let url_string = format!("{}://{}/api/v{}/", scheme, domain, API_VERSION);
-        let mut url = url::Url::parse(&url_string)
-            .chain_err(|| format!("failure to parse URL '{}'", url_string))?;
-        url.set_port(Some(port)).expect("bad port provided");
+        if private_token.len() != 20 {
+            bail!(format!("private token should be a 20 characters string (not {})", private_token.len()));
+        }
+
+        let url: url::Url = validate_url(scheme, domain, port).chain_err(|| "invalid URL")?;
+
         Ok(GitLab {
             url: url,
             private_token: private_token.to_string(),
