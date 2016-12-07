@@ -131,9 +131,9 @@ impl GitLab {
     /// use gitlab_api::GitLab;
     ///
     /// let expected_url = "https://gitlab.example.com\
-    ///                     /api/v3/groups?order_by=path&private_token=XXXXXXXXXXXXX";
+    ///                     /api/v3/groups?order_by=path&private_token=XXXXXXXXXXXXXXXXXXXX";
     ///
-    /// let gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXX").unwrap();
+    /// let gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
     ///
     /// assert_eq!(gl.build_url("groups?order_by=path").unwrap(), expected_url);
     /// ```
