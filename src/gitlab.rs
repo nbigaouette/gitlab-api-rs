@@ -226,11 +226,152 @@ impl GitLab {
 }
 
 
-// #[cfg(test)]
-// mod tests {
-//
-// #[test]
-// fn it_works() {
-// }
-// }
-//
+#[cfg(test)]
+mod tests {
+    use std::fmt;
+    use gitlab::*;
+    use errors::*;
+
+    fn verify_ok<T>(result: &Result<T>) {
+        if let &Err(ref e) = result {
+            println!("error: {}", e);
+
+            for e in e.iter().skip(1) {
+                println!("caused by: {}", e);
+            }
+
+            // The backtrace is not always generated. Try to run this example
+            // with `RUST_BACKTRACE=1`.
+            if let Some(backtrace) = e.backtrace() {
+                println!("backtrace: {:?}", backtrace);
+            }
+        }
+        assert!(result.is_ok());
+    }
+
+    fn verify_err<T>(result: &Result<T>)
+        where T: fmt::Debug
+    {
+        match result {
+            &Err(_) => { /* pass */ },
+            &Ok(ref t) => {
+                panic!(format!("Expected an Err(), got an Ok(t), with t: {:?}", t));
+            }
+        }
+    }
+
+
+    #[test]
+    fn new_valid() {
+        let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_ok(&gl);
+
+        let gl = GitLab::new_insecure("gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_ok(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_0() {
+        let gl = GitLab::new("", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure("", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_1() {
+        let gl = GitLab::new("gitlab", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure("gitlab", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_2() {
+        let gl = GitLab::new("gitla/b.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure("gitla/b.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_3() {
+        let gl = GitLab::new("/gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure("/gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_4() {
+        let gl = GitLab::new("http:/gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure("http:/gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_5() {
+        let gl = GitLab::new("http:///gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure("http:///gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_6() {
+        let gl = GitLab::new(".gitlab", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure(".gitlab", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_7() {
+        let gl = GitLab::new(".gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure(".gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_8() {
+        let gl = GitLab::new("gitlab.", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure("gitlab.", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_url_10() {
+        let gl = GitLab::new("gitlab.com.", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+
+        let gl = GitLab::new_insecure("gitlab.com.", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn new_invalid_token() {
+        let gl = GitLab::new("gitlab.com", "");
+        assert!(gl.is_err());
+
+        let gl = GitLab::new("gitlab.com", "X");
+        assert!(gl.is_err());
+
+        let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXX");
+        assert!(gl.is_err());
+
+        let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXXX");
+        assert!(gl.is_err());
+    }
+}
