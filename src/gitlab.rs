@@ -159,6 +159,22 @@ impl GitLab {
     //     self.client.get(&url).header(hyper::header::Connection::close()).send()
     // }
 
+
+    /// Set pagination information
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use gitlab_api::{GitLab, Pagination};
+    ///
+    /// let expected_url = "https://gitlab.example.com\
+    ///                     /api/v3/groups?order_by=path&\
+    ///                     private_token=XXXXXXXXXXXXXXXXXXXX&page=2&per_page=5";
+    ///
+    /// let mut gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+    /// gl.set_pagination(Pagination {page: 2, per_page: 5});
+    /// assert_eq!(gl.build_url("groups?order_by=path").unwrap(), expected_url);
+    /// ```
     pub fn set_pagination(&mut self, pagination: Pagination) {
         self.pagination = Some(pagination);
     }
