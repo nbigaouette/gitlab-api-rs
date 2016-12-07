@@ -40,8 +40,8 @@ impl fmt::Debug for GitLab {
                "GitLab {{ scheme: {}, domain: {}, port: {}, private_token: XXXXXXXXXXXXXXXXXXXX, \
                 pagination: {:?} }}",
                self.url.scheme(),
-               self.url.domain().expect("bad hostname provided"),
-               self.url.port().expect("bad port provided"),
+               self.url.domain().unwrap_or("bad hostname provided"),
+               self.url.port().map(|port_u16| port_u16.to_string()).unwrap_or("no port provided".to_string()),
                self.pagination)
     }
 }
