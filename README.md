@@ -61,7 +61,7 @@ This crate uses a builder pattern to add filters to a query. Once the query is b
 extern crate gitlab_api as gitlab;
 
 fn main() {
-    let gl = gitlab::GitLab::new(&"gitlab.com", &"GITLAB_TOKEN_XXXXXXX");
+    let gl = gitlab::GitLab::new(&"gitlab.com", &"GITLAB_TOKEN_XXXXXXX").unwrap();
 
     // Get GitLab's version.
     let gitlab_version = gl.version().unwrap();
