@@ -64,19 +64,19 @@ fn main() {
     let gl = gitlab::GitLab::new(&"gitlab.com", &"GITLAB_TOKEN_XXXXXXX");
 
     // Get GitLab's version.
-    let gitlab_version = gl.version();
+    let gitlab_version = gl.version().unwrap();
     println!("gitlab_version: {:?}", gitlab_version);
 
     // Get projects, owned by authenticated user and which are archived.
-    let projects = gl.projects().owned().archived(true).list();
+    let projects = gl.projects().owned().archived(true).list().unwrap();
     println!("projects: {:?}", projects);
 
     // Get groups owned by authenticated user.
-    let owned_groups = gl.groups().owned().list();
+    let owned_groups = gl.groups().owned().list().unwrap();
     println!("owned_groups: {:?}", owned_groups);
 
     // Get closed issues.
-    let closed_issues = gl.issues().state(gitlab::issues::State::Closed).list();
+    let closed_issues = gl.issues().state(gitlab::issues::State::Closed).list().unwrap();
     println!("closed_issues: {:?}", closed_issues);
 }
 ```
