@@ -466,4 +466,13 @@ mod tests {
         let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXXX");
         verify_err(&gl);
     }
+
+    #[test]
+    fn build_url_doc() {
+        let expected_url = "https://gitlab.example.com\
+                            /api/v3/groups?order_by=path&private_token=XXXXXXXXXXXXXXXXXXXX";
+        let gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+        let url = gl.build_url("groups?order_by=path").unwrap();
+        assert_eq!(url, expected_url);
+    }
 }
