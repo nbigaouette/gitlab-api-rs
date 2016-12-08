@@ -121,12 +121,13 @@ impl<'a> BuildQuery for IssuesLister<'a> {
 
         // Append a "?" only if at least one of the `Option` is `Some(_)` or if
         // strings contain something.
-        query.push_str(match (&self.internal.state,
+        query.push_str(match (&self.internal.iid,
+                              &self.internal.state,
                               &self.internal.labels,
                               &self.internal.milestone,
                               &self.internal.order_by,
                               &self.internal.sort) {
-            (&None, &None, &None, &None, &None) => "",
+            (&None, &None, &None, &None, &None, &None) => "",
             _ => "?",
         });
 
@@ -221,6 +222,17 @@ mod tests {
         assert_eq!(query, expected_string);
 
         let query = gl.issues().project(TEST_PROJECT_ID).build_query();
+        assert_eq!(query, expected_string);
+    }
+
+
+    #[test]
+    fn build_query_iid() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = format!("projects/{}/issues?iid=42", TEST_PROJECT_ID);
+        let query = gl.issues().project(TEST_PROJECT_ID).iid(42).build_query();
         assert_eq!(query, expected_string);
     }
 
