@@ -333,6 +333,18 @@ mod tests {
     }
 
     #[test]
+    fn gitlab_listers_projects() {
+        let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+        let projects_lister = gl.projects();
+        let debug = format!("{:?}", projects_lister);
+        assert_eq!("ProjectsLister { gl: GitLab { scheme: https, domain: gitlab.com, port: no \
+                    port provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }, \
+                    internal: ProjectListerInternal { archived: None, visibility: None, \
+                    order_by: None, sort: None, search: None, simple: None } }",
+                   debug);
+    }
+
+    #[test]
     fn new_valid() {
         let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
         verify_ok(&gl);
