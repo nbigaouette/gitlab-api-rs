@@ -230,8 +230,8 @@ mod tests {
         let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
-        let expected_string = "groups/123/issues?milestone=TestMilestone";
-        let query = gl.issues().group(TEST_PROJECT_ID).milestone("TestMilestone".to_string()).build_query();
+        let expected_string = "groups/123/issues?milestone=Test+Milestone";
+        let query = gl.issues().group(TEST_PROJECT_ID).milestone("Test Milestone".to_string()).build_query();
         assert_eq!(query, expected_string);
     }
 
