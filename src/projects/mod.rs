@@ -159,7 +159,7 @@ impl<'a> Project {
 
     /// Return a lister for the project's merge requests
     pub fn merge_requests(&'a self, gl: &'a ::GitLab) -> ::merge_requests::MergeRequestsLister {
-        ::merge_requests::MergeRequestsLister::new(gl)
+        ::merge_requests::MergeRequestsLister::new(gl, self.id)
     }
 }
 
