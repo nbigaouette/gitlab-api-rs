@@ -309,6 +309,16 @@ mod tests {
         assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: 81, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: Some(Pagination { page: 2, per_page: 5 }) }", debug);
     }
 
+    #[test]
+    fn gitlab_listers_groups() {
+        let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+        let groups_lister = gl.groups();
+        let debug = format!("{:?}", groups_lister);
+        assert_eq!("GroupsLister { gl: GitLab { scheme: https, domain: gitlab.com, port: no \
+                    port provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }, \
+                    internal: GroupsListerInternal { skip_groups: None, all_available: None, \
+                    search: None, order_by: None, sort: None } }", debug);
+    }
 
     #[test]
     fn new_valid() {
