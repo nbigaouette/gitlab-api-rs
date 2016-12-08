@@ -26,6 +26,7 @@
 use serde_urlencoded;
 
 use BuildQuery;
+use Project;
 use Projects;
 
 
@@ -148,6 +149,20 @@ impl<'a> BuildQuery for ProjectsLister<'a> {
         query
     }
 }
+
+
+impl<'a> Project {
+    /// Return a lister for the project's issues
+    pub fn issues(&'a self, gl: &'a ::GitLab) -> ::issues::project::IssuesLister {
+        ::issues::project::IssuesLister::new(gl, self.id)
+    }
+
+    /// Return a lister for the project's merge requests
+    pub fn merge_requests(&'a self, gl: &'a ::GitLab) -> ::merge_requests::MergeRequestsLister {
+        ::merge_requests::MergeRequestsLister::new(gl, self.id)
+    }
+}
+
 
 
 #[cfg(test)]

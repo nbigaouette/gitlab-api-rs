@@ -39,6 +39,7 @@ impl<'a> ProjectsLister<'a> {
         ProjectsLister { gl: gl, id: id }
     }
 
+
     /// Commit the lister: Query GitLab and return a list of projects.
     pub fn list(&self) -> Result<Project> {
         // let query = serde_urlencoded::to_string(&self);
@@ -46,6 +47,21 @@ impl<'a> ProjectsLister<'a> {
         debug!("query: {:?}", query);
 
         self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
+    }
+
+
+    /// Return a lister for the project's issues
+    pub fn issues(self) -> Result<::issues::project::IssuesLister<'a>> {
+        let project = self.list().chain_err(|| "failure to find project")?;
+
+        Ok(::issues::project::IssuesLister::new(self.gl, project.id))
+    }
+
+    /// Return a lister for the project's merge requests
+    pub fn merge_requests(self) -> Result<::merge_requests::MergeRequestsLister<'a>> {
+        let project = self.list().chain_err(|| "failure to find project")?;
+
+        Ok(::merge_requests::MergeRequestsLister::new(self.gl, project.id))
     }
 }
 

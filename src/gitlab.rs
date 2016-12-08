@@ -290,6 +290,26 @@ mod tests {
         }
     }
 
+    #[test]
+    fn impl_debug_for_gitlab() {
+        let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+
+        let debug = format!("{:?}", gl);
+        assert_eq!("GitLab { scheme: https, domain: gitlab.com, port: no port provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }", debug);
+
+        let gl = gl.scheme("http").port(80);
+        let debug = format!("{:?}", gl);
+        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: no port provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }", debug);
+
+        let mut gl = gl.port(81);
+        let debug = format!("{:?}", gl);
+        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: 81, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }", debug);
+
+        gl.set_pagination(Pagination {page: 2, per_page: 5});
+        let debug = format!("{:?}", gl);
+        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: 81, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: Some(Pagination { page: 2, per_page: 5 }) }", debug);
+    }
+
 
     #[test]
     fn new_valid() {

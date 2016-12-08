@@ -70,7 +70,7 @@ pub struct MergeRequest {
     milestone: Option<::Milestone>,
     merge_when_build_succeeds: bool,
     merge_status: Status,
-    sha: String,
+    sha: Option<String>,
     merge_commit_sha: Option<String>,
     subscribed: bool,
     user_notes_count: i64,
