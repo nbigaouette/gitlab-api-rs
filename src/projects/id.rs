@@ -55,6 +55,13 @@ impl<'a> ProjectsLister<'a> {
 
         Ok(::issues::project::IssuesLister::new(self.gl, project.id))
     }
+
+    /// Return a lister for the project's merge requests
+    pub fn merge_requests(self) -> Result<::merge_requests::MergeRequestsLister<'a>> {
+        let project = self.list().chain_err(|| "failure to find project")?;
+
+        Ok(::merge_requests::MergeRequestsLister::new(self.gl, project.id))
+    }
 }
 
 impl<'a> BuildQuery for ProjectsLister<'a> {
