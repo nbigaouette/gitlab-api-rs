@@ -367,4 +367,15 @@ mod tests {
         let default_issues_lister = format!("{:?}", ::issues::project::IssuesLister::new(&gl, project_id));
         assert_eq!(issues_lister, default_issues_lister);
     }
+
+
+    #[test]
+    fn project_to_merge_requests() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+        let project_id = 123;
+        let project = ::Project { id: project_id, ..Default::default() };
+        let merge_requests_lister = format!("{:?}", project.merge_requests(&gl));
+        let default_merge_requests_lister = format!("{:?}", ::merge_requests::MergeRequestsLister::new(&gl, project_id));
+        assert_eq!(merge_requests_lister, default_merge_requests_lister);
+    }
 }
