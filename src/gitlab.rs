@@ -475,4 +475,15 @@ mod tests {
         let url = gl.build_url("groups?order_by=path").unwrap();
         assert_eq!(url, expected_url);
     }
+
+    #[test]
+    fn build_url_pagination() {
+        let expected_url = "https://gitlab.example.com\
+                            /api/v3/groups?order_by=path&\
+                            private_token=XXXXXXXXXXXXXXXXXXXX&page=2&per_page=5";
+        let mut gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+        gl.set_pagination(Pagination {page: 2, per_page: 5});
+        let url = gl.build_url("groups?order_by=path").unwrap();
+        assert_eq!(url, expected_url);
+    }
 }
