@@ -356,4 +356,15 @@ mod tests {
         let query = gl.projects().archived(true).simple(true).build_query();
         assert_eq!(query, expected_string);
     }
+
+
+    #[test]
+    fn project_to_issues() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+        let project_id = 123;
+        let project = ::Project { id: project_id, ..Default::default() };
+        let issues_lister = format!("{:?}", project.issues(&gl));
+        let default_issues_lister = format!("{:?}", ::issues::project::IssuesLister::new(&gl, project_id));
+        assert_eq!(issues_lister, default_issues_lister);
+    }
 }
