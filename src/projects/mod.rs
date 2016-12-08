@@ -156,6 +156,11 @@ impl<'a> Project {
     pub fn issues(&'a self, gl: &'a ::GitLab) -> ::issues::IssuesLister {
         ::issues::IssuesLister::new(gl)
     }
+
+    /// Return a lister for the project's merge requests
+    pub fn merge_requests(&'a self, gl: &'a ::GitLab) -> ::merge_requests::MergeRequestsLister {
+        ::merge_requests::MergeRequestsLister::new(gl)
+    }
 }
 
 
