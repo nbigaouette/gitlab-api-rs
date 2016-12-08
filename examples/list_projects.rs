@@ -87,6 +87,12 @@ fn run() -> Result<()> {
         .chain_err(|| "failure to find project's issues")?;
     println!("issues: {:?}", issues);
 
+    let merge_requests = project
+        .merge_requests(&gl)
+        .list()
+        .chain_err(|| "failure to find project's merge_requests")?;
+    println!("merge_requests: {:?}", merge_requests);
+
     let issues = gl
         .projects()
         .id(gitlab::projects::ListingId::Id(9))
