@@ -39,6 +39,7 @@ impl<'a> ProjectsLister<'a> {
         ProjectsLister { gl: gl, id: id }
     }
 
+
     /// Commit the lister: Query GitLab and return a list of projects.
     pub fn list(&self) -> Result<Project> {
         // let query = serde_urlencoded::to_string(&self);
