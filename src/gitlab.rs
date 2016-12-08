@@ -345,6 +345,18 @@ mod tests {
     }
 
     #[test]
+    fn gitlab_listers_issues() {
+        let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+        let issues_lister = gl.issues();
+        let debug = format!("{:?}", issues_lister);
+        assert_eq!("IssuesLister { gl: GitLab { scheme: https, domain: gitlab.com, port: no port \
+                    provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }, internal: \
+                    IssuesListerInternal { state: None, labels: None, order_by: None, sort: None \
+                    } }",
+                   debug);
+    }
+
+    #[test]
     fn new_valid() {
         let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
         verify_ok(&gl);
