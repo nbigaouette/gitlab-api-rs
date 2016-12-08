@@ -294,19 +294,30 @@ mod tests {
         let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
 
         let debug = format!("{:?}", gl);
-        assert_eq!("GitLab { scheme: https, domain: gitlab.com, port: no port provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }", debug);
+        assert_eq!("GitLab { scheme: https, domain: gitlab.com, port: no port provided, \
+                    private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }",
+                   debug);
 
         let gl = gl.scheme("http").port(80);
         let debug = format!("{:?}", gl);
-        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: no port provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }", debug);
+        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: no port provided, \
+                    private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }",
+                   debug);
 
         let mut gl = gl.port(81);
         let debug = format!("{:?}", gl);
-        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: 81, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }", debug);
+        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: 81, private_token: \
+                    XXXXXXXXXXXXXXXXXXXX, pagination: None }",
+                   debug);
 
-        gl.set_pagination(Pagination {page: 2, per_page: 5});
+        gl.set_pagination(Pagination {
+            page: 2,
+            per_page: 5,
+        });
         let debug = format!("{:?}", gl);
-        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: 81, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: Some(Pagination { page: 2, per_page: 5 }) }", debug);
+        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: 81, private_token: \
+                    XXXXXXXXXXXXXXXXXXXX, pagination: Some(Pagination { page: 2, per_page: 5 }) }",
+                   debug);
     }
 
     #[test]
@@ -317,7 +328,8 @@ mod tests {
         assert_eq!("GroupsLister { gl: GitLab { scheme: https, domain: gitlab.com, port: no \
                     port provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }, \
                     internal: GroupsListerInternal { skip_groups: None, all_available: None, \
-                    search: None, order_by: None, sort: None } }", debug);
+                    search: None, order_by: None, sort: None } }",
+                   debug);
     }
 
     #[test]

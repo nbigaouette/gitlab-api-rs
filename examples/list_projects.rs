@@ -74,27 +74,23 @@ fn run() -> Result<()> {
         .chain_err(|| "cannot get projects")?;
     println!("projects: {:?}", projects);
 
-    let project = gl
-        .projects()
+    let project = gl.projects()
         .id(gitlab::projects::ListingId::Id(9))
         .list()
         .chain_err(|| "failure to find project")?;
     println!("project: {:?}", project);
 
-    let issues = project
-        .issues(&gl)
+    let issues = project.issues(&gl)
         .list()
         .chain_err(|| "failure to find project's issues")?;
     println!("issues: {:?}", issues);
 
-    let merge_requests = project
-        .merge_requests(&gl)
+    let merge_requests = project.merge_requests(&gl)
         .list()
         .chain_err(|| "failure to find project's merge_requests")?;
     println!("merge_requests: {:?}", merge_requests);
 
-    let issues = gl
-        .projects()
+    let issues = gl.projects()
         .id(gitlab::projects::ListingId::Id(9))
         .issues()
         .chain_err(|| "failure to build a gitlab::issues::project::IssuesLister")?
@@ -102,8 +98,7 @@ fn run() -> Result<()> {
         .chain_err(|| "failure to find issues")?;
     println!("issues: {:?}", issues);
 
-    let merge_requests = gl
-        .projects()
+    let merge_requests = gl.projects()
         .id(gitlab::projects::ListingId::Id(9))
         .merge_requests()
         .chain_err(|| "failure to build a gitlab::merge_requests::project::IssuesLister")?
