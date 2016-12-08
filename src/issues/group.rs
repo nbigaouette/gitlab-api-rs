@@ -226,6 +226,17 @@ mod tests {
 
 
     #[test]
+    fn build_query_milestone() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = "groups/123/issues?milestone=TestMilestone";
+        let query = gl.issues().group(TEST_PROJECT_ID).milestone("TestMilestone".to_string()).build_query();
+        assert_eq!(query, expected_string);
+    }
+
+
+    #[test]
     fn build_query_skip_groups() {
         let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
