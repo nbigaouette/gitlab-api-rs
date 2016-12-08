@@ -455,15 +455,15 @@ mod tests {
     #[test]
     fn new_invalid_token() {
         let gl = GitLab::new("gitlab.com", "");
-        assert!(gl.is_err());
+        verify_err(&gl);
 
         let gl = GitLab::new("gitlab.com", "X");
-        assert!(gl.is_err());
+        verify_err(&gl);
 
         let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXX");
-        assert!(gl.is_err());
+        verify_err(&gl);
 
         let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXXX");
-        assert!(gl.is_err());
+        verify_err(&gl);
     }
 }
