@@ -30,7 +30,7 @@
 //!
 
 
-// use serde_urlencoded;
+use serde_urlencoded;
 
 use BuildQuery;
 use Issues;
@@ -167,8 +167,8 @@ impl<'a> BuildQuery for IssuesLister<'a> {
             query.push_str(split_char);
             split_char = &amp_char;
 
-            query.push_str("milestone=");
-            query.push_str(milestone);
+            let params = &[("milestone", milestone)];
+            query.push_str(&serde_urlencoded::to_string(&params).unwrap());
         });
 
         self.internal.order_by.map(|order_by| {
