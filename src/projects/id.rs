@@ -47,6 +47,14 @@ impl<'a> ProjectsLister<'a> {
 
         self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
     }
+
+
+    /// Return a lister for the project's issues
+    pub fn issues(self) -> Result<::issues::project::IssuesLister<'a>> {
+        let project = self.list().chain_err(|| "failure to find project")?;
+
+        Ok(::issues::project::IssuesLister::new(self.gl, project.id))
+    }
 }
 
 impl<'a> BuildQuery for ProjectsLister<'a> {
