@@ -153,8 +153,8 @@ impl<'a> BuildQuery for ProjectsLister<'a> {
 
 impl<'a> Project {
     /// Return a lister for the project's issues
-    pub fn issues(&'a self, gl: &'a ::GitLab) -> ::issues::IssuesLister {
-        ::issues::IssuesLister::new(gl)
+    pub fn issues(&'a self, gl: &'a ::GitLab) -> ::issues::project::IssuesLister {
+        ::issues::project::IssuesLister::new(gl, self.id)
     }
 
     /// Return a lister for the project's merge requests
