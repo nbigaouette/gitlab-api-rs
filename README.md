@@ -7,6 +7,10 @@ Rust wrapper to the GitLab API.
 [![Documentation](https://docs.rs/gitlab-api/badge.svg)](https://docs.rs/gitlab-api)
 [![License](https://img.shields.io/crates/l/gitlab-api.svg)](#licensing)
 [![Coverage Status](https://coveralls.io/repos/github/nbigaouette/gitlab-api-rs/badge.svg?branch=master)](https://coveralls.io/github/nbigaouette/gitlab-api-rs?branch=master)
+[![Codecov](https://img.shields.io/codecov/c/github/nbigaouette/gitlab-api-rs/master.svg?style=flat)](https://codecov.io/github/nbigaouette/gitlab-api-rs?branch=master)
+
+
+
 
 ## Synopsis
 
