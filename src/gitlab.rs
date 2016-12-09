@@ -102,7 +102,7 @@ impl GitLab {
                     let proxy: Vec<&str> = proxy.trim_left_matches("http://").split(':').collect();
                     let hostname = proxy[0].to_string();
                     let port = proxy[1].parse()
-                        .chain_err(|| format!("failure to set port to {}", port))?;
+                        .chain_err(|| format!("failure to set port to {}", proxy[1]))?;
 
                     hyper::Client::with_http_proxy(hostname, port)
                 }
