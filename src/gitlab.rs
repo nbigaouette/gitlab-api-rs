@@ -321,6 +321,23 @@ mod tests {
     }
 
     #[test]
+    fn gitlab_proxy() {
+        use std::env;
+
+        // NOTE: We cannot split this test in two, as tests are run in parallel their will be
+        // a race condition when setting the `HTTP_PROXY` environment variable.
+
+        // Use good proxy port. Should succeed.
+        env::set_var("HTTP_PROXY", "http://localhost:8000");
+        let _ = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+
+        // Use bad proxy port. Constructor should fail
+        env::set_var("HTTP_PROXY", "http://localhost:abc");
+        let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX");
+        verify_err(&gl);
+    }
+
+    #[test]
     fn gitlab_listers_groups() {
         let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         let groups_lister = gl.groups();
