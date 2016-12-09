@@ -28,7 +28,7 @@
 //!
 
 
-// use serde_urlencoded;
+use serde_urlencoded;
 
 use BuildQuery;
 use Issues;
@@ -152,8 +152,8 @@ impl<'a> BuildQuery for IssuesLister<'a> {
             query.push_str(split_char);
             split_char = &amp_char;
 
-            query.push_str("milestone=");
-            query.push_str(milestone);
+            let params = &[("milestone", milestone)];
+            query.push_str(&serde_urlencoded::to_string(&params).unwrap());
         });
 
         self.internal.order_by.map(|order_by| {
@@ -221,6 +221,17 @@ mod tests {
 
         let expected_string = "groups/123/issues?state=closed";
         let query = gl.issues().group(TEST_PROJECT_ID).state(::issues::State::Closed).build_query();
+        assert_eq!(query, expected_string);
+    }
+
+
+    #[test]
+    fn build_query_milestone() {
+        let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+        // let gl: ::GitLab = Default::default();
+
+        let expected_string = "groups/123/issues?milestone=Test+Milestone";
+        let query = gl.issues().group(TEST_PROJECT_ID).milestone("Test Milestone".to_string()).build_query();
         assert_eq!(query, expected_string);
     }
 

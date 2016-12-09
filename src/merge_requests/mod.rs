@@ -229,6 +229,11 @@ mod tests {
         let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
+        let expected_string = format!("projects/{}/merge_requests?state=merged", TEST_PROJECT_ID);
+        let query =
+            gl.merge_requests(TEST_PROJECT_ID).state(::merge_requests::State::Merged).build_query();
+        assert_eq!(query, expected_string);
+
         let expected_string = format!("projects/{}/merge_requests?state=opened", TEST_PROJECT_ID);
         let query =
             gl.merge_requests(TEST_PROJECT_ID).state(::merge_requests::State::Opened).build_query();
@@ -237,6 +242,11 @@ mod tests {
         let expected_string = format!("projects/{}/merge_requests?state=closed", TEST_PROJECT_ID);
         let query =
             gl.merge_requests(TEST_PROJECT_ID).state(::merge_requests::State::Closed).build_query();
+        assert_eq!(query, expected_string);
+
+        let expected_string = format!("projects/{}/merge_requests?state=all", TEST_PROJECT_ID);
+        let query =
+            gl.merge_requests(TEST_PROJECT_ID).state(::merge_requests::State::All).build_query();
         assert_eq!(query, expected_string);
     }
 

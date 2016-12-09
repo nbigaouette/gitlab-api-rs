@@ -102,7 +102,7 @@ impl GitLab {
                     let proxy: Vec<&str> = proxy.trim_left_matches("http://").split(':').collect();
                     let hostname = proxy[0].to_string();
                     let port = proxy[1].parse()
-                        .chain_err(|| format!("failure to set port to {}", port))?;
+                        .chain_err(|| format!("failure to set port to {}", proxy[1]))?;
 
                     hyper::Client::with_http_proxy(hostname, port)
                 }
@@ -211,7 +211,6 @@ impl GitLab {
         res.read_to_string(&mut body).chain_err(|| "cannot read response body")?;
         debug!("body:\n{:?}", body);
 
-        // assert_eq!(res.status, hyper::status::StatusCode::Ok);
         if res.status != hyper::status::StatusCode::Ok {
             bail!(format!("status code '{}', not '200 OK'", res.status));
         }
@@ -295,21 +294,67 @@ mod tests {
         let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
 
         let debug = format!("{:?}", gl);
-        assert_eq!("GitLab { scheme: https, domain: gitlab.com, port: no port provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }", debug);
+        assert_eq!("GitLab { scheme: https, domain: gitlab.com, port: no port provided, \
+                    private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }",
+                   debug);
 
         let gl = gl.scheme("http").port(80);
         let debug = format!("{:?}", gl);
-        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: no port provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }", debug);
+        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: no port provided, \
+                    private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }",
+                   debug);
 
         let mut gl = gl.port(81);
         let debug = format!("{:?}", gl);
-        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: 81, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }", debug);
+        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: 81, private_token: \
+                    XXXXXXXXXXXXXXXXXXXX, pagination: None }",
+                   debug);
 
-        gl.set_pagination(Pagination {page: 2, per_page: 5});
+        gl.set_pagination(Pagination {
+            page: 2,
+            per_page: 5,
+        });
         let debug = format!("{:?}", gl);
-        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: 81, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: Some(Pagination { page: 2, per_page: 5 }) }", debug);
+        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: 81, private_token: \
+                    XXXXXXXXXXXXXXXXXXXX, pagination: Some(Pagination { page: 2, per_page: 5 }) }",
+                   debug);
     }
 
+    #[test]
+    fn gitlab_listers_groups() {
+        let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+        let groups_lister = gl.groups();
+        let debug = format!("{:?}", groups_lister);
+        assert_eq!("GroupsLister { gl: GitLab { scheme: https, domain: gitlab.com, port: no \
+                    port provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }, \
+                    internal: GroupsListerInternal { skip_groups: None, all_available: None, \
+                    search: None, order_by: None, sort: None } }",
+                   debug);
+    }
+
+    #[test]
+    fn gitlab_listers_projects() {
+        let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+        let projects_lister = gl.projects();
+        let debug = format!("{:?}", projects_lister);
+        assert_eq!("ProjectsLister { gl: GitLab { scheme: https, domain: gitlab.com, port: no \
+                    port provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }, \
+                    internal: ProjectListerInternal { archived: None, visibility: None, \
+                    order_by: None, sort: None, search: None, simple: None } }",
+                   debug);
+    }
+
+    #[test]
+    fn gitlab_listers_issues() {
+        let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+        let issues_lister = gl.issues();
+        let debug = format!("{:?}", issues_lister);
+        assert_eq!("IssuesLister { gl: GitLab { scheme: https, domain: gitlab.com, port: no port \
+                    provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }, internal: \
+                    IssuesListerInternal { state: None, labels: None, order_by: None, sort: None \
+                    } }",
+                   debug);
+    }
 
     #[test]
     fn new_valid() {
@@ -410,15 +455,35 @@ mod tests {
     #[test]
     fn new_invalid_token() {
         let gl = GitLab::new("gitlab.com", "");
-        assert!(gl.is_err());
+        verify_err(&gl);
 
         let gl = GitLab::new("gitlab.com", "X");
-        assert!(gl.is_err());
+        verify_err(&gl);
 
         let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXX");
-        assert!(gl.is_err());
+        verify_err(&gl);
 
         let gl = GitLab::new("gitlab.com", "XXXXXXXXXXXXXXXXXXXXX");
-        assert!(gl.is_err());
+        verify_err(&gl);
+    }
+
+    #[test]
+    fn build_url_doc() {
+        let expected_url = "https://gitlab.example.com\
+                            /api/v3/groups?order_by=path&private_token=XXXXXXXXXXXXXXXXXXXX";
+        let gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+        let url = gl.build_url("groups?order_by=path").unwrap();
+        assert_eq!(url, expected_url);
+    }
+
+    #[test]
+    fn build_url_pagination() {
+        let expected_url = "https://gitlab.example.com\
+                            /api/v3/groups?order_by=path&\
+                            private_token=XXXXXXXXXXXXXXXXXXXX&page=2&per_page=5";
+        let mut gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
+        gl.set_pagination(Pagination {page: 2, per_page: 5});
+        let url = gl.build_url("groups?order_by=path").unwrap();
+        assert_eq!(url, expected_url);
     }
 }

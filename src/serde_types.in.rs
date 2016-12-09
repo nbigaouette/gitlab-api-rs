@@ -113,7 +113,7 @@ struct ProjectNamespaceAvatar {
 }
 
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 struct ProjectNamespace {
     id: i64,
     name: String,
@@ -172,7 +172,7 @@ struct ProjectSharedWithGroup {
 
 // https://users.rust-lang.org/t/what-am-i-doing-wrong-go-program-is-12x-faster-than-rust/5692/13
 // https://doc.rust-lang.org/rustc-serialize/rustc_serialize/json/index.html
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct Project {
     id: i64,
     description: String,
