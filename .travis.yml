@@ -19,9 +19,6 @@ matrix:
     - rust: nightly
     - os: osx
 
-os:
-  - linux
-  - osx
 
 # load travis-cargo
 before_script:
