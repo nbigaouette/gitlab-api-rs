@@ -250,6 +250,42 @@ impl GitLab {
     //     info!("query: {:?}", query);
     //     self.get(&query)
     // }
+
+    // Higher level methods
+
+    pub fn get_project(&mut self, namespace: &str, name: &str) -> Result<::Project> {
+        // We can't search for "namespace/name", so we search for "name", and loop on the result
+        // until we find the proper "namespace/name".
+        // NOTE: Since our search match could contain many results and they will be paginated,
+        //       we need two loops: one on content of a page, one for the pages.
+
+        let projects_lister = self.projects().search(name.to_string());
+        println!("projects_lister: {:?}", projects_lister);
+
+        let initial_pagination = self.pagination;
+        let mut pagination = Pagination {page: 1, per_page: 20};
+
+        // Query GitLab inside the page loop
+        loop {
+            // Bump for the next page
+            self.pagination = Some(pagination);
+
+            let projects = projects_lister.list().chain_err(|| "cannot get projects")?;
+
+            // Loop over the found projects
+            for project in projects {
+                println!("############# project: {:?}", project);
+            }
+
+            // pagination.page = pagination.page + 1;
+            pagination.page += 1;
+        }
+
+        // Restore the initial pagination
+        self.pagination = initial_pagination;
+
+        unimplemented!();
+    }
 }
 
 
