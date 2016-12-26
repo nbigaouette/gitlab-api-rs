@@ -271,10 +271,12 @@ impl GitLab {
         loop {
             let projects = self.projects().search(name.to_string()).list().chain_err(|| "cannot get projects")?;
 
+            let nb_projects_found = projects.len();
+
             // Find the right project in the vector
             found_project = projects.into_iter().find(|ref project| project.namespace.name == namespace && project.name == name);
 
-            if found_project.is_some() {
+            if found_project.is_some() || nb_projects_found < self.pagination.unwrap().per_page as usize {
                 break;
             }
 
