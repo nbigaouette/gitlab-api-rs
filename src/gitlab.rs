@@ -265,7 +265,7 @@ impl GitLab {
         // Set a default value for the pagination if it's None
         self.pagination = self.pagination.or(Some(Pagination {page: 1, per_page: 20}));
 
-        let mut found_project: Option<::Project> = None;
+        let mut found_project: Option<::Project>;
 
         // Query GitLab inside the page loop
         loop {
