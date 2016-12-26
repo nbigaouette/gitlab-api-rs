@@ -259,32 +259,43 @@ impl GitLab {
         // NOTE: Since our search match could contain many results and they will be paginated,
         //       we need two loops: one on content of a page, one for the pages.
 
-        let projects_lister = self.projects().search(name.to_string());
-        println!("projects_lister: {:?}", projects_lister);
+        // Store the initial pagination so we can restore it later
+        let initial_pagination = self.pagination.clone();
 
-        let initial_pagination = self.pagination;
-        let mut pagination = Pagination {page: 1, per_page: 20};
+        // Set a default value for the pagination if it's None
+        self.pagination = self.pagination.or(Some(Pagination {page: 1, per_page: 20}));
+
+        let mut found_project: Option<::Project> = None;
 
         // Query GitLab inside the page loop
         loop {
-            // Bump for the next page
-            self.pagination = Some(pagination);
-
-            let projects = projects_lister.list().chain_err(|| "cannot get projects")?;
+            let projects = self.projects().search(name.to_string()).list().chain_err(|| "cannot get projects")?;
 
             // Loop over the found projects
             for project in projects {
                 println!("############# project: {:?}", project);
+
+                if project.namespace.name == namespace && project.name == name {
+                    found_project = Some(project);
+                    break;
+                }
             }
 
-            // pagination.page = pagination.page + 1;
-            pagination.page += 1;
+            if found_project.is_some() {
+                break;
+            }
+
+            // Bump to the next page
+            self.pagination.as_mut().map(|pagination| pagination.page += 1);
         }
 
         // Restore the initial pagination
         self.pagination = initial_pagination;
 
-        unimplemented!();
+        match found_project {
+            None => bail!(format!("Project '{}/{}' not found!", namespace, name)),
+            Some(project) => Ok(project)
+        }
     }
 }
 
