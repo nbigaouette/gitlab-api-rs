@@ -205,7 +205,7 @@ pub struct Project {
     avatar_url: Option<String>,
     star_count: i64,
     forks_count: i64,
-    open_issues_count: i64,
+    open_issues_count: Option<i64>,
     runners_token: Option<String>,
     public_builds: bool,
     shared_with_groups: Vec<ProjectSharedWithGroup>,
