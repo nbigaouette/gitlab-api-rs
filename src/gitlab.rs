@@ -271,15 +271,8 @@ impl GitLab {
         loop {
             let projects = self.projects().search(name.to_string()).list().chain_err(|| "cannot get projects")?;
 
-            // Loop over the found projects
-            for project in projects {
-                println!("############# project: {:?}", project);
-
-                if project.namespace.name == namespace && project.name == name {
-                    found_project = Some(project);
-                    break;
-                }
-            }
+            // Find the right project in the vector
+            found_project = projects.into_iter().find(|ref project| project.namespace.name == namespace && project.name == name);
 
             if found_project.is_some() {
                 break;
