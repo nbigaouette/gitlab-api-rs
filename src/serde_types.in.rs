@@ -190,11 +190,11 @@ pub struct Project {
     path: String,
     path_with_namespace: String,
     container_registry_enabled: Option<bool>,
-    issues_enabled: bool,
-    merge_requests_enabled: bool,
-    wiki_enabled: bool,
-    builds_enabled: bool,
-    snippets_enabled: bool,
+    issues_enabled: Option<bool>,
+    merge_requests_enabled: Option<bool>,
+    wiki_enabled: Option<bool>,
+    builds_enabled: Option<bool>,
+    snippets_enabled: Option<bool>,
     created_at: String,  // FIXME: Date instead?
     last_activity_at: String,  // FIXME: Date instead?
     shared_runners_enabled: bool,
