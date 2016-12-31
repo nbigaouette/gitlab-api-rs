@@ -345,6 +345,59 @@ impl GitLab {
             Some(issue) => Ok(issue)
         }
     }
+
+    /// Get a project merge request from a its `iid`.
+    ///
+    /// Since GitLab uses unique `id`s in its API and _not_ `iid`s, we will need to list issues
+    /// (grouped by pages of 20) until we find the proper issue matching the `id` requested.
+    ///
+    /// **Note**: A `iid` is the issue number as seen by normal user, for example appearing on
+    /// a GitLab URL. This `iid` can be used to reference an issue (in other issues, in commit
+    /// messages, etc.) by prepending a pound sign to it, for example `#3`. An `id`, instead, is
+    /// GitLab's internal and unique id associated with the issue.
+    ///
+    /// Because we need to search (and thus query the GitLab server possibly multiple times), this
+    /// _can_ be a slow operation if there is many issues in the project.
+    pub fn get_merge_request(&mut self, namespace: &str, name: &str, iid: i64) -> Result<::merge_requests::MergeRequest> {
+        let project = self.get_project(namespace, name).chain_err(|| format!("cannot get project '{}/{}'", namespace, name))?;
+
+        // NOTE: We can't use `self.issues().single(project.id, id).list()` since
+        //       the `id` is the _gitlab internal_ id, not the `iid`. We'll unfortunately have to
+        //       search for the issue instead.
+
+        // Store the initial pagination so we can restore it later
+        let initial_pagination = self.pagination.clone();
+
+        // Set a default value for the pagination if it's None
+        self.pagination = self.pagination.or(Some(Pagination {page: 1, per_page: 20}));
+
+        let mut found_merge_request: Option<::merge_requests::MergeRequest>;
+
+        // Query GitLab inside the page loop
+        loop {
+            let merge_requests = self.merge_requests(project.id).list().chain_err(|| format!("cannot get merge requests for project '{}/{}'", project.namespace.name, project.name))?;
+
+            let nb_mr_found = merge_requests.len();
+
+            // Find the right issue in the vector
+            found_merge_request = merge_requests.into_iter().find(|ref mr| mr.iid == iid);
+
+            if found_merge_request.is_some() || nb_mr_found < self.pagination.unwrap().per_page as usize {
+                break;
+            }
+
+            // Bump to the next page
+            self.pagination.as_mut().map(|pagination| pagination.page += 1);
+        }
+
+        // Restore the initial pagination
+        self.pagination = initial_pagination;
+
+        match found_merge_request {
+            None => bail!(format!("Merge request iid={} for project '{}/{}' not found!", iid, project.namespace.name, project.name)),
+            Some(merge_request) => Ok(merge_request)
+        }
+    }
 }
 
 
