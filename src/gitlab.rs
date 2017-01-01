@@ -282,9 +282,7 @@ impl GitLab {
     ///
     /// Because we need to search (and thus query the GitLab server possibly multiple times), this
     /// _can_ be a slow operation if there is many issues in the project.
-    pub fn get_issue<'a>(&'a mut self, namespace: &str, name: &str, iid: i64) -> Result<::Issue> {
-        // let issues = self.issues().project(project.id).list().chain_err(...)?;
-        // let mrs    = self.merge_requests(project.id).list().chain_err(...)?;
+    pub fn get_issue(&self, namespace: &str, name: &str, iid: i64) -> Result<::Issue> {
         self.high_level_get(namespace, name, iid, |project_id| self.issues().project(project_id))
     }
 
