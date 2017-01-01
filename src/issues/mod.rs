@@ -22,7 +22,10 @@
 // use serde_urlencoded;
 
 use BuildQuery;
+use Lister;
+use GitLabItem;
 use Issues;
+use Issue;
 
 pub mod group;
 pub mod project;
@@ -42,6 +45,32 @@ include!(concat!(env!("OUT_DIR"), "/issues/serde_types.rs"));
 pub struct IssuesLister<'a> {
     gl: &'a ::GitLab,
     internal: IssuesListerInternal,
+}
+
+
+impl GitLabItem for Issue {
+    fn iid(&self) -> i64 {
+        self.iid
+    }
+}
+
+
+impl<'a> Lister<Issues> for IssuesLister<'a> {
+    /// Commit the lister: Query GitLab and return a list of issues.
+    fn list(&self) -> Result<Issues> {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        self.gl.get(&query, None, None).chain_err(|| format!("cannot get query {}", query))
+    }
+
+    /// Commit the lister: Query GitLab and return a list of issues.
+    fn list_paginated(&self, page: u16, per_page: u16) -> Result<Issues> {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        self.gl.get(&query, page, per_page).chain_err(|| format!("cannot get query {}", query))
+    }
 }
 
 
@@ -96,13 +125,13 @@ impl<'a> IssuesLister<'a> {
     }
 
 
-    /// Commit the lister: Query GitLab and return a list of projects.
-    pub fn list(&self) -> Result<Issues> {
-        let query = self.build_query();
-        debug!("query: {:?}", query);
-
-        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
-    }
+    // /// Commit the lister: Query GitLab and return a list of issues.
+    // pub fn list(&self) -> Result<Issues> {
+    //     let query = self.build_query();
+    //     debug!("query: {:?}", query);
+    //
+    //     self.gl.get(&query, None, None).chain_err(|| format!("cannot get query {}", query))
+    // }
 }
 
 

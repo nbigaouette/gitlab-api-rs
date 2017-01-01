@@ -22,6 +22,8 @@ pub mod errors {
     error_chain!{}
 }
 
+use ::errors::*;
+
 
 #[cfg(feature = "serde_derive")]
 include!("serde_types.in.rs");
@@ -44,15 +46,28 @@ pub mod issues;
 pub mod merge_requests;
 
 // Re-export those structs
-pub use gitlab::Pagination;
 pub use gitlab::GitLab;
 // pub use projects::Project;
+// Re-export those traits
 
 
 trait BuildQuery {
     fn build_query(&self) -> String;
 }
 
+pub trait Lister<T> {
+    fn list(&self) -> Result<T>;
+    // fn list_paginated(&self, page: u16, per_page: u16) -> Result<T>;
+    // FIXME: Remove default implementation, will have to implement this for other structs.
+    //        See src/issues/mod.rs
+    fn list_paginated(&self, _page: u16, _per_page: u16) -> Result<T> {
+        self.list()
+    }
+}
+
+pub trait GitLabItem {
+    fn iid(&self) -> i64;
+}
 
 
 #[cfg(test)]

@@ -10,6 +10,8 @@ use serde_json;
 
 
 // use Groups;
+use Lister;
+use GitLabItem;
 
 use ::errors::*;
 
@@ -19,16 +21,9 @@ pub const API_VERSION: u16 = 3;
 
 
 
-#[derive(Default, Clone, Copy, Debug)]
-pub struct Pagination {
-    pub page: u16,
-    pub per_page: u16,
-}
-
 pub struct GitLab {
     url: url::Url,
     private_token: String,
-    pagination: Option<Pagination>,
     client: hyper::Client,
 }
 
@@ -37,15 +32,13 @@ pub struct GitLab {
 impl fmt::Debug for GitLab {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f,
-               "GitLab {{ scheme: {}, domain: {}, port: {}, private_token: XXXXXXXXXXXXXXXXXXXX, \
-                pagination: {:?} }}",
+               "GitLab {{ scheme: {}, domain: {}, port: {}, private_token: XXXXXXXXXXXXXXXXXXXX }}",
                self.url.scheme(),
                self.url.domain().unwrap_or("bad hostname provided"),
                self.url
                    .port()
                    .map(|port_u16| port_u16.to_string())
-                   .unwrap_or("no port provided".to_string()),
-               self.pagination)
+                   .unwrap_or("no port provided".to_string()))
     }
 }
 
@@ -96,7 +89,6 @@ impl GitLab {
         Ok(GitLab {
             url: url,
             private_token: private_token.to_string(),
-            pagination: None,
             client: match env::var("HTTP_PROXY") {
                 Ok(proxy) => {
                     let proxy: Vec<&str> = proxy.trim_left_matches("http://").split(':').collect();
@@ -156,10 +148,6 @@ impl GitLab {
                         self.url.as_str())
             })?;
         new_url.query_pairs_mut().append_pair("private_token", &self.private_token);
-        self.pagination.as_ref().map(|pagination| {
-            new_url.query_pairs_mut().append_pair("page", &pagination.page.to_string());
-            new_url.query_pairs_mut().append_pair("per_page", &pagination.per_page.to_string());
-        });
 
         Ok(new_url.into_string())
     }
@@ -171,31 +159,17 @@ impl GitLab {
     // }
 
 
-    /// Set pagination information
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use gitlab_api::{GitLab, Pagination};
-    ///
-    /// let expected_url = "https://gitlab.example.com\
-    ///                     /api/v3/groups?order_by=path&\
-    ///                     private_token=XXXXXXXXXXXXXXXXXXXX&page=2&per_page=5";
-    ///
-    /// let mut gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
-    /// gl.set_pagination(Pagination {page: 2, per_page: 5});
-    /// assert_eq!(gl.build_url("groups?order_by=path").unwrap(), expected_url);
-    /// ```
-    pub fn set_pagination(&mut self, pagination: Pagination) {
-        self.pagination = Some(pagination);
-    }
-
-    pub fn get<T>(&self, query: &str) -> Result<T>
-        where T: serde::Deserialize
+    pub fn get<T, U>(&self, query: &str, page: U, per_page: U) -> Result<T>
+        where T: serde::Deserialize,
+              U: Into<Option<u16>>
     {
-        let url = self.build_url(query)
+        let mut url = self.build_url(query)
             .chain_err(|| format!("failure to build url for query '{}'", query))?;
         info!("url: {:?}", url);
+
+        // Add pagination information if requested.
+        page.into().map(|page| url.push_str(&format!("&page={}", page)));
+        per_page.into().map(|per_page| url.push_str(&format!("&per_page={}", per_page)));
 
         // Close connections after each GET.
         let mut res: hyper::client::Response = self.client
@@ -220,7 +194,7 @@ impl GitLab {
     }
 
     pub fn version(&self) -> Result<::Version> {
-        self.get("version").chain_err(|| "cannot query 'version'")
+        self.get("version", None, None).chain_err(|| "cannot query 'version'")
     }
 
     pub fn groups(&self) -> ::groups::GroupsLister {
@@ -253,43 +227,46 @@ impl GitLab {
 
     // Higher level methods
 
-    pub fn get_project(&mut self, namespace: &str, name: &str) -> Result<::Project> {
-        // We can't search for "namespace/name", so we search for "name", and loop on the result
-        // until we find the proper "namespace/name".
-        // NOTE: Since our search match could contain many results and they will be paginated,
-        //       we need two loops: one on content of a page, one for the pages.
+    fn high_level_get<T, F, L>(&self, namespace: &str, name: &str, iid: i64, f: F) -> Result<T>
+        where   F: Fn(i64) -> L,
+                L: Lister<Vec<T>>,
+                T: GitLabItem {
 
-        // Store the initial pagination so we can restore it later
-        let initial_pagination = self.pagination.clone();
+        let project = self.get_project(namespace, name).chain_err(|| format!("cannot get project '{}/{}'", namespace, name))?;
+
+        // NOTE: We can't use `self.issues().single(project.id, id).list()` (or the like) since
+        //       the `id` is the _gitlab internal_ id, not the `iid`. We'll unfortunately have to
+        //       search for the issue instead.
 
         // Set a default value for the pagination if it's None
-        self.pagination = self.pagination.or(Some(Pagination {page: 1, per_page: 20}));
+        let mut pagination_page = 1;
+        let pagination_per_page = 20;
 
-        let mut found_project: Option<::Project>;
+        let mut found: Option<T>;
 
         // Query GitLab inside the page loop
         loop {
-            let projects = self.projects().search(name.to_string()).list().chain_err(|| "cannot get projects")?;
+            // let issues = self.issues().project(project.id).list().chain_err(|| format!("cannot get issues for project '{}/{}'", project.namespace.name, project.name))?;
+            // let merge_requests = self.merge_requests(project.id).list().chain_err(|| format!("cannot get merge requests for project '{}/{}'", project.namespace.name, project.name))?;
 
-            let nb_projects_found = projects.len();
+            let found_items = f(project.id).list_paginated(pagination_page, pagination_per_page).chain_err(|| format!("cannot get high level for project '{}/{}'", project.namespace.name, project.name))?;
 
-            // Find the right project in the vector
-            found_project = projects.into_iter().find(|ref project| project.namespace.name == namespace && project.name == name);
+            let nb_found = found_items.len();
 
-            if found_project.is_some() || nb_projects_found < self.pagination.unwrap().per_page as usize {
+            // Find the right item in the vector
+            found = found_items.into_iter().find(|ref item| item.iid() == iid);
+
+            if found.is_some() || nb_found < pagination_per_page as usize {
                 break;
             }
 
             // Bump to the next page
-            self.pagination.as_mut().map(|pagination| pagination.page += 1);
+            pagination_page += 1;
         }
 
-        // Restore the initial pagination
-        self.pagination = initial_pagination;
-
-        match found_project {
-            None => bail!(format!("Project '{}/{}' not found!", namespace, name)),
-            Some(project) => Ok(project)
+        match found {
+            None => bail!(format!("Item iid={} for project '{}/{}' not found!", iid, project.namespace.name, project.name)),
+            Some(item) => Ok(item)
         }
     }
 
@@ -305,44 +282,44 @@ impl GitLab {
     ///
     /// Because we need to search (and thus query the GitLab server possibly multiple times), this
     /// _can_ be a slow operation if there is many issues in the project.
-    pub fn get_issue(&mut self, namespace: &str, name: &str, iid: i64) -> Result<::Issue> {
-        let project = self.get_project(namespace, name).chain_err(|| format!("cannot get project '{}/{}'", namespace, name))?;
+    pub fn get_issue<'a>(&'a mut self, namespace: &str, name: &str, iid: i64) -> Result<::Issue> {
+        // let issues = self.issues().project(project.id).list().chain_err(...)?;
+        // let mrs    = self.merge_requests(project.id).list().chain_err(...)?;
+        self.high_level_get(namespace, name, iid, |project_id| self.issues().project(project_id))
+    }
 
-        // NOTE: We can't use `self.issues().single(project.id, id).list()` since
-        //       the `id` is the _gitlab internal_ id, not the `iid`. We'll unfortunately have to
-        //       search for the issue instead.
+    pub fn get_project(&self, namespace: &str, name: &str) -> Result<::Project> {
+        // We can't search for "namespace/name", so we search for "name", and loop on the result
+        // until we find the proper "namespace/name".
+        // NOTE: Since our search match could contain many results and they will be paginated,
+        //       we need two loops: one on content of a page, one for the pages.
 
-        // Store the initial pagination so we can restore it later
-        let initial_pagination = self.pagination.clone();
+        let mut pagination_page = 1;
+        let pagination_per_page = 20;
 
-        // Set a default value for the pagination if it's None
-        self.pagination = self.pagination.or(Some(Pagination {page: 1, per_page: 20}));
-
-        let mut found_issue: Option<::Issue>;
+        let mut found_project: Option<::Project>;
 
         // Query GitLab inside the page loop
         loop {
-            let issues = self.issues().project(project.id).list().chain_err(|| format!("cannot get issues for project '{}/{}'", project.namespace.name, project.name))?;
+            // FIXME: Use list_paginated()
+            let projects = self.projects().search(name.to_string()).list().chain_err(|| "cannot get projects")?;
 
-            let issues_found = issues.len();
+            let nb_projects_found = projects.len();
 
-            // Find the right issue in the vector
-            found_issue = issues.into_iter().find(|ref issue| issue.iid == iid);
+            // Find the right project in the vector
+            found_project = projects.into_iter().find(|ref project| project.namespace.name == namespace && project.name == name);
 
-            if found_issue.is_some() || issues_found < self.pagination.unwrap().per_page as usize {
+            if found_project.is_some() || nb_projects_found < pagination_per_page as usize {
                 break;
             }
 
             // Bump to the next page
-            self.pagination.as_mut().map(|pagination| pagination.page += 1);
+            pagination_page += 1;
         }
 
-        // Restore the initial pagination
-        self.pagination = initial_pagination;
-
-        match found_issue {
-            None => bail!(format!("Issue iid={} for project '{}/{}' not found!", iid, project.namespace.name, project.name)),
-            Some(issue) => Ok(issue)
+        match found_project {
+            None => bail!(format!("Project '{}/{}' not found!", namespace, name)),
+            Some(project) => Ok(project)
         }
     }
 
@@ -358,18 +335,15 @@ impl GitLab {
     ///
     /// Because we need to search (and thus query the GitLab server possibly multiple times), this
     /// _can_ be a slow operation if there is many issues in the project.
-    pub fn get_merge_request(&mut self, namespace: &str, name: &str, iid: i64) -> Result<::merge_requests::MergeRequest> {
+    pub fn get_merge_request(&self, namespace: &str, name: &str, iid: i64) -> Result<::merge_requests::MergeRequest> {
         let project = self.get_project(namespace, name).chain_err(|| format!("cannot get project '{}/{}'", namespace, name))?;
 
         // NOTE: We can't use `self.issues().single(project.id, id).list()` since
         //       the `id` is the _gitlab internal_ id, not the `iid`. We'll unfortunately have to
         //       search for the issue instead.
 
-        // Store the initial pagination so we can restore it later
-        let initial_pagination = self.pagination.clone();
-
-        // Set a default value for the pagination if it's None
-        self.pagination = self.pagination.or(Some(Pagination {page: 1, per_page: 20}));
+        let mut pagination_page = 1;
+        let pagination_per_page = 20;
 
         let mut found_merge_request: Option<::merge_requests::MergeRequest>;
 
@@ -382,16 +356,13 @@ impl GitLab {
             // Find the right issue in the vector
             found_merge_request = merge_requests.into_iter().find(|ref mr| mr.iid == iid);
 
-            if found_merge_request.is_some() || nb_mr_found < self.pagination.unwrap().per_page as usize {
+            if found_merge_request.is_some() || nb_mr_found < pagination_per_page as usize {
                 break;
             }
 
             // Bump to the next page
-            self.pagination.as_mut().map(|pagination| pagination.page += 1);
+            pagination_page += 1;
         }
-
-        // Restore the initial pagination
-        self.pagination = initial_pagination;
 
         match found_merge_request {
             None => bail!(format!("Merge request iid={} for project '{}/{}' not found!", iid, project.namespace.name, project.name)),
@@ -443,28 +414,19 @@ mod tests {
 
         let debug = format!("{:?}", gl);
         assert_eq!("GitLab { scheme: https, domain: gitlab.com, port: no port provided, \
-                    private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }",
+                    private_token: XXXXXXXXXXXXXXXXXXXX }",
                    debug);
 
         let gl = gl.scheme("http").port(80);
         let debug = format!("{:?}", gl);
         assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: no port provided, \
-                    private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }",
+                    private_token: XXXXXXXXXXXXXXXXXXXX }",
                    debug);
 
-        let mut gl = gl.port(81);
+        let gl = gl.port(81);
         let debug = format!("{:?}", gl);
         assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: 81, private_token: \
-                    XXXXXXXXXXXXXXXXXXXX, pagination: None }",
-                   debug);
-
-        gl.set_pagination(Pagination {
-            page: 2,
-            per_page: 5,
-        });
-        let debug = format!("{:?}", gl);
-        assert_eq!("GitLab { scheme: http, domain: gitlab.com, port: 81, private_token: \
-                    XXXXXXXXXXXXXXXXXXXX, pagination: Some(Pagination { page: 2, per_page: 5 }) }",
+                    XXXXXXXXXXXXXXXXXXXX }",
                    debug);
     }
 
@@ -474,7 +436,7 @@ mod tests {
         let groups_lister = gl.groups();
         let debug = format!("{:?}", groups_lister);
         assert_eq!("GroupsLister { gl: GitLab { scheme: https, domain: gitlab.com, port: no \
-                    port provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }, \
+                    port provided, private_token: XXXXXXXXXXXXXXXXXXXX }, \
                     internal: GroupsListerInternal { skip_groups: None, all_available: None, \
                     search: None, order_by: None, sort: None } }",
                    debug);
@@ -486,7 +448,7 @@ mod tests {
         let projects_lister = gl.projects();
         let debug = format!("{:?}", projects_lister);
         assert_eq!("ProjectsLister { gl: GitLab { scheme: https, domain: gitlab.com, port: no \
-                    port provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }, \
+                    port provided, private_token: XXXXXXXXXXXXXXXXXXXX }, \
                     internal: ProjectListerInternal { archived: None, visibility: None, \
                     order_by: None, sort: None, search: None, simple: None } }",
                    debug);
@@ -498,7 +460,7 @@ mod tests {
         let issues_lister = gl.issues();
         let debug = format!("{:?}", issues_lister);
         assert_eq!("IssuesLister { gl: GitLab { scheme: https, domain: gitlab.com, port: no port \
-                    provided, private_token: XXXXXXXXXXXXXXXXXXXX, pagination: None }, internal: \
+                    provided, private_token: XXXXXXXXXXXXXXXXXXXX }, internal: \
                     IssuesListerInternal { state: None, labels: None, order_by: None, sort: None \
                     } }",
                    debug);
@@ -620,17 +582,6 @@ mod tests {
         let expected_url = "https://gitlab.example.com\
                             /api/v3/groups?order_by=path&private_token=XXXXXXXXXXXXXXXXXXXX";
         let gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
-        let url = gl.build_url("groups?order_by=path").unwrap();
-        assert_eq!(url, expected_url);
-    }
-
-    #[test]
-    fn build_url_pagination() {
-        let expected_url = "https://gitlab.example.com\
-                            /api/v3/groups?order_by=path&\
-                            private_token=XXXXXXXXXXXXXXXXXXXX&page=2&per_page=5";
-        let mut gl = GitLab::new("gitlab.example.com", "XXXXXXXXXXXXXXXXXXXX").unwrap();
-        gl.set_pagination(Pagination {page: 2, per_page: 5});
         let url = gl.build_url("groups?order_by=path").unwrap();
         assert_eq!(url, expected_url);
     }

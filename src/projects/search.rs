@@ -64,7 +64,7 @@ impl<'a> ProjectsLister<'a> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
-        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
+        self.gl.get(&query, None, None).chain_err(|| format!("cannot get query {}", query))
     }
 }
 
