@@ -8,6 +8,7 @@ extern crate env_logger;
 
 use gitlab::GitLab;
 // use gitlab::Pagination;
+use gitlab::Lister;
 
 use gitlab::errors::*;
 
