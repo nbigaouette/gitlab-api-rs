@@ -336,38 +336,7 @@ impl GitLab {
     /// Because we need to search (and thus query the GitLab server possibly multiple times), this
     /// _can_ be a slow operation if there is many issues in the project.
     pub fn get_merge_request(&self, namespace: &str, name: &str, iid: i64) -> Result<::merge_requests::MergeRequest> {
-        let project = self.get_project(namespace, name).chain_err(|| format!("cannot get project '{}/{}'", namespace, name))?;
-
-        // NOTE: We can't use `self.issues().single(project.id, id).list()` since
-        //       the `id` is the _gitlab internal_ id, not the `iid`. We'll unfortunately have to
-        //       search for the issue instead.
-
-        let mut pagination_page = 1;
-        let pagination_per_page = 20;
-
-        let mut found_merge_request: Option<::merge_requests::MergeRequest>;
-
-        // Query GitLab inside the page loop
-        loop {
-            let merge_requests = self.merge_requests(project.id).list().chain_err(|| format!("cannot get merge requests for project '{}/{}'", project.namespace.name, project.name))?;
-
-            let nb_mr_found = merge_requests.len();
-
-            // Find the right issue in the vector
-            found_merge_request = merge_requests.into_iter().find(|ref mr| mr.iid == iid);
-
-            if found_merge_request.is_some() || nb_mr_found < pagination_per_page as usize {
-                break;
-            }
-
-            // Bump to the next page
-            pagination_page += 1;
-        }
-
-        match found_merge_request {
-            None => bail!(format!("Merge request iid={} for project '{}/{}' not found!", iid, project.namespace.name, project.name)),
-            Some(merge_request) => Ok(merge_request)
-        }
+        self.high_level_get(namespace, name, iid, |project_id| self.merge_requests(project_id))
     }
 }
 
