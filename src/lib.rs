@@ -57,12 +57,7 @@ trait BuildQuery {
 
 pub trait Lister<T> {
     fn list(&self) -> Result<T>;
-    // fn list_paginated(&self, page: u16, per_page: u16) -> Result<T>;
-    // FIXME: Remove default implementation, will have to implement this for other structs.
-    //        See src/issues/mod.rs
-    fn list_paginated(&self, _page: u16, _per_page: u16) -> Result<T> {
-        self.list()
-    }
+    fn list_paginated(&self, page: u16, per_page: u16) -> Result<T>;
 }
 
 pub trait GitLabItem {

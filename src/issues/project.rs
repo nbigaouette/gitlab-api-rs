@@ -57,6 +57,13 @@ impl<'a> Lister<Issues> for IssuesLister<'a> {
 
         self.gl.get(&query, None, None).chain_err(|| format!("cannot get query {}", query))
     }
+
+    fn list_paginated(&self, page: u16, per_page: u16) -> Result<Issues> {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        self.gl.get(&query, page, per_page).chain_err(|| format!("cannot get query {}", query))
+    }
 }
 
 

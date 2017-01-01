@@ -26,6 +26,7 @@
 use serde_urlencoded;
 
 use BuildQuery;
+use Lister;
 use Project;
 use Projects;
 
@@ -57,6 +58,25 @@ include!(concat!(env!("OUT_DIR"), "/projects/serde_types.rs"));
 pub struct ProjectsLister<'a> {
     gl: &'a ::GitLab,
     internal: ProjectListerInternal,
+}
+
+
+impl<'a> Lister<Projects> for ProjectsLister<'a> {
+    /// Commit the lister: Query GitLab and return a list of projects.
+    fn list(&self) -> Result<Projects> {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        self.gl.get(&query, None, None).chain_err(|| format!("cannot get query {}", query))
+    }
+
+    /// Commit the lister: Query GitLab and return a list of issues.
+    fn list_paginated(&self, page: u16, per_page: u16) -> Result<Projects> {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        self.gl.get(&query, page, per_page).chain_err(|| format!("cannot get query {}", query))
+    }
 }
 
 
@@ -125,14 +145,6 @@ impl<'a> ProjectsLister<'a> {
     pub fn simple(&'a mut self, simple: bool) -> &'a mut ProjectsLister {
         self.internal.simple = Some(simple);
         self
-    }
-
-    /// Commit the lister: Query GitLab and return a list of projects.
-    pub fn list(&self) -> Result<Projects> {
-        let query = self.build_query();
-        debug!("query: {:?}", query);
-
-        self.gl.get(&query, None, None).chain_err(|| format!("cannot get query {}", query))
     }
 }
 
