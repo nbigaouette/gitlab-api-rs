@@ -10,7 +10,6 @@ use serde_json;
 
 // use Groups;
 use Lister;
-use GitLabItem;
 
 use ::errors::*;
 

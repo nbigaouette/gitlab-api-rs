@@ -23,7 +23,6 @@
 
 use BuildQuery;
 use Lister;
-use GitLabItem;
 use Issues;
 use Issue;
 
@@ -45,13 +44,6 @@ include!(concat!(env!("OUT_DIR"), "/issues/serde_types.rs"));
 pub struct IssuesLister<'a> {
     gl: &'a ::GitLab,
     internal: IssuesListerInternal,
-}
-
-
-impl GitLabItem for Issue {
-    fn iid(&self) -> i64 {
-        self.iid
-    }
 }
 
 

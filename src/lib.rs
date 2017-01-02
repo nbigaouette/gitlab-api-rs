@@ -60,10 +60,6 @@ pub trait Lister<T> {
     fn list_paginated(&self, page: u16, per_page: u16) -> Result<T>;
 }
 
-pub trait GitLabItem {
-    fn iid(&self) -> i64;
-}
-
 
 #[cfg(test)]
 mod tests {

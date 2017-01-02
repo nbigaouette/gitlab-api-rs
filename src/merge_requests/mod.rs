@@ -31,7 +31,6 @@
 
 use BuildQuery;
 use Lister;
-use GitLabItem;
 
 pub mod single;
 
@@ -49,13 +48,6 @@ pub struct MergeRequestsLister<'a> {
     gl: &'a ::GitLab,
     id: i64,
     internal: MergeRequestsListerInternal,
-}
-
-
-impl GitLabItem for MergeRequest {
-    fn iid(&self) -> i64 {
-        self.iid
-    }
 }
 
 
