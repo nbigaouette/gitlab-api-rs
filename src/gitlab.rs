@@ -165,7 +165,8 @@ impl GitLab {
     ///
     /// The method _can_ be paginated if `page` and `per_page` is provided.
     ///
-    /// NOTE:
+    /// Notes:
+    ///
     /// * This method is meant to be used internally;
     /// * Until all `BuildQuery::build_query()`s use `serde_urlencoded`, the `query` paramter will
     ///   have to remain a string.
