@@ -310,22 +310,22 @@ impl GitLab {
         let mut pagination_page = 1;
         let pagination_per_page = 20;
 
-        let mut found_project: Option<::Project>;
+        let mut found: Option<::Project>;
 
         // Query GitLab inside the page loop
         loop {
-            let projects = self.projects()
+            let found_items = self.projects()
                 .search(name.to_string())
                 .list_paginated(pagination_page, pagination_per_page)
                 .chain_err(|| "cannot get projects")?;
 
-            let nb_projects_found = projects.len();
+            let nb_found = found_items.len();
 
             // Find the right project in the vector
-            found_project = projects.into_iter()
+            found = found_items.into_iter()
                 .find(|ref project| project.namespace.name == namespace && project.name == name);
 
-            if found_project.is_some() || nb_projects_found < pagination_per_page as usize {
+            if found.is_some() || nb_found < pagination_per_page as usize {
                 break;
             }
 
@@ -333,9 +333,9 @@ impl GitLab {
             pagination_page += 1;
         }
 
-        match found_project {
+        match found {
             None => bail!(format!("Project '{}/{}' not found!", namespace, name)),
-            Some(project) => Ok(project),
+            Some(item) => Ok(item),
         }
     }
 
