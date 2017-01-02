@@ -228,11 +228,13 @@ impl GitLab {
     // Higher level methods
 
     fn high_level_get<T, F, L>(&self, namespace: &str, name: &str, iid: i64, f: F) -> Result<T>
-        where   F: Fn(i64) -> L,
-                L: Lister<Vec<T>>,
-                T: GitLabItem {
+        where F: Fn(i64) -> L,
+              L: Lister<Vec<T>>,
+              T: GitLabItem
+    {
 
-        let project = self.get_project(namespace, name).chain_err(|| format!("cannot get project '{}/{}'", namespace, name))?;
+        let project = self.get_project(namespace, name)
+            .chain_err(|| format!("cannot get project '{}/{}'", namespace, name))?;
 
         // NOTE: We can't use `self.issues().single(project.id, id).list()` (or the like) since
         //       the `id` is the _gitlab internal_ id, not the `iid`. We'll unfortunately have to
@@ -249,7 +251,12 @@ impl GitLab {
             // let issues = self.issues().project(project.id).list().chain_err(|| format!("cannot get issues for project '{}/{}'", project.namespace.name, project.name))?;
             // let merge_requests = self.merge_requests(project.id).list().chain_err(|| format!("cannot get merge requests for project '{}/{}'", project.namespace.name, project.name))?;
 
-            let found_items = f(project.id).list_paginated(pagination_page, pagination_per_page).chain_err(|| format!("cannot get high level for project '{}/{}'", project.namespace.name, project.name))?;
+            let found_items = f(project.id).list_paginated(pagination_page, pagination_per_page)
+                .chain_err(|| {
+                    format!("cannot get high level for project '{}/{}'",
+                            project.namespace.name,
+                            project.name)
+                })?;
 
             let nb_found = found_items.len();
 
@@ -265,8 +272,13 @@ impl GitLab {
         }
 
         match found {
-            None => bail!(format!("Item iid={} for project '{}/{}' not found!", iid, project.namespace.name, project.name)),
-            Some(item) => Ok(item)
+            None => {
+                bail!(format!("Item iid={} for project '{}/{}' not found!",
+                              iid,
+                              project.namespace.name,
+                              project.name))
+            }
+            Some(item) => Ok(item),
         }
     }
 
@@ -283,7 +295,10 @@ impl GitLab {
     /// Because we need to search (and thus query the GitLab server possibly multiple times), this
     /// _can_ be a slow operation if there is many issues in the project.
     pub fn get_issue(&self, namespace: &str, name: &str, iid: i64) -> Result<::Issue> {
-        self.high_level_get(namespace, name, iid, |project_id| self.issues().project(project_id))
+        self.high_level_get(namespace,
+                            name,
+                            iid,
+                            |project_id| self.issues().project(project_id))
     }
 
     pub fn get_project(&self, namespace: &str, name: &str) -> Result<::Project> {
@@ -300,12 +315,16 @@ impl GitLab {
         // Query GitLab inside the page loop
         loop {
             // FIXME: Use list_paginated()
-            let projects = self.projects().search(name.to_string()).list().chain_err(|| "cannot get projects")?;
+            let projects = self.projects()
+                .search(name.to_string())
+                .list()
+                .chain_err(|| "cannot get projects")?;
 
             let nb_projects_found = projects.len();
 
             // Find the right project in the vector
-            found_project = projects.into_iter().find(|ref project| project.namespace.name == namespace && project.name == name);
+            found_project = projects.into_iter()
+                .find(|ref project| project.namespace.name == namespace && project.name == name);
 
             if found_project.is_some() || nb_projects_found < pagination_per_page as usize {
                 break;
@@ -317,7 +336,7 @@ impl GitLab {
 
         match found_project {
             None => bail!(format!("Project '{}/{}' not found!", namespace, name)),
-            Some(project) => Ok(project)
+            Some(project) => Ok(project),
         }
     }
 
@@ -333,8 +352,15 @@ impl GitLab {
     ///
     /// Because we need to search (and thus query the GitLab server possibly multiple times), this
     /// _can_ be a slow operation if there is many issues in the project.
-    pub fn get_merge_request(&self, namespace: &str, name: &str, iid: i64) -> Result<::merge_requests::MergeRequest> {
-        self.high_level_get(namespace, name, iid, |project_id| self.merge_requests(project_id))
+    pub fn get_merge_request(&self,
+                             namespace: &str,
+                             name: &str,
+                             iid: i64)
+                             -> Result<::merge_requests::MergeRequest> {
+        self.high_level_get(namespace,
+                            name,
+                            iid,
+                            |project_id| self.merge_requests(project_id))
     }
 }
 
