@@ -224,22 +224,18 @@ impl GitLab {
     //     self.get(&query)
     // }
 
-    // Higher level methods
 
-    fn high_level_get<T, F, L>(&self, namespace: &str, name: &str, iid: i64, f: F) -> Result<T>
-        where F: Fn(i64) -> L,
-              L: Lister<Vec<T>>,
-              T: GitLabItem
+    /// Search for a (generic) GitLab item, iterating over all found match to get the proper one.
+    ///
+    /// This allows getting, for example, a specific issue from a specific project. The GitLab API
+    /// does not make this easy to do in a generic way, so we need to perform the search in a loop
+    /// until the proper item is found and returned.
+    fn get_paginated_from_project<T, F, G, L>(&self, item_search_closure: F, iter_find_closure: G) -> Result<T>
+        where F: Fn() -> L,
+              G: Fn(&<std::vec::IntoIter<T> as IntoIterator>::Item) -> bool,
+              L: Lister<Vec<T>>
     {
-
-        let project = self.get_project(namespace, name)
-            .chain_err(|| format!("cannot get project '{}/{}'", namespace, name))?;
-
-        // NOTE: We can't use `self.issues().single(project.id, id).list()` (or the like) since
-        //       the `id` is the _gitlab internal_ id, not the `iid`. We'll unfortunately have to
-        //       search for the issue instead.
-
-        // Set a default value for the pagination if it's None
+        // Explicitly set the pagination information so we can iterate over the pages.
         let mut pagination_page = 1;
         let pagination_per_page = 20;
 
@@ -247,22 +243,33 @@ impl GitLab {
 
         // Query GitLab inside the page loop
         loop {
-            // let issues = self.issues().project(project.id).list().chain_err(|| format!("cannot get issues for project '{}/{}'", project.namespace.name, project.name))?;
-            // let merge_requests = self.merge_requests(project.id).list().chain_err(|| format!("cannot get merge requests for project '{}/{}'", project.namespace.name, project.name))?;
+            // Query GitLab, specifying the pagination information. Use a closure, passed as
+            // argument, to make this operation generic.
+            // To list project's issues:
+            // let found_items = self.issues().project(id).list_paginated(...).chain_err(...)?;
+            // To list project's merge requests:
+            // let found_items = self.merge_requests(id).list_paginated(...).chain_err(..)?;
+            // To get matching projects:
+            // let found_items = self.projects().search(name).list_paginated(...).chain_err(...)?;
 
-            let found_items = f(project.id).list_paginated(pagination_page, pagination_per_page)
-                .chain_err(|| {
-                    format!("cannot get high level for project '{}/{}'",
-                            project.namespace.name,
-                            project.name)
-                })?;
+            let found_items = item_search_closure().list_paginated(pagination_page, pagination_per_page)
+                .chain_err(|| "cannot get item in GitLab::get_paginated_from_project()")?;
 
             let nb_found = found_items.len();
 
-            // Find the right item in the vector
-            found = found_items.into_iter().find(|ref item| item.iid() == iid);
+            // Find the right item in the vector, if any. Use the second closure passed as argument
+            // as the closure used in `find()`.
+            found = found_items.into_iter().find(&iter_find_closure);
 
-            if found.is_some() || nb_found < pagination_per_page as usize {
+            // Break if we find something.
+            if found.is_some() {
+                break;
+            }
+
+            // Also break if the number of found items is less than the maximum allowed per page.
+            // In that case, there is no more match and we need to stop the loop (we did not find
+            // anything).
+            if nb_found < pagination_per_page as usize {
                 break;
             }
 
@@ -270,13 +277,9 @@ impl GitLab {
             pagination_page += 1;
         }
 
+        // Return the found item
         match found {
-            None => {
-                bail!(format!("Item iid={} for project '{}/{}' not found!",
-                              iid,
-                              project.namespace.name,
-                              project.name))
-            }
+            None => bail!("not found!"),
             Some(item) => Ok(item),
         }
     }
@@ -294,48 +297,30 @@ impl GitLab {
     /// Because we need to search (and thus query the GitLab server possibly multiple times), this
     /// _can_ be a slow operation if there is many issues in the project.
     pub fn get_issue(&self, namespace: &str, name: &str, iid: i64) -> Result<::Issue> {
-        self.high_level_get(namespace,
-                            name,
-                            iid,
-                            |project_id| self.issues().project(project_id))
+        // We first need to find the specific project.
+        let project = self.get_project(namespace, name)
+            .chain_err(|| format!("cannot get project '{}/{}'", namespace, name))?;
+
+        // Closure to search for the item, possibly returning multiple match on multiple pages.
+        let query_gitlab_closure = || self.issues().project(project.id);
+        // Closure to find the right item in the found list on the page.
+        let iter_find_closure = |ref issue: &::Issue| issue.iid == iid;
+
+        self.get_paginated_from_project(query_gitlab_closure, iter_find_closure)
     }
 
+    /// Get a specific "namespace/name" project.
+    /// NOTE: We can't search for "namespace/name", so we search for "name", and refine the match
+    ///       on the namespace. This means the operation could be slow as multiple query to the
+    ///       GitLab server might be required to find the right item.
     pub fn get_project(&self, namespace: &str, name: &str) -> Result<::Project> {
-        // We can't search for "namespace/name", so we search for "name", and loop on the result
-        // until we find the proper "namespace/name".
-        // NOTE: Since our search match could contain many results and they will be paginated,
-        //       we need two loops: one on content of a page, one for the pages.
 
-        let mut pagination_page = 1;
-        let pagination_per_page = 20;
+        // Closure to search for the item, possibly returning multiple match on multiple pages.
+        let query_gitlab_closure = || self.projects().search(name.to_string());
+        // Closure to find the right item in the found list on the page.
+        let iter_find_closure = |ref project: &::Project| project.namespace.name == namespace && project.name == name;
 
-        let mut found: Option<::Project>;
-
-        // Query GitLab inside the page loop
-        loop {
-            let found_items = self.projects()
-                .search(name.to_string())
-                .list_paginated(pagination_page, pagination_per_page)
-                .chain_err(|| "cannot get projects")?;
-
-            let nb_found = found_items.len();
-
-            // Find the right project in the vector
-            found = found_items.into_iter()
-                .find(|ref project| project.namespace.name == namespace && project.name == name);
-
-            if found.is_some() || nb_found < pagination_per_page as usize {
-                break;
-            }
-
-            // Bump to the next page
-            pagination_page += 1;
-        }
-
-        match found {
-            None => bail!(format!("Project '{}/{}' not found!", namespace, name)),
-            Some(item) => Ok(item),
-        }
+        self.get_paginated_from_project(query_gitlab_closure, iter_find_closure)
     }
 
     /// Get a project merge request from a its `iid`.
@@ -355,10 +340,17 @@ impl GitLab {
                              name: &str,
                              iid: i64)
                              -> Result<::merge_requests::MergeRequest> {
-        self.high_level_get(namespace,
-                            name,
-                            iid,
-                            |project_id| self.merge_requests(project_id))
+
+        // We first need to find the specific project.
+        let project = self.get_project(namespace, name)
+            .chain_err(|| format!("cannot get project '{}/{}'", namespace, name))?;
+
+        // Closure to search for the item, possibly returning multiple match on multiple pages.
+        let query_gitlab_closure = || self.merge_requests(project.id);
+        // Closure to find the right item in the found list on the page.
+        let iter_find_closure = |ref issue: &::merge_requests::MergeRequest| issue.iid == iid;
+
+        self.get_paginated_from_project(query_gitlab_closure, iter_find_closure)
     }
 }
 
