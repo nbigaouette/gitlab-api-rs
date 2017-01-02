@@ -314,10 +314,9 @@ impl GitLab {
 
         // Query GitLab inside the page loop
         loop {
-            // FIXME: Use list_paginated()
             let projects = self.projects()
                 .search(name.to_string())
-                .list()
+                .list_paginated(pagination_page, pagination_per_page)
                 .chain_err(|| "cannot get projects")?;
 
             let nb_projects_found = projects.len();
