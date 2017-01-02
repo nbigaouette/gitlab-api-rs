@@ -311,7 +311,7 @@ impl GitLab {
         self.get_paginated_from_project(query_gitlab_closure, iter_find_closure)
     }
 
-    /// Get a project issue from a its `iid`.
+    /// Get a project issue from a its project's `namespace` and `name` and the issue's `iid`.
     ///
     /// Since GitLab uses unique `id`s in its API and _not_ `iid`s, we will need to list issues
     /// (grouped by pages of 20) until we find the proper issue matching the `id` requested.
@@ -336,7 +336,7 @@ impl GitLab {
         self.get_paginated_from_project(query_gitlab_closure, iter_find_closure)
     }
 
-    /// Get a project merge request from a its `iid`.
+    /// Get a project merge request from a its project's `namespace` and `name` and the issue's `iid`.
     ///
     /// Since GitLab uses unique `id`s in its API and _not_ `iid`s, we will need to list issues
     /// (grouped by pages of 20) until we find the proper issue matching the `id` requested.
