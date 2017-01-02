@@ -1,7 +1,6 @@
 
-use std::fmt;
 use std::io::Read;  // Trait providing read_to_string()
-use std::env;
+use std;
 
 use url;
 use hyper;
@@ -29,8 +28,8 @@ pub struct GitLab {
 
 
 // Explicitly implement Debug trait for GitLab so we can hide the token.
-impl fmt::Debug for GitLab {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl std::fmt::Debug for GitLab {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f,
                "GitLab {{ scheme: {}, domain: {}, port: {}, private_token: XXXXXXXXXXXXXXXXXXXX }}",
                self.url.scheme(),
@@ -89,7 +88,7 @@ impl GitLab {
         Ok(GitLab {
             url: url,
             private_token: private_token.to_string(),
-            client: match env::var("HTTP_PROXY") {
+            client: match std::env::var("HTTP_PROXY") {
                 Ok(proxy) => {
                     let proxy: Vec<&str> = proxy.trim_left_matches("http://").split(':').collect();
                     let hostname = proxy[0].to_string();
