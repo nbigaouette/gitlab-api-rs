@@ -24,7 +24,6 @@
 use BuildQuery;
 use Lister;
 use Issues;
-use Issue;
 
 pub mod group;
 pub mod project;

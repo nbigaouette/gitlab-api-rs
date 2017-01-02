@@ -5,7 +5,6 @@ use std::env;
 extern crate log;
 extern crate env_logger;
 
-use gitlab::Lister;
 use gitlab::errors::*;
 
 
