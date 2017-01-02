@@ -157,6 +157,20 @@ impl GitLab {
     // }
 
 
+    /// Perform an HTTP GET to the GitLab server from a specific query.
+    ///
+    /// The `query` is simply the string part appearing in the GET URL.
+    /// For example, for a `GET https://www.example.com/projects/:id/merge_requests?iid=42`, the
+    /// `query` is `projects/:id/merge_requests?iid=42`.
+    ///
+    /// The method _can_ be paginated if `page` and `per_page` is provided.
+    ///
+    /// NOTE:
+    /// * This method is meant to be used internally;
+    /// * Until all `BuildQuery::build_query()`s use `serde_urlencoded`, the `query` paramter will
+    ///   have to remain a string.
+    ///
+    /// Returns a specific GitLab type, wrapped in a `Result`.
     pub fn get<T, U>(&self, query: &str, page: U, per_page: U) -> Result<T>
         where T: serde::Deserialize,
               U: Into<Option<u16>>
