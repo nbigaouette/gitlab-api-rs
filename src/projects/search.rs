@@ -22,6 +22,7 @@
 use serde_urlencoded;
 
 use BuildQuery;
+use Lister;
 use Projects;
 use projects::{SearchProjectListerInternal, ListingOrderBy};
 
@@ -35,6 +36,26 @@ pub struct ProjectsLister<'a> {
     query: String,
     internal: SearchProjectListerInternal,
 }
+
+
+impl<'a> Lister<Projects> for ProjectsLister<'a> {
+    /// Commit the lister: Query GitLab and return a list of projects.
+    fn list(&self) -> Result<Projects> {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        self.gl.get(&query, None, None).chain_err(|| format!("cannot get query {}", query))
+    }
+
+    /// Commit the lister: Query GitLab and return a list of issues.
+    fn list_paginated(&self, page: u16, per_page: u16) -> Result<Projects> {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        self.gl.get(&query, page, per_page).chain_err(|| format!("cannot get query {}", query))
+    }
+}
+
 
 impl<'a> ProjectsLister<'a> {
     pub fn new(gl: &'a ::GitLab, query: String) -> ProjectsLister {
@@ -56,15 +77,6 @@ impl<'a> ProjectsLister<'a> {
     pub fn sort(&'a mut self, sort: ::ListingSort) -> &'a mut ProjectsLister {
         self.internal.sort = Some(sort);
         self
-    }
-
-    /// Commit the lister: Query GitLab and return a list of projects.
-    pub fn list(&self) -> Result<Projects> {
-        // let query = serde_urlencoded::to_string(&self);
-        let query = self.build_query();
-        debug!("query: {:?}", query);
-
-        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
     }
 }
 

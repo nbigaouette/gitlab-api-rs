@@ -6,6 +6,7 @@ extern crate log;
 extern crate env_logger;
 
 use gitlab::GitLab;
+use gitlab::Lister;
 
 use gitlab::errors::*;
 

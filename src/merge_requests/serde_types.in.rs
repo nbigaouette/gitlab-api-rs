@@ -12,7 +12,7 @@ pub enum State {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-enum Status {
+pub enum Status {
     #[serde(rename = "can_be_merged")]
     CanBeMerged,
     #[serde(rename = "cannot_be_merged")]
@@ -34,7 +34,7 @@ pub enum ListingOrderBy {
 
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
-pub struct MergeRequestsListerInternal {
+struct MergeRequestsListerInternal {
     /// Merge request's IID
     iid: Option<Vec<i64>>,
     /// State of the requests
@@ -49,34 +49,34 @@ pub struct MergeRequestsListerInternal {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MergeRequest {
-    id: i64,
-    iid: i64,
-    project_id: i64,
-    title: String,
-    description: String,
-    state: State,
-    created_at: String,  // FIXME: Use chrono crate
-    updated_at: String,  // FIXME: Use chrono crate
-    target_branch: String,
-    source_branch: String,
-    upvotes: i64,
-    downvotes: i64,
-    author: ::User,
-    assignee: Option<::User>,
-    source_project_id: i64,
-    target_project_id: i64,
-    labels: Vec<String>,
-    work_in_progress: bool,
-    milestone: Option<::Milestone>,
-    merge_when_build_succeeds: bool,
-    merge_status: Status,
-    sha: Option<String>,
-    merge_commit_sha: Option<String>,
-    subscribed: bool,
-    user_notes_count: i64,
-    should_remove_source_branch: Option<bool>,
-    force_remove_source_branch: Option<bool>,
-    web_url: String
+    pub id: i64,
+    pub iid: i64,
+    pub project_id: i64,
+    pub title: String,
+    pub description: String,
+    pub state: State,
+    pub created_at: String,  // FIXME: Use chrono crate
+    pub updated_at: String,  // FIXME: Use chrono crate
+    pub target_branch: String,
+    pub source_branch: String,
+    pub upvotes: i64,
+    pub downvotes: i64,
+    pub author: ::User,
+    pub assignee: Option<::User>,
+    pub source_project_id: i64,
+    pub target_project_id: i64,
+    pub labels: Vec<String>,
+    pub work_in_progress: bool,
+    pub milestone: Option<::Milestone>,
+    pub merge_when_build_succeeds: bool,
+    pub merge_status: Status,
+    pub sha: Option<String>,
+    pub merge_commit_sha: Option<String>,
+    pub subscribed: bool,
+    pub user_notes_count: i64,
+    pub should_remove_source_branch: Option<bool>,
+    pub force_remove_source_branch: Option<bool>,
+    pub web_url: String
 }
 
 pub type MergeRequests = Vec<MergeRequest>;

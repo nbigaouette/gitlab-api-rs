@@ -30,6 +30,7 @@
 // use serde_urlencoded;
 
 use BuildQuery;
+use Lister;
 
 pub mod single;
 
@@ -47,6 +48,25 @@ pub struct MergeRequestsLister<'a> {
     gl: &'a ::GitLab,
     id: i64,
     internal: MergeRequestsListerInternal,
+}
+
+
+impl<'a> Lister<MergeRequests> for MergeRequestsLister<'a> {
+    /// Commit the lister: Query GitLab and return a list of projects.
+    fn list(&self) -> Result<MergeRequests> {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        self.gl.get(&query, None, None).chain_err(|| format!("cannot get query {}", query))
+    }
+
+    /// Commit the lister: Query GitLab and return a list of issues.
+    fn list_paginated(&self, page: u16, per_page: u16) -> Result<MergeRequests> {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        self.gl.get(&query, page, per_page).chain_err(|| format!("cannot get query {}", query))
+    }
 }
 
 
@@ -91,15 +111,6 @@ impl<'a> MergeRequestsLister<'a> {
     fn sort(&'a mut self, sort: ::ListingSort) -> &'a mut MergeRequestsLister {
         self.internal.sort = Some(sort);
         self
-    }
-
-
-    /// Commit the lister: Query GitLab and return a list of projects.
-    pub fn list(&self) -> Result<MergeRequests> {
-        let query = self.build_query();
-        debug!("query: {:?}", query);
-
-        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
     }
 }
 

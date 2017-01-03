@@ -33,6 +33,7 @@
 use serde_urlencoded;
 
 use BuildQuery;
+use Lister;
 use Issues;
 use issues::ProjectsIssuesListerInternal;
 
@@ -45,6 +46,24 @@ pub struct IssuesLister<'a> {
     /// The ID of a group
     id: i64,
     internal: ProjectsIssuesListerInternal,
+}
+
+
+impl<'a> Lister<Issues> for IssuesLister<'a> {
+    /// Commit the lister: Query GitLab and return a list of issues.
+    fn list(&self) -> Result<Issues> {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        self.gl.get(&query, None, None).chain_err(|| format!("cannot get query {}", query))
+    }
+
+    fn list_paginated(&self, page: u16, per_page: u16) -> Result<Issues> {
+        let query = self.build_query();
+        debug!("query: {:?}", query);
+
+        self.gl.get(&query, page, per_page).chain_err(|| format!("cannot get query {}", query))
+    }
 }
 
 
@@ -93,15 +112,6 @@ impl<'a> IssuesLister<'a> {
     pub fn sort(&'a mut self, sort: ::ListingSort) -> &'a mut IssuesLister {
         self.internal.sort = Some(sort);
         self
-    }
-
-
-    /// Commit the lister: Query GitLab and return a list of issues.
-    pub fn list(&self) -> Result<Issues> {
-        let query = self.build_query();
-        debug!("query: {:?}", query);
-
-        self.gl.get(&query).chain_err(|| format!("cannot get query {}", query))
     }
 }
 
@@ -198,6 +208,8 @@ impl<'a> BuildQuery for IssuesLister<'a> {
     }
 }
 
+
+
 #[cfg(test)]
 mod tests {
     use BuildQuery;
@@ -242,8 +254,12 @@ mod tests {
         let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
-        let expected_string = format!("projects/{}/issues?milestone=Test+Milestone", TEST_PROJECT_ID);
-        let query = gl.issues().project(TEST_PROJECT_ID).milestone("Test Milestone".to_string()).build_query();
+        let expected_string = format!("projects/{}/issues?milestone=Test+Milestone",
+                                      TEST_PROJECT_ID);
+        let query = gl.issues()
+            .project(TEST_PROJECT_ID)
+            .milestone("Test Milestone".to_string())
+            .build_query();
         assert_eq!(query, expected_string);
     }
 

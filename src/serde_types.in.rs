@@ -38,7 +38,7 @@ pub enum ListingVisibility {
 
 
 #[derive(Debug, Serialize, Deserialize)]
-enum IssueState {
+pub enum IssueState {
     #[serde(rename = "opened")]
     Opened,
 
@@ -48,7 +48,7 @@ enum IssueState {
 
 
 #[derive(Debug, Serialize, Deserialize)]
-enum UserState {
+pub enum UserState {
     #[serde(rename = "active")]
     Active,
 
@@ -58,7 +58,7 @@ enum UserState {
 
 
 #[derive(Debug, Serialize, Deserialize)]
-enum MilestoneState {
+pub enum MilestoneState {
     #[serde(rename = "active")]
     Active,
 
@@ -108,65 +108,65 @@ pub struct ProjectOwner {
 
 
 #[derive(Debug, Serialize, Deserialize)]
-struct ProjectNamespaceAvatar {
-    url: Option<String>,
+pub struct ProjectNamespaceAvatar {
+    pub url: Option<String>,
 }
 
 
 #[derive(Default, Debug, Serialize, Deserialize)]
-struct ProjectNamespace {
-    id: i64,
-    name: String,
-    path: String,
-    owner_id: Option<i64>,  // FIXME: Why would a project not have this?
-    created_at: String,  // FIXME: Date instead?
-    updated_at: String,  // FIXME: Date instead?
-    description: String,
-    avatar: Option<ProjectNamespaceAvatar>,
-    membership_lock: Option<bool>,
-    share_with_group_lock: bool,
-    visibility_level: i64,
-    request_access_enabled: bool,
-    ldap_sync_status: Option<String>,
-    ldap_sync_error: Option<String>,  // FIXME: Is String the proper type?
-    ldap_sync_last_update_at: Option<String>,  // FIXME: Is String the proper type?
-    ldap_sync_last_successful_update_at: Option<String>,  // FIXME: Is String the proper type?
-    ldap_sync_last_sync_at: Option<String>,  // FIXME: Is String the proper type?
-    deleted_at: Option<String>,  // FIXME: Is String the proper type?
-    lfs_enabled: Option<String>,  // FIXME: Is String the proper type?
-    repository_size_limit: Option<String>  // FIXME: Is String the proper type?
+pub struct ProjectNamespace {
+    pub id: i64,
+    pub name: String,
+    pub path: String,
+    pub owner_id: Option<i64>,  // FIXME: Why would a project not have this?
+    pub created_at: String,  // FIXME: Date instead?
+    pub updated_at: String,  // FIXME: Date instead?
+    pub description: String,
+    pub avatar: Option<ProjectNamespaceAvatar>,
+    pub membership_lock: Option<bool>,
+    pub share_with_group_lock: bool,
+    pub visibility_level: i64,
+    pub request_access_enabled: bool,
+    pub ldap_sync_status: Option<String>,
+    pub ldap_sync_error: Option<String>,  // FIXME: Is String the proper type?
+    pub ldap_sync_last_update_at: Option<String>,  // FIXME: Is String the proper type?
+    pub ldap_sync_last_successful_update_at: Option<String>,  // FIXME: Is String the proper type?
+    pub ldap_sync_last_sync_at: Option<String>,  // FIXME: Is String the proper type?
+    pub deleted_at: Option<String>,  // FIXME: Is String the proper type?
+    pub lfs_enabled: Option<String>,  // FIXME: Is String the proper type?
+    pub repository_size_limit: Option<String>  // FIXME: Is String the proper type?
 }
 
 
 #[derive(Debug, Serialize, Deserialize)]
-struct ProjectForkedFrom {
-    id: i64,
-    http_url_to_repo: String,
-    web_url: String,
-    name: String,
-    name_with_namespace: String,
-    path: String,
-    path_with_namespace: String,
+pub struct ProjectForkedFrom {
+    pub id: i64,
+    pub http_url_to_repo: String,
+    pub web_url: String,
+    pub name: String,
+    pub name_with_namespace: String,
+    pub path: String,
+    pub path_with_namespace: String,
 }
 
 
 #[derive(Debug, Serialize, Deserialize)]
-struct ProjectAccess {
-    access_level: i64,
-    notification_level: i64,
+pub struct ProjectAccess {
+    pub access_level: i64,
+    pub notification_level: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct ProjectPermissions {
-    project_access: Option<ProjectAccess>,
-    group_access: Option<ProjectAccess>,
+pub struct ProjectPermissions {
+    pub project_access: Option<ProjectAccess>,
+    pub group_access: Option<ProjectAccess>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct ProjectSharedWithGroup {
-    group_id: i64,
-    group_name: String,
-    group_access_level: i64,
+pub struct ProjectSharedWithGroup {
+    pub group_id: i64,
+    pub group_name: String,
+    pub group_access_level: i64,
 }
 
 
@@ -174,46 +174,46 @@ struct ProjectSharedWithGroup {
 // https://doc.rust-lang.org/rustc-serialize/rustc_serialize/json/index.html
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct Project {
-    id: i64,
-    description: String,
-    default_branch: Option<String>,
-    tag_list: Vec<String>,
-    public: bool,
-    archived: bool,
-    visibility_level: i64,
-    ssh_url_to_repo: String,
-    http_url_to_repo: String,
-    web_url: String,
+    pub id: i64,
+    pub description: String,
+    pub default_branch: Option<String>,
+    pub tag_list: Vec<String>,
+    pub public: bool,
+    pub archived: bool,
+    pub visibility_level: i64,
+    pub ssh_url_to_repo: String,
+    pub http_url_to_repo: String,
+    pub web_url: String,
     // owner: Option<ProjectOwner>,  // FIXME: Why would a project not have an owner?
-    name: String,
-    name_with_namespace: String,
-    path: String,
-    path_with_namespace: String,
-    container_registry_enabled: Option<bool>,
-    issues_enabled: bool,
-    merge_requests_enabled: bool,
-    wiki_enabled: bool,
-    builds_enabled: bool,
-    snippets_enabled: bool,
-    created_at: String,  // FIXME: Date instead?
-    last_activity_at: String,  // FIXME: Date instead?
-    shared_runners_enabled: bool,
-    lfs_enabled: bool,
-    creator_id: i64,
-    namespace: ProjectNamespace,
-    forked_from_project: Option<ProjectForkedFrom>,
-    avatar_url: Option<String>,
-    star_count: i64,
-    forks_count: i64,
-    open_issues_count: i64,
-    runners_token: Option<String>,
-    public_builds: bool,
-    shared_with_groups: Vec<ProjectSharedWithGroup>,
-    only_allow_merge_if_build_succeeds: bool,
-    request_access_enabled: bool,
-    only_allow_merge_if_all_discussions_are_resolved: Option<bool>,  // FIXME: Is bool the proper type?
-    approvals_before_merge: Option<i64>,
-    permissions: Option<ProjectPermissions>,
+    pub name: String,
+    pub name_with_namespace: String,
+    pub path: String,
+    pub path_with_namespace: String,
+    pub container_registry_enabled: Option<bool>,
+    pub issues_enabled: Option<bool>,
+    pub merge_requests_enabled: Option<bool>,
+    pub wiki_enabled: Option<bool>,
+    pub builds_enabled: Option<bool>,
+    pub snippets_enabled: Option<bool>,
+    pub created_at: String,  // FIXME: Date instead?
+    pub last_activity_at: String,  // FIXME: Date instead?
+    pub shared_runners_enabled: bool,
+    pub lfs_enabled: bool,
+    pub creator_id: i64,
+    pub namespace: ProjectNamespace,
+    pub forked_from_project: Option<ProjectForkedFrom>,
+    pub avatar_url: Option<String>,
+    pub star_count: i64,
+    pub forks_count: i64,
+    pub open_issues_count: Option<i64>,
+    pub runners_token: Option<String>,
+    pub public_builds: bool,
+    pub shared_with_groups: Vec<ProjectSharedWithGroup>,
+    pub only_allow_merge_if_build_succeeds: bool,
+    pub request_access_enabled: bool,
+    pub only_allow_merge_if_all_discussions_are_resolved: Option<bool>,  // FIXME: Is bool the proper type?
+    pub approvals_before_merge: Option<i64>,
+    pub permissions: Option<ProjectPermissions>,
 }
 
 pub type Projects = Vec<Project>;
@@ -221,51 +221,51 @@ pub type Projects = Vec<Project>;
 
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Milestone {
-    id: i64,
-    iid: i64,
-    project_id: i64,
-    title: String,
-    description: String,
-    state: MilestoneState,
-    created_at: String,  // FIXME: Use date type?
-    updated_at: String,  // FIXME: Use date type?
-    due_date: Option<String>  // FIXME: Use date type?
+pub struct Milestone {
+    pub id: i64,
+    pub iid: i64,
+    pub project_id: i64,
+    pub title: String,
+    pub description: String,
+    pub state: MilestoneState,
+    pub created_at: String,  // FIXME: Use date type?
+    pub updated_at: String,  // FIXME: Use date type?
+    pub due_date: Option<String>  // FIXME: Use date type?
 }
 
 
 #[derive(Debug, Serialize, Deserialize)]
-struct User {
-    name: String,
-    username: String,
-    id: i64,
-    state: UserState,
-    avatar_url: Option<String>,
-    web_url: Option<String>
+pub struct User {
+    pub name: String,
+    pub username: String,
+    pub id: i64,
+    pub state: UserState,
+    pub avatar_url: Option<String>,
+    pub web_url: Option<String>
 }
 
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Issue {
-    id: i64,
-    iid: i64,
-    project_id: i64,
-    title: String,
-    description: String,
-    state: IssueState,
-    created_at: String,  // FIXME: Use date type?
-    updated_at: String,  // FIXME: Use date type?
-    labels: Vec<String>,
-    milestone: Option<Milestone>,
-    assignee: Option<User>,
-    author: User,
-    subscribed: bool,
-    user_notes_count: i64,
-    upvotes: i64,
-    downvotes: i64,
-    due_date: Option<String>,  // FIXME: Use date type?
-    confidential: bool,
-    web_url: Option<String>
+    pub id: i64,
+    pub iid: i64,
+    pub project_id: i64,
+    pub title: String,
+    pub description: String,
+    pub state: IssueState,
+    pub created_at: String,  // FIXME: Use date type?
+    pub updated_at: String,  // FIXME: Use date type?
+    pub labels: Vec<String>,
+    pub milestone: Option<Milestone>,
+    pub assignee: Option<User>,
+    pub author: User,
+    pub subscribed: bool,
+    pub user_notes_count: i64,
+    pub upvotes: i64,
+    pub downvotes: i64,
+    pub due_date: Option<String>,  // FIXME: Use date type?
+    pub confidential: bool,
+    pub web_url: Option<String>
 }
 
 

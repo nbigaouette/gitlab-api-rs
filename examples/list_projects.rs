@@ -8,6 +8,7 @@ extern crate env_logger;
 
 use gitlab::GitLab;
 // use gitlab::Pagination;
+use gitlab::Lister;
 
 use gitlab::errors::*;
 
@@ -54,7 +55,10 @@ fn run() -> Result<()> {
     };
 
     let gl = GitLab::new(&hostname, &token).chain_err(|| "failure to create GitLab instance")?;
-    // let gl = GitLab::new(&hostname, &token).chain_err(|| "failure to create GitLab instance")?.scheme("http").port(80);
+    // let gl = GitLab::new(&hostname, &token)
+    //     .chain_err(|| "failure to create GitLab instance")?
+    //     .scheme("http")
+    //     .port(80);
     // let gl = gl.scheme("http").port(80);
 
     let projects = gl.projects().list().chain_err(|| "cannot get projects")?;

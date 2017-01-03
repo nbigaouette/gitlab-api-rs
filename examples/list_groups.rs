@@ -54,10 +54,6 @@ fn run() -> Result<()> {
     // let mut gl = gitlab::GitLab::new(&hostname, &token).chain_err(|| "failure to create GitLab instance")?.scheme("http").port(80);
     // gl = gl.scheme("http").port(80);
 
-    gl.set_pagination(gitlab::Pagination {
-        page: 1,
-        per_page: 100,
-    });
     println!("gl: {:?}", gl);
 
     let groups = gl.groups().list().chain_err(|| "cannot get groups")?;
