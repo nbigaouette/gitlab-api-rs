@@ -21,8 +21,6 @@
 
 
 use BuildQuery;
-use Project;
-use projects::ListingId;
 
 use ::errors::*;
 
@@ -30,18 +28,18 @@ use ::errors::*;
 #[derive(Debug, Clone)]
 pub struct ProjectsLister<'a> {
     gl: &'a ::GitLab,
-    id: ListingId,
+    id: ::projects::ListingId,
 }
 
 
 impl<'a> ProjectsLister<'a> {
-    pub fn new(gl: &'a ::GitLab, id: ListingId) -> ProjectsLister {
+    pub fn new(gl: &'a ::GitLab, id: ::projects::ListingId) -> ProjectsLister {
         ProjectsLister { gl: gl, id: id }
     }
 
 
     /// Commit the lister: Query GitLab and return a list of projects.
-    pub fn list(&self) -> Result<Project> {
+    pub fn list(&self) -> Result<::projects::Project> {
         // let query = serde_urlencoded::to_string(&self);
         let query = self.build_query();
         debug!("query: {:?}", query);
@@ -70,8 +68,8 @@ impl<'a> BuildQuery for ProjectsLister<'a> {
         let mut query = String::from("projects/");
 
         query.push_str(&match self.id {
-            ListingId::Id(id) => id.to_string(),
-            ListingId::NamespaceProject(ref s) => s.replace("/", "%2F"),
+            ::projects::ListingId::Id(id) => id.to_string(),
+            ::projects::ListingId::NamespaceProject(ref s) => s.replace("/", "%2F"),
         });
 
         query
@@ -81,7 +79,6 @@ impl<'a> BuildQuery for ProjectsLister<'a> {
 
 #[cfg(test)]
 mod tests {
-    use projects::ListingId;
     use BuildQuery;
 
     const TEST_PROJECT_ID: i64 = 123;
@@ -95,14 +92,14 @@ mod tests {
 
         let expected_string = format!("projects/{}", TEST_PROJECT_ID);
         let query = gl.projects()
-            .id(ListingId::Id(TEST_PROJECT_ID))
+            .id(::projects::ListingId::Id(TEST_PROJECT_ID))
             .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/{}",
                                       TEST_PROJECT_NAME.to_string().replace("/", "%2F"));
         let query = gl.projects()
-            .id(ListingId::NamespaceProject(TEST_PROJECT_NAME.to_string()))
+            .id(::projects::ListingId::NamespaceProject(TEST_PROJECT_NAME.to_string()))
             .build_query();
         assert_eq!(query, expected_string);
     }

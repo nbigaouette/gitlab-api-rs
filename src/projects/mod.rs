@@ -27,8 +27,6 @@ use serde_urlencoded;
 
 use BuildQuery;
 use Lister;
-use Project;
-use Projects;
 
 
 pub mod all;
@@ -57,13 +55,13 @@ include!(concat!(env!("OUT_DIR"), "/projects/serde_types.rs"));
 #[derive(Debug, Clone)]
 pub struct ProjectsLister<'a> {
     gl: &'a ::GitLab,
-    internal: ProjectListerInternal,
+    internal: ::projects::ProjectListerInternal,
 }
 
 
-impl<'a> Lister<Projects> for ProjectsLister<'a> {
+impl<'a> Lister<::projects::Projects> for ProjectsLister<'a> {
     /// Commit the lister: Query GitLab and return a list of projects.
-    fn list(&self) -> Result<Projects> {
+    fn list(&self) -> Result<::projects::Projects> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
@@ -71,7 +69,7 @@ impl<'a> Lister<Projects> for ProjectsLister<'a> {
     }
 
     /// Commit the lister: Query GitLab and return a list of issues.
-    fn list_paginated(&self, page: u16, per_page: u16) -> Result<Projects> {
+    fn list_paginated(&self, page: u16, per_page: u16) -> Result<::projects::Projects> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
@@ -84,7 +82,7 @@ impl<'a> ProjectsLister<'a> {
     pub fn new(gl: &'a ::GitLab) -> ProjectsLister {
         ProjectsLister {
             gl: gl,
-            internal: ProjectListerInternal {
+            internal: ::projects::ProjectListerInternal {
                 archived: None,
                 visibility: None,
                 order_by: None,
@@ -374,7 +372,7 @@ mod tests {
     fn project_to_issues() {
         let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         let project_id = 123;
-        let project = ::Project { id: project_id, ..Default::default() };
+        let project = ::projects::Project { id: project_id, ..Default::default() };
         let issues_lister = format!("{:?}", project.issues(&gl));
         let default_issues_lister = format!("{:?}",
                                             ::issues::project::IssuesLister::new(&gl, project_id));
@@ -386,7 +384,7 @@ mod tests {
     fn project_to_merge_requests() {
         let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         let project_id = 123;
-        let project = ::Project { id: project_id, ..Default::default() };
+        let project = ::projects::Project { id: project_id, ..Default::default() };
         let merge_requests_lister = format!("{:?}", project.merge_requests(&gl));
         let default_merge_requests_lister =
             format!("{:?}",

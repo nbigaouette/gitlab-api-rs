@@ -133,6 +133,6 @@ mod tests {
             }
         ]"##;
 
-        let project: ::Projects = serde_json::from_str(json_reply).expect("JSON deserialization failed");
+        let project: ::projects::Projects = serde_json::from_str(json_reply).expect("JSON deserialization failed");
     }
 }

@@ -23,8 +23,6 @@ use serde_urlencoded;
 
 use BuildQuery;
 use Lister;
-use Projects;
-use projects::{SearchProjectListerInternal, ListingOrderBy};
 
 use ::errors::*;
 
@@ -34,13 +32,13 @@ pub struct ProjectsLister<'a> {
     gl: &'a ::GitLab,
     /// A string contained in the project name.
     query: String,
-    internal: SearchProjectListerInternal,
+    internal: ::projects::SearchProjectListerInternal,
 }
 
 
-impl<'a> Lister<Projects> for ProjectsLister<'a> {
+impl<'a> Lister<::projects::Projects> for ProjectsLister<'a> {
     /// Commit the lister: Query GitLab and return a list of projects.
-    fn list(&self) -> Result<Projects> {
+    fn list(&self) -> Result<::projects::Projects> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
@@ -48,7 +46,7 @@ impl<'a> Lister<Projects> for ProjectsLister<'a> {
     }
 
     /// Commit the lister: Query GitLab and return a list of issues.
-    fn list_paginated(&self, page: u16, per_page: u16) -> Result<Projects> {
+    fn list_paginated(&self, page: u16, per_page: u16) -> Result<::projects::Projects> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
@@ -62,14 +60,14 @@ impl<'a> ProjectsLister<'a> {
         ProjectsLister {
             gl: gl,
             query: query,
-            internal: SearchProjectListerInternal {
+            internal: ::projects::SearchProjectListerInternal {
                 order_by: None,
                 sort: None,
             },
         }
     }
 
-    pub fn order_by(&'a mut self, order_by: ListingOrderBy) -> &'a mut ProjectsLister {
+    pub fn order_by(&'a mut self, order_by: ::projects::ListingOrderBy) -> &'a mut ProjectsLister {
         self.internal.order_by = Some(order_by);
         self
     }
@@ -99,7 +97,6 @@ impl<'a> BuildQuery for ProjectsLister<'a> {
 #[cfg(test)]
 mod tests {
     use BuildQuery;
-    use projects::ListingOrderBy;
 
     const TEST_SEARCH_QUERY: &'static str = "SearchPattern";
 
@@ -125,21 +122,21 @@ mod tests {
         let expected_string = format!("projects/search/{}?order_by=id", TEST_SEARCH_QUERY);
         let query = gl.projects()
             .search(TEST_SEARCH_QUERY.to_string())
-            .order_by(ListingOrderBy::Id)
+            .order_by(::projects::ListingOrderBy::Id)
             .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/search/{}?order_by=name", TEST_SEARCH_QUERY);
         let query = gl.projects()
             .search(TEST_SEARCH_QUERY.to_string())
-            .order_by(ListingOrderBy::Name)
+            .order_by(::projects::ListingOrderBy::Name)
             .build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = format!("projects/search/{}?order_by=created_at", TEST_SEARCH_QUERY);
         let query = gl.projects()
             .search(TEST_SEARCH_QUERY.to_string())
-            .order_by(ListingOrderBy::CreatedAt)
+            .order_by(::projects::ListingOrderBy::CreatedAt)
             .build_query();
         assert_eq!(query, expected_string);
 
@@ -147,7 +144,7 @@ mod tests {
                                       TEST_SEARCH_QUERY);
         let query = gl.projects()
             .search(TEST_SEARCH_QUERY.to_string())
-            .order_by(ListingOrderBy::LastActivityAt)
+            .order_by(::projects::ListingOrderBy::LastActivityAt)
             .build_query();
         assert_eq!(query, expected_string);
     }
@@ -183,7 +180,7 @@ mod tests {
                                       TEST_SEARCH_QUERY);
         let query = gl.projects()
             .search(TEST_SEARCH_QUERY.to_string())
-            .order_by(ListingOrderBy::CreatedAt)
+            .order_by(::projects::ListingOrderBy::CreatedAt)
             .sort(::ListingSort::Desc)
             .build_query();
         assert_eq!(query, expected_string);
