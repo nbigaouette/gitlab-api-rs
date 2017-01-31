@@ -41,9 +41,10 @@ pub enum ListingVisibility {
 pub enum IssueState {
     #[serde(rename = "opened")]
     Opened,
-
     #[serde(rename = "closed")]
     Closed,
+    #[serde(rename = "reopened")]
+    Reopened,
 }
 
 
