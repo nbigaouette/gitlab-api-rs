@@ -10,6 +10,9 @@ keywords = ["gitlab", "git"]
 categories = ["api-bindings"]
 build = "build.rs"
 
+[badges]
+travis-ci = { repository = "nbigaouette/gitlab-api-rs" }
+
 [features]
 default = ["serde_codegen"]
 unstable = ["serde_derive"]
