@@ -21,7 +21,7 @@ env_logger = "0.4"
 
 [dependencies]
 log = "0.3"
-error-chain = "0.7.1"
+error-chain = "0.8"
 regex = "0.2.1"
 url = "1.2.3"
 serde = "0.9"
