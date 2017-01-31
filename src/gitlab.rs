@@ -371,7 +371,7 @@ impl GitLab {
         // Closure to search for the item, possibly returning multiple match on multiple pages.
         let query_gitlab_closure = || self.merge_requests(project.id);
         // Closure to find the right item in the found list on the page.
-        let iter_find_closure = |ref issue: &::merge_requests::MergeRequest| issue.iid == iid;
+        let iter_find_closure = |ref merge_request: &::merge_requests::MergeRequest| merge_request.iid == iid;
 
         self.get_paginated_from_project(query_gitlab_closure, iter_find_closure)
     }
