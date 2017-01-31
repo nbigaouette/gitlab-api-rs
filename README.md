@@ -104,6 +104,7 @@ fn main() {
 * Crate uses `https` by default. Use `GitLab::new_insecure()` to use `http` (or `port()` and `sheme()` setters on `GitLab` struct).
 * Sending your token in clear over `http` is dangerous!
 * See [examples/list_projects.rs] for an example of how to load the token (and the hostname) from an environment variable.
+* See the `examples` directory for many more examples on how to use this crate.
 
 
 ## Dependencies
