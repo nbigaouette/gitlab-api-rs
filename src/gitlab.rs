@@ -195,7 +195,8 @@ impl GitLab {
         // The headers might leak the token, don't print them.
         // debug!("res.headers: {:?}", res.headers);
         // Hide the url's token in logger
-        debug!("res.url: {}", remove_gitlab_token_from_url(res.url.as_str()));
+        debug!("res.url: {}",
+               remove_gitlab_token_from_url(res.url.as_str()));
 
         let mut body = String::new();
         res.read_to_string(&mut body).chain_err(|| "cannot read response body")?;
@@ -269,8 +270,9 @@ impl GitLab {
             // To get matching projects:
             // let found_items = self.projects().search(name).list_paginated(...).chain_err(...)?;
 
-            let found_items = item_search_closure().list_paginated(pagination_page, pagination_per_page)
-                .chain_err(|| "cannot get item in GitLab::get_paginated_from_project()")?;
+            let found_items =
+                item_search_closure().list_paginated(pagination_page, pagination_per_page)
+                    .chain_err(|| "cannot get item in GitLab::get_paginated_from_project()")?;
 
             let nb_found = found_items.len();
 
@@ -310,7 +312,9 @@ impl GitLab {
         // Closure to search for the item, possibly returning multiple match on multiple pages.
         let query_gitlab_closure = || self.projects().search(name.to_string());
         // Closure to find the right item in the found list on the page.
-        let iter_find_closure = |ref project: &::projects::Project| project.namespace.name == namespace && project.name == name;
+        let iter_find_closure = |ref project: &::projects::Project| {
+            project.namespace.name == namespace && project.name == name
+        };
 
         self.get_paginated_from_project(query_gitlab_closure, iter_find_closure)
     }
@@ -340,10 +344,12 @@ impl GitLab {
         self.get_paginated_from_project(query_gitlab_closure, iter_find_closure)
     }
 
-    /// Get a project merge request from a its project's `namespace` and `name` and the issue's `iid`.
+    /// Get a project merge request from a its project's `namespace` and `name` and
+    /// the issue's `iid`.
     ///
-    /// Since GitLab uses unique `id`s in its API and _not_ `iid`s, we will need to list issues
-    /// (grouped by pages of 20) until we find the proper issue matching the `id` requested.
+    /// Since GitLab uses unique `id`s in its API and _not_ `iid`s, we will need to
+    /// list issues (grouped by pages of 20) until we find the proper issue matching
+    /// the `id` requested.
     ///
     /// **Note**: A `iid` is the issue number as seen by normal user, for example appearing on
     /// a GitLab URL. This `iid` can be used to reference an issue (in other issues, in commit

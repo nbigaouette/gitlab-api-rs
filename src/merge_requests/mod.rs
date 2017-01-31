@@ -303,7 +303,8 @@ mod tests {
         let gl = ::GitLab::new(&"localhost", "XXXXXXXXXXXXXXXXXXXX").unwrap();
         // let gl: ::GitLab = Default::default();
 
-        let expected_string = format!("projects/{}/merge_requests?iid[]=456&iid[]=789&order_by=created_at&sort=asc",
+        let expected_string = format!("projects/{}/merge_requests?\
+            iid[]=456&iid[]=789&order_by=created_at&sort=asc",
                                       TEST_PROJECT_ID);
         let query = gl.merge_requests(TEST_PROJECT_ID)
             .iid(vec![456, 789])

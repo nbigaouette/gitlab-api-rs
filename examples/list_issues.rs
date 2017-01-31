@@ -55,7 +55,9 @@ fn run() -> Result<()> {
     };
 
     let gl = GitLab::new(&hostname, &token).chain_err(|| "failure to create GitLab instance")?;
-    // let gl = GitLab::new(&hostname, &token).chain_err(|| "failure to create GitLab instance")?.scheme("http").port(80);
+    // let gl = GitLab::new(&hostname, &token)
+    //     .chain_err(|| "failure to create GitLab instance")?
+    //     .scheme("http").port(80);
     // let gl = gl.scheme("http").port(80);
 
     let issues = gl.issues().list().chain_err(|| "cannot get issues")?;

@@ -173,15 +173,18 @@ mod tests {
         assert_eq!(query, expected_string);
 
         let expected_string = "projects/all?order_by=created_at";
-        let query = gl.projects().all().order_by(::projects::ListingOrderBy::CreatedAt).build_query();
+        let query =
+            gl.projects().all().order_by(::projects::ListingOrderBy::CreatedAt).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "projects/all?order_by=updated_at";
-        let query = gl.projects().all().order_by(::projects::ListingOrderBy::UpdatedAt).build_query();
+        let query =
+            gl.projects().all().order_by(::projects::ListingOrderBy::UpdatedAt).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "projects/all?order_by=last_activity_at";
-        let query = gl.projects().all().order_by(::projects::ListingOrderBy::LastActivityAt).build_query();
+        let query =
+            gl.projects().all().order_by(::projects::ListingOrderBy::LastActivityAt).build_query();
         assert_eq!(query, expected_string);
     }
 

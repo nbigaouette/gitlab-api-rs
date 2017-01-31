@@ -53,7 +53,9 @@ fn run() -> Result<()> {
     };
 
     let gl = GitLab::new(&hostname, &token).chain_err(|| "failure to create GitLab instance")?;
-    // let gl = GitLab::new(&hostname, &token).chain_err(|| "failure to create GitLab instance")?.scheme("http").port(80);
+    // let gl = GitLab::new(&hostname, &token)
+    //     .chain_err(|| "failure to create GitLab instance")?
+    //     .scheme("http").port(80);
     // let gl = gl.scheme("http").port(80);
 
     let project_id = 142;
@@ -76,7 +78,10 @@ fn run() -> Result<()> {
         .chain_err(|| "cannot get merge request")?;
     println!("merge_requests: {:?}", merge_requests);
 
-    // let merge_requests = gl.merge_requests(project_id).iid(merge_requests_iids).list().chain_err(|| "cannot get merge request")?;
+    // let merge_requests = gl.merge_requests(project_id)
+    //     .iid(merge_requests_iids)
+    //     .list()
+    //     .chain_err(|| "cannot get merge request")?;
     // println!("merge_requests: {:?}", merge_requests);
 
     Ok(())

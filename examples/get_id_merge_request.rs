@@ -57,7 +57,9 @@ fn run() -> Result<()> {
     };
 
     let gl = GitLab::new(&hostname, &token).chain_err(|| "failure to create GitLab instance")?;
-    // let gl = GitLab::new(&hostname, &token).chain_err(|| "failure to create GitLab instance")?.scheme("http").port(80);
+    // let gl = GitLab::new(&hostname, &token)
+    //     .chain_err(|| "failure to create GitLab instance")?
+    //     .scheme("http").port(80);
     // let gl = gl.scheme("http").port(80);
 
     let matches = clap::App::new("get_id_merge_request")
@@ -88,10 +90,15 @@ fn run() -> Result<()> {
     let project_name = matches.value_of("project").unwrap();
     let merge_request_iid = value_t!(matches, "id", i64).unwrap_or_else(|e| e.exit());
 
-    let merge_request = gl.get_merge_request(project_namespace, project_name, merge_request_iid).chain_err(|| "cannot get merge request")?;
+    let merge_request = gl.get_merge_request(project_namespace, project_name, merge_request_iid)
+        .chain_err(|| "cannot get merge request")?;
     // println!("merge_request: {:?}", merge_request);
 
-    println!("Id for {}/{}!{}: {}", project_namespace, project_name, merge_request_iid, merge_request.id);
+    println!("Id for {}/{}!{}: {}",
+             project_namespace,
+             project_name,
+             merge_request_iid,
+             merge_request.id);
 
     Ok(())
 }

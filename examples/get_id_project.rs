@@ -57,7 +57,9 @@ fn run() -> Result<()> {
     };
 
     let gl = GitLab::new(&hostname, &token).chain_err(|| "failure to create GitLab instance")?;
-    // let gl = GitLab::new(&hostname, &token).chain_err(|| "failure to create GitLab instance")?.scheme("http").port(80);
+    // let gl = GitLab::new(&hostname, &token)
+    //     .chain_err(|| "failure to create GitLab instance")?
+    //     .scheme("http").port(80);
     // let gl = gl.scheme("http").port(80);
 
     let matches = clap::App::new("get_id_project")
@@ -81,10 +83,14 @@ fn run() -> Result<()> {
     let project_namespace = matches.value_of("namespace").unwrap();
     let project_name = matches.value_of("project").unwrap();
 
-    let project = gl.get_project(project_namespace, project_name).chain_err(|| "cannot get project")?;
+    let project = gl.get_project(project_namespace, project_name)
+        .chain_err(|| "cannot get project")?;
     // println!("project: {:?}", project);
 
-    println!("Id for {}/{}: {}", project_namespace, project_name, project.id);
+    println!("Id for {}/{}: {}",
+             project_namespace,
+             project_name,
+             project.id);
 
     Ok(())
 }

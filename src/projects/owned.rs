@@ -201,21 +201,27 @@ mod tests {
         let mut projects_lister = gl.projects().owned();
         let query = projects_lister.order_by(::projects::ListingOrderBy::CreatedAt).build_query();
         assert_eq!(query, expected_string);
-        let query = gl.projects().owned().order_by(::projects::ListingOrderBy::CreatedAt).build_query();
+        let query =
+            gl.projects().owned().order_by(::projects::ListingOrderBy::CreatedAt).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "projects/owned?order_by=updated_at";
         let mut projects_lister = gl.projects().owned();
         let query = projects_lister.order_by(::projects::ListingOrderBy::UpdatedAt).build_query();
         assert_eq!(query, expected_string);
-        let query = gl.projects().owned().order_by(::projects::ListingOrderBy::UpdatedAt).build_query();
+        let query =
+            gl.projects().owned().order_by(::projects::ListingOrderBy::UpdatedAt).build_query();
         assert_eq!(query, expected_string);
 
         let expected_string = "projects/owned?order_by=last_activity_at";
         let mut projects_lister = gl.projects().owned();
-        let query = projects_lister.order_by(::projects::ListingOrderBy::LastActivityAt).build_query();
+        let query = projects_lister.order_by(::projects::ListingOrderBy::LastActivityAt)
+            .build_query();
         assert_eq!(query, expected_string);
-        let query = gl.projects().owned().order_by(::projects::ListingOrderBy::LastActivityAt).build_query();
+        let query = gl.projects()
+            .owned()
+            .order_by(::projects::ListingOrderBy::LastActivityAt)
+            .build_query();
         assert_eq!(query, expected_string);
     }
 
