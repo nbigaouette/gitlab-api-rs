@@ -4,13 +4,10 @@ use std::env;
 #[macro_use]
 extern crate log;
 extern crate env_logger;
-#[macro_use]
 extern crate clap;
 
 
 use gitlab::GitLab;
-use gitlab::issues;
-use gitlab::Lister;
 
 use gitlab::errors::*;
 

@@ -49,7 +49,7 @@ fn run() -> Result<()> {
         }
     };
 
-    let mut gl =
+    let gl =
         gitlab::GitLab::new(&hostname, &token).chain_err(|| "failure to create GitLab instance")?;
     // let mut gl = gitlab::GitLab::new(&hostname, &token)
     //     .chain_err(|| "failure to create GitLab instance")?

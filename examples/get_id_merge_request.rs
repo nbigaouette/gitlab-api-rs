@@ -9,8 +9,6 @@ extern crate clap;
 
 
 use gitlab::GitLab;
-use gitlab::issues;
-use gitlab::Lister;
 
 use gitlab::errors::*;
 

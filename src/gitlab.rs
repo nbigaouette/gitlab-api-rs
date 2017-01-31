@@ -312,7 +312,7 @@ impl GitLab {
         // Closure to search for the item, possibly returning multiple match on multiple pages.
         let query_gitlab_closure = || self.projects().search(name.to_string());
         // Closure to find the right item in the found list on the page.
-        let iter_find_closure = |ref project: &::projects::Project| {
+        let iter_find_closure = |project: &::projects::Project| {
             project.namespace.name == namespace && project.name == name
         };
 
@@ -339,7 +339,7 @@ impl GitLab {
         // Closure to search for the item, possibly returning multiple match on multiple pages.
         let query_gitlab_closure = || self.issues().project(project.id);
         // Closure to find the right item in the found list on the page.
-        let iter_find_closure = |ref issue: &::issues::Issue| issue.iid == iid;
+        let iter_find_closure = |issue: &::issues::Issue| issue.iid == iid;
 
         self.get_paginated_from_project(query_gitlab_closure, iter_find_closure)
     }
@@ -371,7 +371,7 @@ impl GitLab {
         // Closure to search for the item, possibly returning multiple match on multiple pages.
         let query_gitlab_closure = || self.merge_requests(project.id);
         // Closure to find the right item in the found list on the page.
-        let iter_find_closure = |ref merge_request: &::merge_requests::MergeRequest| merge_request.iid == iid;
+        let iter_find_closure = |merge_request: &::merge_requests::MergeRequest| merge_request.iid == iid;
 
         self.get_paginated_from_project(query_gitlab_closure, iter_find_closure)
     }
