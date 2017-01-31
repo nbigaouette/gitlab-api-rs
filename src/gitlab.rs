@@ -6,6 +6,7 @@ use url;
 use hyper;
 use serde;
 use serde_json;
+use regex;
 
 
 // use Groups;
@@ -178,7 +179,7 @@ impl GitLab {
     {
         let mut url = self.build_url(query)
             .chain_err(|| format!("failure to build url for query '{}'", query))?;
-        info!("url: {:?}", url);
+        info!("url: {:?}", remove_gitlab_token_from_url(&url));
 
         // Add pagination information if requested.
         page.into().map(|page| url.push_str(&format!("&page={}", page)));
@@ -191,8 +192,10 @@ impl GitLab {
             .send()
             .chain_err(|| format!("cannot send request '{}' to {:?}", query, self))?;
         info!("res.status: {:?}", res.status);
-        debug!("res.headers: {:?}", res.headers);
-        debug!("res.url: {:?}", res.url);
+        // The headers might leak the token, don't print them.
+        // debug!("res.headers: {:?}", res.headers);
+        // Hide the url's token in logger
+        debug!("res.url: {}", remove_gitlab_token_from_url(res.url.as_str()));
 
         let mut body = String::new();
         res.read_to_string(&mut body).chain_err(|| "cannot read response body")?;
@@ -366,6 +369,14 @@ impl GitLab {
 
         self.get_paginated_from_project(query_gitlab_closure, iter_find_closure)
     }
+}
+
+/// Remove the private token from a URL string, replacing it with `${GITLAB_TOKEN}`.
+/// This allows setting the environment variable `${GITLAB_TOKEN}` and still be able
+/// to copy-paste a printed URL.
+fn remove_gitlab_token_from_url(url: &str) -> String {
+    let re = regex::Regex::new(r"private_token=\w{20}").unwrap();
+    re.replace_all(url, "private_token=$${GITLAB_TOKEN}").into()
 }
 
 
