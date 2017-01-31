@@ -5,15 +5,11 @@
 
 
 // FIXME: Use https://github.com/nox/serde_urlencoded
-// FIXME: Make sure that all structs above Issue are not using `String`s instead of `Enum`s.
-// FIXME: Harmonize the different state enums (e.g. IssueState, MergeRequestState, Authors)
-// FIXME: Move all enums here (ListingOrderBy, ListingSort, etc.)
 // FIXME: Use a type for sha1
 // FIXME: Use chrono crate for dates
 // FIXME: Use unsigned integers where it makes sense (id, iid, etc.)
 // FIXME: Verify all `match` in push_str() in build_query(): They should contain all members.
 // FIXME: Get rid of build_query(), use serde's Serialize instead.
-// FIXME: Write nicer wrappers, getting rid of Listing.
 
 
 
