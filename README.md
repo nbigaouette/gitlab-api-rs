@@ -56,7 +56,7 @@ The (v3) API is quite long, so the parts I need will be implemented first.
 
 ```
 [dependencies]
-gitlab-api = "0.5.0"
+gitlab-api = "0.5.1"
 ```
 
 This crate uses a builder pattern to add filters to a query. Once the query is built, `list()` will commit it by contacting the GitLab server and performing the request.
