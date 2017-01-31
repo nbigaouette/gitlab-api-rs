@@ -119,14 +119,14 @@ pub struct ProjectNamespace {
     pub name: String,
     pub path: String,
     pub owner_id: Option<i64>,  // FIXME: Why would a project not have this?
-    pub created_at: String,  // FIXME: Date instead?
-    pub updated_at: String,  // FIXME: Date instead?
-    pub description: String,
+    pub created_at: Option<String>,  // FIXME: Date instead?
+    pub updated_at: Option<String>,  // FIXME: Date instead?
+    pub description: Option<String>,
     pub avatar: Option<ProjectNamespaceAvatar>,
     pub membership_lock: Option<bool>,
-    pub share_with_group_lock: bool,
-    pub visibility_level: i64,
-    pub request_access_enabled: bool,
+    pub share_with_group_lock: Option<bool>,
+    pub visibility_level: Option<i64>,
+    pub request_access_enabled: Option<bool>,
     pub ldap_sync_status: Option<String>,
     pub ldap_sync_error: Option<String>,  // FIXME: Is String the proper type?
     pub ldap_sync_last_update_at: Option<String>,  // FIXME: Is String the proper type?
