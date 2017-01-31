@@ -7,6 +7,7 @@ license = "MIT/Apache-2.0"
 repository = "https://github.com/nbigaouette/gitlab-api-rs"
 readme = "README.md"
 keywords = ["gitlab", "git"]
+categories = ["api-bindings"]
 build = "build.rs"
 
 [features]
