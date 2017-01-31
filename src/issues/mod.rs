@@ -21,22 +21,21 @@
 
 // use serde_urlencoded;
 
-use BuildQuery;
-use Lister;
-use Issues;
-
-pub mod group;
-pub mod project;
-pub mod single;
-
-use ::errors::*;
-
 
 #[cfg(feature = "serde_derive")]
 include!("serde_types.in.rs");
 
 #[cfg(feature = "serde_codegen")]
 include!(concat!(env!("OUT_DIR"), "/issues/serde_types.rs"));
+
+use BuildQuery;
+use Lister;
+
+pub mod group;
+pub mod project;
+pub mod single;
+
+use ::errors::*;
 
 
 #[derive(Debug, Clone)]

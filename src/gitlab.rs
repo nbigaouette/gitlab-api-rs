@@ -305,12 +305,12 @@ impl GitLab {
     /// NOTE: We can't search for "namespace/name", so we search for "name", and refine the match
     ///       on the namespace. This means the operation could be slow as multiple query to the
     ///       GitLab server might be required to find the right item.
-    pub fn get_project(&self, namespace: &str, name: &str) -> Result<::Project> {
+    pub fn get_project(&self, namespace: &str, name: &str) -> Result<::projects::Project> {
 
         // Closure to search for the item, possibly returning multiple match on multiple pages.
         let query_gitlab_closure = || self.projects().search(name.to_string());
         // Closure to find the right item in the found list on the page.
-        let iter_find_closure = |ref project: &::Project| project.namespace.name == namespace && project.name == name;
+        let iter_find_closure = |ref project: &::projects::Project| project.namespace.name == namespace && project.name == name;
 
         self.get_paginated_from_project(query_gitlab_closure, iter_find_closure)
     }
@@ -327,7 +327,7 @@ impl GitLab {
     ///
     /// Because we need to search (and thus query the GitLab server possibly multiple times), this
     /// _can_ be a slow operation if there is many issues in the project.
-    pub fn get_issue(&self, namespace: &str, name: &str, iid: i64) -> Result<::Issue> {
+    pub fn get_issue(&self, namespace: &str, name: &str, iid: i64) -> Result<::issues::Issue> {
         // We first need to find the specific project.
         let project = self.get_project(namespace, name)
             .chain_err(|| format!("cannot get project '{}/{}'", namespace, name))?;
@@ -335,7 +335,7 @@ impl GitLab {
         // Closure to search for the item, possibly returning multiple match on multiple pages.
         let query_gitlab_closure = || self.issues().project(project.id);
         // Closure to find the right item in the found list on the page.
-        let iter_find_closure = |ref issue: &::Issue| issue.iid == iid;
+        let iter_find_closure = |ref issue: &::issues::Issue| issue.iid == iid;
 
         self.get_paginated_from_project(query_gitlab_closure, iter_find_closure)
     }

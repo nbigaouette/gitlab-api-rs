@@ -27,7 +27,6 @@
 use serde_urlencoded;
 
 use BuildQuery;
-use Projects;
 
 use groups::ProjectsListerInternal;
 
@@ -91,7 +90,7 @@ impl<'a> ProjectsLister<'a> {
 
 
     /// Commit the lister: Query GitLab and return a list of projects.
-    pub fn list(&self) -> Result<Projects> {
+    pub fn list(&self) -> Result<::projects::Projects> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
