@@ -199,7 +199,7 @@ impl GitLab {
 
         let mut body = String::new();
         res.read_to_string(&mut body).chain_err(|| "cannot read response body")?;
-        debug!("body:\n{:?}", body);
+        debug!("body:\n{}", body);
 
         if res.status != hyper::status::StatusCode::Ok {
             bail!(format!("status code '{}', not '200 OK'", res.status));
