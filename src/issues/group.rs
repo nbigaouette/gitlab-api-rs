@@ -31,8 +31,6 @@
 use serde_urlencoded;
 
 use BuildQuery;
-use Issues;
-use issues::GroupIssuesListerInternal;
 
 use ::errors::*;
 
@@ -42,7 +40,7 @@ pub struct IssuesLister<'a> {
     gl: &'a ::GitLab,
     /// The ID of a group
     id: i64,
-    internal: GroupIssuesListerInternal,
+    internal: ::issues::GroupIssuesListerInternal,
 }
 
 
@@ -51,7 +49,7 @@ impl<'a> IssuesLister<'a> {
         IssuesLister {
             gl: gl,
             id: id,
-            internal: GroupIssuesListerInternal {
+            internal: ::issues::GroupIssuesListerInternal {
                 state: None,
                 labels: None,
                 milestone: None,
@@ -89,7 +87,7 @@ impl<'a> IssuesLister<'a> {
 
 
     /// Commit the lister: Query GitLab and return a list of issues.
-    pub fn list(&self) -> Result<Issues> {
+    pub fn list(&self) -> Result<::issues::Issues> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 

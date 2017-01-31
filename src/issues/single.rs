@@ -19,7 +19,6 @@
 
 
 use BuildQuery;
-use Issue;
 
 use ::errors::*;
 
@@ -44,7 +43,7 @@ impl<'a> IssueLister<'a> {
     }
 
     /// Commit the lister: Query GitLab and return a list of projects.
-    pub fn list(&self) -> Result<Issue> {
+    pub fn list(&self) -> Result<::issues::Issue> {
         let query = self.build_query();
         debug!("query: {:?}", query);
 
