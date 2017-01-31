@@ -14,7 +14,7 @@ default = ["serde_codegen"]
 unstable = ["serde_derive"]
 
 [build-dependencies]
-serde_codegen = { version = "0.8", optional = true }
+serde_codegen = { version = "0.9", optional = true }
 
 [dev-dependencies]
 env_logger = "0.3"
@@ -24,10 +24,10 @@ log = "0.3"
 error-chain = "0.7.1"
 regex = "0.2.1"
 url = "1.2.3"
-serde = "0.8"
-serde_derive = { version = "0.8", optional = true }
-serde_json = "0.8"
-serde_urlencoded = "0.3"
+serde = "0.9"
+serde_derive = { version = "0.9", optional = true }
+serde_json = "0.9"
+serde_urlencoded = "0.4"
 
 # Compilation on OSX will fail in case you don't do one of these two things:
 # 1) Use this instead to link against "security-framework":
