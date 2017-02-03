@@ -1,6 +1,6 @@
 [package]
 name = "gitlab-api"
-version = "0.5.2"
+version = "0.6.0"
 authors = ["Nicolas Bigaouette <nbigaouette@gmail.com>"]
 description = "Wrapper for GitLab API v3"
 license = "MIT/Apache-2.0"
@@ -8,17 +8,9 @@ repository = "https://github.com/nbigaouette/gitlab-api-rs"
 readme = "README.md"
 keywords = ["gitlab", "git"]
 categories = ["api-bindings"]
-build = "build.rs"
 
 [badges]
 travis-ci = { repository = "nbigaouette/gitlab-api-rs" }
-
-[features]
-default = ["serde_codegen"]
-unstable = ["serde_derive"]
-
-[build-dependencies]
-serde_codegen = { version = "0.9", optional = true }
 
 [dev-dependencies]
 env_logger = "0.4"
@@ -30,7 +22,7 @@ error-chain = "0.8"
 regex = "0.2.1"
 url = "1.4"
 serde = "0.9"
-serde_derive = { version = "0.9", optional = true }
+serde_derive = "0.9"
 serde_json = "0.9"
 serde_urlencoded = "0.4"
 
