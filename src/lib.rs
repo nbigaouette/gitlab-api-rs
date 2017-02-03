@@ -1,9 +1,5 @@
-#![cfg_attr(feature = "serde_derive", feature(proc_macro))]
-
-#[cfg(feature = "serde_derive")]
 #[macro_use]
 extern crate serde_derive;
-
 extern crate serde;
 extern crate serde_json;
 extern crate serde_urlencoded;
@@ -20,14 +16,6 @@ pub mod errors {
 }
 
 use ::errors::*;
-
-
-#[cfg(feature = "serde_derive")]
-include!("serde_types.in.rs");
-
-#[cfg(feature = "serde_codegen")]
-include!(concat!(env!("OUT_DIR"), "/serde_types.rs"));
-
 
 #[macro_use]
 extern crate log;
@@ -47,6 +35,95 @@ pub mod merge_requests;
 pub use gitlab::GitLab;
 // pub use projects::Project;
 // Re-export those traits
+
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum ListingSort {
+    #[serde(rename = "asc")]
+    Asc,
+    #[serde(rename = "desc")]
+    Desc,
+}
+
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum ListingVisibility {
+    #[serde(rename = "public")]
+    Public,
+    #[serde(rename = "internal")]
+    Internal,
+    #[serde(rename = "private")]
+    Private,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum UserState {
+    #[serde(rename = "active")]
+    Active,
+
+    #[serde(rename = "blocked")]
+    Blocked,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum MilestoneState {
+    #[serde(rename = "active")]
+    Active,
+
+    #[serde(rename = "closed")]
+    Closed,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Version {
+    pub version: String,
+    pub revision: String,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Group {
+    pub id: i64,
+    pub name: String,
+    pub path: String,
+    pub description: String,
+    pub visibility_level: i64,
+    pub lfs_enabled: bool,
+    pub avatar_url: Option<String>,
+    pub web_url: String,
+    pub request_access_enabled: bool,
+}
+
+pub type Groups = Vec<Group>;
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Milestone {
+    pub id: i64,
+    pub iid: i64,
+    pub project_id: i64,
+    pub title: String,
+    pub description: String,
+    pub state: MilestoneState,
+    pub created_at: String,  // FIXME: Use date type?
+    pub updated_at: String,  // FIXME: Use date type?
+    pub due_date: Option<String>  // FIXME: Use date type?
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct User {
+    pub name: String,
+    pub username: String,
+    pub id: i64,
+    pub state: UserState,
+    pub avatar_url: Option<String>,
+    pub web_url: Option<String>
+}
+
 
 
 trait BuildQuery {
