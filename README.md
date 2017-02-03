@@ -10,7 +10,7 @@ Rust wrapper to the GitLab API.
 [![Codecov](https://img.shields.io/codecov/c/github/nbigaouette/gitlab-api-rs/master.svg?style=flat)](https://codecov.io/github/nbigaouette/gitlab-api-rs?branch=master)
 
 
-
+**NOTE**: Requires Rust 1.15 (stable) since this crate is using custom derive for Serde.
 
 ## Synopsis
 
