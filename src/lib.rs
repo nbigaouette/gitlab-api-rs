@@ -206,7 +206,7 @@ mod tests {
             }
         ]"##;
 
-        let project: ::projects::Projects = serde_json::from_str(json_reply)
+        let _: ::projects::Projects = serde_json::from_str(json_reply)
             .expect("JSON deserialization failed");
     }
 }
