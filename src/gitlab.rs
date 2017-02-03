@@ -390,7 +390,6 @@ fn remove_gitlab_token_from_url(url: &str) -> String {
 mod tests {
     use std::fmt;
     use gitlab::*;
-    use errors::*;
 
     fn verify_ok<T>(result: &Result<T>) {
         if let &Err(ref e) = result {

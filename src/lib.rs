@@ -141,7 +141,6 @@ mod tests {
     // use gitlab::GitLab;
     // use hyper;
     use serde_json;
-    use std::error::Error;
 
     // #[test]
     // fn unauthorized() {
